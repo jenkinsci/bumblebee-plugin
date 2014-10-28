@@ -1,0 +1,37 @@
+<j:jelly xmlns:j="jelly:core"
+         xmlns:st="jelly:stapler"
+         xmlns:d="jelly:define"
+         xmlns:l="/lib/layout"
+         xmlns:t="/lib/hudson"
+         xmlns:f="/lib/form">
+    <f:section title="BumbleBee Global Settings">
+       
+            <f:entry title="BumbleBee URL:"  field="bumblebeeUrl">
+            <f:textbox name="bumblebeeUrl" value="${descriptor.getBumblebeeUrl()}" checkUrl="'descriptorByName/BumblebeePublisher/checkbumblebeeUrl?bumblebeeUrl='+encodeURIComponent(this.value)" />
+          </f:entry>
+          
+          <f:entry title="Quality Center URL:"  field="qcUrl">
+            <f:textbox name="qcUrl" value="${descriptor.getQcUrl()}" checkUrl="'descriptorByName/BumblebeePublisher/checkqcUrl?qcUrl='+encodeURIComponent(this.value)" />
+          </f:entry>
+          
+          
+          <f:entry title="Quality Center login:"   field="qcUserName" >
+            <f:textbox name="qcUserName" value="${descriptor.getQcUserName()}"    checkUrl="'descriptorByName/BumblebeePublisher/checkqcUserName?qcUserName='+encodeURIComponent(this.value)" />
+          </f:entry>
+          
+          <f:entry title="Quality Center Password:"  field="password"  >
+          	<f:password name="password"   value="${descriptor.getPassword()}"  />
+          </f:entry>
+          
+           <f:entry title="Upload Timeout:"  field="timeOut"  >
+            <f:number name="timeOut"  default="0"  value="${descriptor.getTimeOut()}" clazz="required" checkMessage="Must be a valid integer" />
+          </f:entry>
+   
+        <f:validateButton
+            disabled="True" 
+            title="${%Save Configuration}"
+            progress="${%Saving  configuration}"
+            method="saveConnection"
+            with="bumblebeeUrl,qcUrl,qcUserName,password,timeOut" />
+    </f:section>
+</j:jelly>

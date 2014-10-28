@@ -1,0 +1,6 @@
+<!--
+  This view is used to render the installed plugins page.
+-->
+<div>
+  This plugin allows you to publish result files that are created in build step.
+</div>

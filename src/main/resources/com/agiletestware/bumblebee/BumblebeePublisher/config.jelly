@@ -1,0 +1,45 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+ <f:block>
+  <d:taglib uri="local">
+  <f:entry title="${%List  of HP ALM  Upload  Configurations }" description="${%List of Upload Configurations }">
+      <f:repeatable var="c" items="${instance.configs}" add="Add More" minimum="1">
+       <table width="100%" title="${%ALM  Upload  Configuration}"   >
+         <f:entry title="Domain"  field="domain">
+            <f:textbox name="Bumblebee.bumblebeeConfiguration.domain"   default="pdam-hp"   value="${c.getDomain()}"  checkUrl="'descriptorByName/BumblebeePublisher/checkDomain?domain='+encodeURIComponent(this.value)" />
+          </f:entry>          
+          <f:entry title="Project"   field="projectName">
+            <f:textbox name="Bumblebee.bumblebeeConfiguration.projectName"   default="project"    value="${c.getProjectName()}" checkUrl="'descriptorByName/BumblebeePublisher/checkProjectName?projectName='+encodeURIComponent(this.value)"  />
+          </f:entry>          
+          <f:entry title="Test Plan"    field="testPlan">
+            <f:textbox name="Bumblebee.bumblebeeConfiguration.testPlan"    default="Subject\testPlan"    value="${c.getTestPlan()}" checkUrl="'descriptorByName/BumblebeePublisher/checkTestPlan?testPlan='+encodeURIComponent(this.value)"/>
+          </f:entry>
+          <f:entry title="Test Lab"    field="testLab">
+            <f:textbox name="Bumblebee.bumblebeeConfiguration.testLab"    default="Root\testLab"      value="${c.getTestLab()}" checkUrl="'descriptorByName/BumblebeePublisher/checkTestLab?testLab='+encodeURIComponent(this.value)" />
+          </f:entry>
+          <f:entry title="Test Set"   field="testSet">
+            <f:textbox name="Bumblebee.bumblebeeConfiguration.testSet"  default="testSet"      value="${c.getTestSet()}" checkUrl="'descriptorByName/BumblebeePublisher/checkTestSet?testSet='+encodeURIComponent(this.value)" />
+          </f:entry>
+           <f:entry title="Format"    field="format">
+            <f:textbox name="Bumblebee.bumblebeeConfiguration.format"  default="junit"      value="${c.getFormat()}" checkUrl="'descriptorByName/BumblebeePublisher/checkFormat?format='+encodeURIComponent(this.value)" />
+          </f:entry>
+          <f:entry title="Result File Pattern"   field="resultPattern"  description="${%description('http://ant.apache.org/manual/Types/fileset.html')}">
+            <f:textbox name="Bumblebee.bumblebeeConfiguration.resultPattern"  default="*.xml"     value="${c.getResultPattern()}"   />
+          </f:entry>
+          <f:entry title="Custom Properties"   field="customProperties" >
+            <f:textbox name="Bumblebee.bumblebeeConfiguration.customProperties" value="${c.getCustomProperties()}"  />
+          </f:entry>
+         
+  <f:entry title="">
+    <div align="right">
+      <f:repeatableDeleteButton />
+    </div>
+  </f:entry>
+  </table>
+    </f:repeatable>
+  </f:entry>
+  </d:taglib>
+</f:block>
+</j:jelly>
+
+
+
