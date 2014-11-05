@@ -8,7 +8,7 @@
 	</parent>
 	<packaging>hpi</packaging>
 	<artifactId>bumblebee</artifactId>
-	<version>3.0.0</version>
+	<version>3.0.0-SNAPSHOT</version>
 	<name>Bumblebee HP ALM Plugin</name>
 	<description>Integrates Jenkins with  HP Quality Center / ALM by automatically publishing test results for Jenkins jobs to HP Quality Center / ALM using the [Bumblebee web service|http://qcconnector.com].'</description>
 	<url>https://wiki.jenkins-ci.org/display/JENKINS/Bumblebee+HP+ALM+Plugin</url>
@@ -22,6 +22,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<skipTests>true</skipTests>
 	</properties>
 	<dependencyManagement>
 		<dependencies>
@@ -47,20 +48,6 @@
 	</dependencyManagement>
 	<build>
 		<plugins>
-			<plugin>
-				<artifactId>maven-release-plugin</artifactId>
-				<configuration>
-					<goals>deploy</goals>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.jenkins-ci.tools</groupId>
-				<artifactId>maven-hpi-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -94,4 +81,16 @@
 			<type>jar</type>
 		</dependency>
 	</dependencies>
+	<repositories>
+		<repository>
+			<id>repo.jenkins-ci.org</id>
+			<url>http://repo.jenkins-ci.org/public/</url>
+		</repository>
+	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>repo.jenkins-ci.org</id>
+			<url>http://repo.jenkins-ci.org/public/</url>
+		</pluginRepository>
+	</pluginRepositories>
 </project>
