@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -48,7 +49,7 @@ import com.agiletestware.bumblebee.util.StringBuilderWrapper;
  */
 public class BumbleBeeApi {
 
-	private static final String DATE_FORMAT_PATTERN = "dd/MM/yyyy";
+	private static final String DATE_FORMAT_PATTERN = "MM/dd/yyyy";
 	private static final String EXPIRE_DATE = "ExpireDate";
 	private static final String CREATE_DATE = "CreateDate";
 	private final String bumblebeeUrl;
@@ -93,13 +94,21 @@ public class BumbleBeeApi {
 		try {
 			final Date createDate = dateFormat.parse(createDateStr);
 			final Date expireDate = dateFormat.parse(expireDateStr);
-			final Date currentDate = new Date();
-			final boolean isValid = currentDate.compareTo(createDate)
-					* currentDate.compareTo(expireDate) > 0;
-			if (!isValid) {
+			final Calendar calendar = Calendar.getInstance();
+			// do not count time differences
+			calendar.set(Calendar.HOUR_OF_DAY, 0);
+			calendar.set(Calendar.MINUTE, 0);
+			calendar.set(Calendar.SECOND, 0);
+			calendar.set(Calendar.MILLISECOND, 0);
+			final Date currentDate = calendar.getTime();
+			if ( // if license create date is a future date
+			(currentDate.compareTo(createDate) < 0) ||
+			// OR if expire date has passed
+					(currentDate.compareTo(expireDate) > 0)) {
 				throw new BumbleBeeException(
 						"Invalid or expired license. Please contact Agiletestware support at contact@agiletestware.com");
 			}
+
 		} catch (final ParseException ex) {
 			throw new BumbleBeeException(
 					MessageFormat
