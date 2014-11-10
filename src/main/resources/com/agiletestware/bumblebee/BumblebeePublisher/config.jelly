@@ -5,7 +5,7 @@
       <f:repeatable var="c" items="${instance.configs}" add="Add More" minimum="1">
        <table width="100%" title="${%ALM  Upload  Configuration}"   >
          <f:entry title="Domain"  field="domain">
-            <f:textbox name="Bumblebee.bumblebeeConfiguration.domain"   default="pdam-hp"   value="${c.getDomain()}"  checkUrl="'descriptorByName/BumblebeePublisher/checkDomain?domain='+encodeURIComponent(this.value)" />
+            <f:textbox name="Bumblebee.bumblebeeConfiguration.domain"   default="DEFAULT"   value="${c.getDomain()}"  checkUrl="'descriptorByName/BumblebeePublisher/checkDomain?domain='+encodeURIComponent(this.value)" />
           </f:entry>          
           <f:entry title="Project"   field="projectName">
             <f:textbox name="Bumblebee.bumblebeeConfiguration.projectName"   default="project"    value="${c.getProjectName()}" checkUrl="'descriptorByName/BumblebeePublisher/checkProjectName?projectName='+encodeURIComponent(this.value)"  />
@@ -20,10 +20,10 @@
             <f:textbox name="Bumblebee.bumblebeeConfiguration.testSet"  default="testSet"      value="${c.getTestSet()}" checkUrl="'descriptorByName/BumblebeePublisher/checkTestSet?testSet='+encodeURIComponent(this.value)" />
           </f:entry>
            <f:entry title="Format"    field="format">
-            <f:textbox name="Bumblebee.bumblebeeConfiguration.format"  default="junit"      value="${c.getFormat()}" checkUrl="'descriptorByName/BumblebeePublisher/checkFormat?format='+encodeURIComponent(this.value)" />
+            <f:textbox name="Bumblebee.bumblebeeConfiguration.format"  default="junit" value="${c.getFormat()}" checkUrl="'descriptorByName/BumblebeePublisher/checkFormat?format='+encodeURIComponent(this.value)" />
           </f:entry>
           <f:entry title="Result File Pattern"   field="resultPattern"  description="${%description('http://ant.apache.org/manual/Types/fileset.html')}">
-            <f:textbox name="Bumblebee.bumblebeeConfiguration.resultPattern"  default="*.xml"     value="${c.getResultPattern()}"   />
+            <f:textbox name="Bumblebee.bumblebeeConfiguration.resultPattern"  default="**/report.xml"     value="${c.getResultPattern()}"   />
           </f:entry>
           <f:entry title="Custom Properties"   field="customProperties" >
             <f:textbox name="Bumblebee.bumblebeeConfiguration.customProperties" value="${c.getCustomProperties()}"  />
