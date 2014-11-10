@@ -123,10 +123,19 @@ public class BumblebeePublisher extends Recorder {
 			try {
 				doBulkUpdate(config, build, launcher, listener);
 
-			} catch (final Exception ex) {
-				listener.getLogger().println("\n" + ex.getMessage());
+			} catch (final Throwable ex) {
+				listener.getLogger().println(ex.getMessage());
 				LOGGER.log(Level.SEVERE, null, ex);
-				success = false;
+				if (config.getFailIfUploadFailed()) {
+					listener.getLogger()
+							.println(
+									"Bumblebee: Fail if upload flag is set to true -> mark build as failed");
+					success = false;
+				} else {
+					listener.getLogger()
+							.println(
+									"Bumblebee: Fail if upload flag is set to false -> ignore errors in the build step");
+				}
 
 			}
 		}

@@ -110,4 +110,12 @@ public class EnvDependentConfigurationWrapper {
 		return wrappedConfig.getMode();
 	}
 
+	/**
+	 *
+	 * @return failIfUploadFailed flag.
+	 */
+	public boolean getFailIfUploadFailed() {
+		return wrappedConfig.getFailIfUploadFailed();
+	}
+
 }

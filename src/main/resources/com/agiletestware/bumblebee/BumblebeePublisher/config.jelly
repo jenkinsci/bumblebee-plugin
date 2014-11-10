@@ -28,7 +28,9 @@
           <f:entry title="Custom Properties"   field="customProperties" >
             <f:textbox name="Bumblebee.bumblebeeConfiguration.customProperties" value="${c.getCustomProperties()}"  />
           </f:entry>
-         
+         <f:entry title="Fail build if upload unsuccessful" field="failIfUploadFailed">
+			<f:checkbox name="Bumblebee.bumblebeeConfiguration.failIfUploadFailed" checked="${c.getFailIfUploadFailed()}"/>
+		  </f:entry>
   <f:entry title="">
     <div align="right">
       <f:repeatableDeleteButton />

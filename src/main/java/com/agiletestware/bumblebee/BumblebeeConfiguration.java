@@ -27,6 +27,7 @@ public final class BumblebeeConfiguration implements Serializable {
 	private final String domain;
 	private final String resultPattern;
 	private final String customProperties;
+	private final boolean failIfUploadFailed;
 
 	/**
 	 * Creates new instance.
@@ -52,7 +53,8 @@ public final class BumblebeeConfiguration implements Serializable {
 	public BumblebeeConfiguration(final String domain,
 			final String projectName, final String testPlan,
 			final String testLab, final String testSet, final String format,
-			final String resultPattern, final String customProperties) {
+			final String resultPattern, final String customProperties,
+			final boolean failIfUploadFailed) {
 		super();
 		this.domain = Util.fixEmptyAndTrim(domain);
 		this.projectName = Util.fixEmptyAndTrim(projectName);
@@ -62,6 +64,7 @@ public final class BumblebeeConfiguration implements Serializable {
 		this.format = Util.fixEmptyAndTrim(format);
 		this.resultPattern = Util.fixEmptyAndTrim(resultPattern);
 		this.customProperties = Util.fixEmptyAndTrim(customProperties);
+		this.failIfUploadFailed = failIfUploadFailed;
 
 	}
 
@@ -135,5 +138,13 @@ public final class BumblebeeConfiguration implements Serializable {
 	 */
 	public String getMode() {
 		return MODE;
+	}
+
+	/**
+	 *
+	 * @return failIfUploadFailed.
+	 */
+	public boolean getFailIfUploadFailed() {
+		return failIfUploadFailed;
 	}
 }
