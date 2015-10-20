@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
@@ -21,7 +20,6 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
@@ -47,6 +45,7 @@ import hudson.FilePath;
 public class BumbleBeeApi {
 
 	private static final String EXPIRE_DATE = "ExpireDate";
+	private static final String ALM_MAPPINGS_DELIMETER = ",";
 	private final String bumblebeeUrl;
 	private final int timeOut;
 
@@ -154,7 +153,7 @@ public class BumbleBeeApi {
 	public boolean uploadSingleFile(final FilePath filePath, final Parameters parameters, final StringBuilderWrapper log)
 			throws IOException, BumbleBeeException, JSONException {
 		boolean fileUploaded = false;
-		log.println("Uploading file :" + filePath.getRemote() + "\n");
+		log.println("Bumblebee: Processing:" + filePath.getRemote() + "\n");
 		try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
 			final HttpPost post = createPostRequest(filePath, parameters);
 			log.println(BumblebeeUtils.maskPasswordInString("Request POST URL : " + post.getRequestLine()));
@@ -254,21 +253,27 @@ public class BumbleBeeApi {
 		final String testLabDirectory = URLEncoder.encode(parameters.getTestlabdirectory(), utf8Encoding);
 		final String testSet = URLEncoder.encode(parameters.getTestSet(), utf8Encoding);
 		final String format = URLEncoder.encode(parameters.getFormat(), utf8Encoding);
-		String customProperties = parameters.getCustomProperties();
-		if (customProperties != null) {
-			customProperties = URLEncoder.encode(customProperties, utf8Encoding);
-			customProperties = customProperties.replaceAll("%3D", "=").replaceAll("%2C", "&");
-		}
-		if (customProperties != null) {
-			return String.format(
-					"%s/updateqcbulk?url=%s&user=%s&encrypted_password=%s&domain=%s&project=%s&testplandirectory=%s&testlabdirectory=%s&testset=%s&format=%s&mode=FULL&%s",
-					bumblebeeUrl, qcUrl, qcUserName, encryptedPass, domain, project, testPlanDirectory, testLabDirectory, testSet, format, customProperties);
-		} else {
-			return String.format(
-					"%s/updateqcbulk?url=%s&user=%s&encrypted_password=%s&domain=%s&project=%s&testplandirectory=%s&testlabdirectory=%s&testset=%s&format=%s&mode=FULL",
-					bumblebeeUrl, qcUrl, qcUserName, encryptedPass, domain, project, testPlanDirectory, testLabDirectory, testSet, format);
-		}
+		final String customProperties = prepareCustomPropertiesString(parameters.getCustomProperties());
 
+		return String.format(
+				"%s/updateqcbulk?url=%s&user=%s&encrypted_password=%s&domain=%s&project=%s&testplandirectory=%s&testlabdirectory=%s&testset=%s&format=%s&mode=FULL&%s",
+				bumblebeeUrl, qcUrl, qcUserName, encryptedPass, domain, project, testPlanDirectory, testLabDirectory, testSet, format, customProperties);
+	}
+
+	private String prepareCustomPropertiesString(final String customProperties) throws UnsupportedEncodingException {
+		if (customProperties == null) {
+			return "";
+		}
+		final StringBuilder builder = new StringBuilder();
+		final String[] customPropsArray = customProperties.split(ALM_MAPPINGS_DELIMETER);
+		// TODO refactoring needed
+		for (int i = 0; i < customPropsArray.length; i++) {
+			if (i > 0) {
+				builder.append(ALM_MAPPINGS_DELIMETER);
+			}
+			builder.append(customPropsArray[i].trim());
+		}
+		return URLEncoder.encode(builder.toString(), StandardCharsets.UTF_8.name()).replaceAll("%3D", "=").replaceAll("%2C", "&");
 	}
 
 }
