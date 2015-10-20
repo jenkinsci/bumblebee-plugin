@@ -25,7 +25,7 @@
           <f:entry title="Result File Pattern"   field="resultPattern"  description="${%description('http://ant.apache.org/manual/Types/fileset.html')}">
             <f:textbox name="Bumblebee.bumblebeeConfiguration.resultPattern"  default="**/report.xml"     value="${c.getResultPattern()}"   />
           </f:entry>
-          <f:entry title="Custom Properties"   field="customProperties" >
+          <f:entry title="HP ALM Mappings"   field="customProperties" >
             <f:textbox name="Bumblebee.bumblebeeConfiguration.customProperties" value="${c.getCustomProperties()}"  />
           </f:entry>
          <f:entry title="Fail build if upload unsuccessful" field="failIfUploadFailed">
