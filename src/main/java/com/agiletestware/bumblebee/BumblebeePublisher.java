@@ -240,8 +240,8 @@ public class BumblebeePublisher extends Recorder {
 				if (!isUrlReachable(bumblebeeUrlTrimmed, timeOut)) {
 					return FormValidation.error("FAILED: Could not connect to " + bumblebeeUrl);
 				}
-				this.qcUserName = qcUrlTrimmed;
-				this.qcUrl = StringUtils.trim(qcUrl);
+				this.qcUserName = qcUserName;
+				this.qcUrl = qcUrlTrimmed;
 				this.bumblebeeUrl = bumblebeeUrl;
 				this.timeOut = timeOut;
 				bmapi = new BumbleBeeApi(this.bumblebeeUrl, this.timeOut);
