@@ -4,6 +4,8 @@
 package com.agiletestware.bumblebee;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -49,17 +51,12 @@ public class BumblebeePublisher extends Recorder {
 	public static final DescriptorImpl DESCRIPTOR = new DescriptorImpl();
 
 	/** Logger. */
-	private static final Logger LOGGER = Logger
-			.getLogger(BumblebeePublisher.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(BumblebeePublisher.class.getName());
 
 	/** Message format for log messages. */
-	private static final ThreadLocalMessageFormat LOG_FORMAT = new ThreadLocalMessageFormat(
-			"\nQC  Configuration:\nBumblebeeUrl: {0}" + "\nPassword: *******"
-					+ "\nQCURL : {1}" + "\nQC UserName: {2}" + "\n Domain: {3}"
-					+ "\nResults Pattern: {4}" + "\n Format: {5}"
-					+ "\nProjectName: {6}" + "\nTestSetName: {7}"
-					+ "\nTestLab: {8}" + "\nTestPlanDirectory:  {9}"
-					+ "\nTest Type: {10}" + "\nCustom Properties: {11}\n");
+	private static final ThreadLocalMessageFormat LOG_FORMAT = new ThreadLocalMessageFormat("\nQC  Configuration:\nBumblebeeUrl: {0}" + "\nPassword: *******"
+			+ "\nQCURL : {1}" + "\nQC UserName: {2}" + "\n Domain: {3}" + "\nResults Pattern: {4}" + "\n Format: {5}" + "\nProjectName: {6}"
+			+ "\nTestSetName: {7}" + "\nTestLab: {8}" + "\nTestPlanDirectory:  {9}" + "\nTest Type: {10}" + "\nCustom Properties: {11}\n");
 
 	/** Configurations. */
 	private final BumblebeeConfiguration[] configs;
@@ -103,21 +100,15 @@ public class BumblebeePublisher extends Recorder {
 	}
 
 	@Override
-	public boolean perform(final AbstractBuild build, final Launcher launcher,
-			final BuildListener listener) throws InterruptedException,
-			IOException {
+	public boolean perform(final AbstractBuild build, final Launcher launcher, final BuildListener listener) throws InterruptedException, IOException {
 		final EnvVars envVars = build.getEnvironment(listener);
 		final List<EnvDependentConfigurationWrapper> configWrappers = getConfigWrappers(envVars);
 
 		boolean success = true;
 		for (final EnvDependentConfigurationWrapper config : configWrappers) {
-			listener.getLogger().println(
-					LOG_FORMAT.format(DESCRIPTOR.bumblebeeUrl,
-							DESCRIPTOR.qcUrl, DESCRIPTOR.qcUserName,
-							config.getDomain(), config.getResultPattern(),
-							config.getFormat(), config.getProjectName(),
-							config.getProjectName(), config.getTestLab(),
-							config.getTestPlan(), config.getFormat(),
+			listener.getLogger()
+					.println(LOG_FORMAT.format(DESCRIPTOR.bumblebeeUrl, DESCRIPTOR.qcUrl, DESCRIPTOR.qcUserName, config.getDomain(), config.getResultPattern(),
+							config.getFormat(), config.getProjectName(), config.getProjectName(), config.getTestLab(), config.getTestPlan(), config.getFormat(),
 							config.getCustomProperties()));
 			try {
 				doBulkUpdate(config, build, launcher, listener);
@@ -126,14 +117,10 @@ public class BumblebeePublisher extends Recorder {
 				listener.getLogger().println(ex.getMessage());
 				LOGGER.log(Level.SEVERE, null, ex);
 				if (config.getFailIfUploadFailed()) {
-					listener.getLogger()
-							.println(
-									"Bumblebee: Fail if upload flag is set to true -> mark build as failed");
+					listener.getLogger().println("Bumblebee: Fail if upload flag is set to true -> mark build as failed");
 					success = false;
 				} else {
-					listener.getLogger()
-							.println(
-									"Bumblebee: Fail if upload flag is set to false -> ignore errors in the build step");
+					listener.getLogger().println("Bumblebee: Fail if upload flag is set to false -> ignore errors in the build step");
 				}
 
 			}
@@ -148,13 +135,11 @@ public class BumblebeePublisher extends Recorder {
 	 * @return A list of configuration wrappers which allow consumer to resolve
 	 *         env variables in configuration values.
 	 */
-	private List<EnvDependentConfigurationWrapper> getConfigWrappers(
-			final EnvVars envVars) {
+	private List<EnvDependentConfigurationWrapper> getConfigWrappers(final EnvVars envVars) {
 		final List<BumblebeeConfiguration> configList = getConfigs();
 		final List<EnvDependentConfigurationWrapper> configWrappers = new ArrayList<>();
 		for (final BumblebeeConfiguration config : configList) {
-			configWrappers.add(new EnvDependentConfigurationWrapper(config,
-					envVars));
+			configWrappers.add(new EnvDependentConfigurationWrapper(config, envVars));
 		}
 		return configWrappers;
 	}
@@ -174,9 +159,8 @@ public class BumblebeePublisher extends Recorder {
 	 *            what it says
 	 * @throws Exception
 	 */
-	public void doBulkUpdate(final EnvDependentConfigurationWrapper config,
-			final AbstractBuild build, final Launcher launcher,
-			final BuildListener listener) throws Exception {
+	public void doBulkUpdate(final EnvDependentConfigurationWrapper config, final AbstractBuild build, final Launcher launcher, final BuildListener listener)
+			throws Exception {
 		listener.getLogger().println("Invoking the remote executor");
 		final Parameters params = new Parameters();
 		params.setBumbleBeeUrl(DESCRIPTOR.bumblebeeUrl);
@@ -193,11 +177,9 @@ public class BumblebeePublisher extends Recorder {
 		params.setMode(config.getMode());
 		params.setTimeOut(DESCRIPTOR.timeOut);
 		params.setCustomProperties(config.getCustomProperties());
-		final BumblebeeRemoteExecutor remoteExecutor = new BumblebeeRemoteExecutor(
-				BumblebeeUtils.getWorkspace(build), params);
+		final BumblebeeRemoteExecutor remoteExecutor = new BumblebeeRemoteExecutor(BumblebeeUtils.getWorkspace(build), params);
 		try {
-			listener.getLogger().println(
-					launcher.getChannel().call(remoteExecutor));
+			listener.getLogger().println(launcher.getChannel().call(remoteExecutor));
 		} catch (final RemoteExecutorException e) {
 			listener.getLogger().println(e.getRemoteExecutionLog());
 			throw e;
@@ -211,8 +193,7 @@ public class BumblebeePublisher extends Recorder {
 	 * @author Sergey Oplavin (oplavin.sergei@gmail.com) (refactored)
 	 *
 	 */
-	public static final class DescriptorImpl extends
-			BuildStepDescriptor<Publisher> {
+	public static final class DescriptorImpl extends BuildStepDescriptor<Publisher> {
 		private static final String PLUGIN_HELP_PAGE_URI = "/plugin/bumblebee/help/main.html";
 		private static final String PLUGIN_DISPLAY_NAME = "Bumblebee  HP  ALM  Uploader";
 		private String bumblebeeUrl;
@@ -241,46 +222,44 @@ public class BumblebeePublisher extends Recorder {
 		}
 
 		@Override
-		public boolean isApplicable(
-				final Class<? extends AbstractProject> jobType) {
+		public boolean isApplicable(final Class<? extends AbstractProject> jobType) {
 			return true;
 		}
 
 		@Override
-		public BumblebeePublisher newInstance(final StaplerRequest req,
-				final JSONObject formData) throws FormException {
-			final List<BumblebeeConfiguration> configs = req
-					.bindParametersToList(BumblebeeConfiguration.class,
-							"Bumblebee.bumblebeeConfiguration.");
+		public BumblebeePublisher newInstance(final StaplerRequest req, final JSONObject formData) throws FormException {
+			final List<BumblebeeConfiguration> configs = req.bindParametersToList(BumblebeeConfiguration.class, "Bumblebee.bumblebeeConfiguration.");
 
 			return new BumblebeePublisher(configs);
 		}
 
 		@Override
-		public boolean configure(final StaplerRequest req,
-				final JSONObject formData) throws FormException {
+		public boolean configure(final StaplerRequest req, final JSONObject formData) throws FormException {
 			return super.configure(req, formData);
 		}
 
 		// Used by global.jelly to authenticate User key
-		public FormValidation doSaveConnection(
-				@QueryParameter("bumblebeeUrl") final String bumblebeeUrl,
-				@QueryParameter("qcUrl") final String qcUrl,
-				@QueryParameter("qcUserName") final String qcUserName,
-				@QueryParameter("password") final String password,
+		public FormValidation doSaveConnection(@QueryParameter("bumblebeeUrl") final String bumblebeeUrl, @QueryParameter("qcUrl") final String qcUrl,
+				@QueryParameter("qcUserName") final String qcUserName, @QueryParameter("password") final String password,
 				@QueryParameter("timeOut") final int timeOut) {
 			try {
-				this.qcUserName = StringUtils.trim(qcUserName);
+				final String qcUrlTrimmed = StringUtils.trim(qcUrl);
+				if (!isUrlReachable(qcUrlTrimmed, timeOut)) {
+					return FormValidation.error("FAILED: Could not connect to " + qcUrlTrimmed);
+				}
+				final String bumblebeeUrlTrimmed = StringUtils.trim(bumblebeeUrl);
+				if (!isUrlReachable(bumblebeeUrlTrimmed, timeOut)) {
+					return FormValidation.error("FAILED: Could not connect to " + bumblebeeUrl);
+				}
+				this.qcUserName = qcUrlTrimmed;
 				this.qcUrl = StringUtils.trim(qcUrl);
-				this.bumblebeeUrl = StringUtils.trim(bumblebeeUrl);
+				this.bumblebeeUrl = bumblebeeUrl;
 				this.timeOut = timeOut;
 				bmapi = new BumbleBeeApi(this.bumblebeeUrl, this.timeOut);
 				// Set password only if old value is null/empty/blank OR if new
 				// value is not equal to old
-				if (StringUtils.isBlank(this.password)
-						|| !this.password.equals(password)) {
-					this.password = bmapi.getEncryptedPassword(StringUtils
-							.trim(password));
+				if (StringUtils.isBlank(this.password) || !this.password.equals(password)) {
+					this.password = bmapi.getEncryptedPassword(StringUtils.trim(password));
 				}
 				save();
 			} catch (final Exception e) {
@@ -288,6 +267,31 @@ public class BumblebeePublisher extends Recorder {
 				return FormValidation.error("FAILED: " + e.getMessage());
 			}
 			return FormValidation.ok("Configuration  Saved");
+		}
+
+		/**
+		 * Is given URL can be reached with HTTP.
+		 *
+		 * @param url
+		 *            URL
+		 * @param timeout
+		 *            connection timeout. zero means infinite timeout.
+		 * @return
+		 */
+		private boolean isUrlReachable(final String url, final int timeout) {
+			try {
+				final HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+				connection.setConnectTimeout(timeout);
+				connection.setReadTimeout(timeout);
+				connection.setRequestMethod("HEAD");
+				final int responseCode = connection.getResponseCode();
+				LOGGER.log(Level.INFO, url + " --> HTTP " + responseCode);
+				return responseCode == 200 || responseCode == 501;
+
+			} catch (final Exception ex) {
+				LOGGER.log(Level.SEVERE, "Could not get HTTP 200 response code from: " + url, ex);
+			}
+			return false;
 		}
 
 		public String getBumblebeeUrl() {
@@ -310,72 +314,54 @@ public class BumblebeePublisher extends Recorder {
 			return this.timeOut;
 		}
 
-		public FormValidation doCheckDomain(
-				@AncestorInPath final AbstractProject<?, ?> project,
-				@QueryParameter final String domain) throws IOException,
-				ServletException {
+		public FormValidation doCheckDomain(@AncestorInPath final AbstractProject<?, ?> project, @QueryParameter final String domain)
+				throws IOException, ServletException {
 			project.checkPermission(Job.CONFIGURE);
 			return BumblebeeUtils.validateRequiredField(domain);
 		}
 
-		public FormValidation doCheckProjectName(
-				@AncestorInPath final AbstractProject<?, ?> project,
-				@QueryParameter final String projectName) throws IOException,
-				ServletException {
+		public FormValidation doCheckProjectName(@AncestorInPath final AbstractProject<?, ?> project, @QueryParameter final String projectName)
+				throws IOException, ServletException {
 			project.checkPermission(Job.CONFIGURE);
 			return BumblebeeUtils.validateRequiredField(projectName);
 		}
 
-		public FormValidation doCheckTestPlan(
-				@AncestorInPath final AbstractProject<?, ?> project,
-				@QueryParameter final String testPlan) throws IOException,
-				ServletException {
+		public FormValidation doCheckTestPlan(@AncestorInPath final AbstractProject<?, ?> project, @QueryParameter final String testPlan)
+				throws IOException, ServletException {
 			project.checkPermission(Job.CONFIGURE);
 			return BumblebeeUtils.validateTestPlan(testPlan);
 		}
 
-		public FormValidation doCheckTestLab(
-				@AncestorInPath final AbstractProject<?, ?> project,
-				@QueryParameter final String testLab) throws IOException,
-				ServletException {
+		public FormValidation doCheckTestLab(@AncestorInPath final AbstractProject<?, ?> project, @QueryParameter final String testLab)
+				throws IOException, ServletException {
 			project.checkPermission(Job.CONFIGURE);
 			return BumblebeeUtils.validateTestLab(testLab);
 		}
 
-		public FormValidation doCheckTestSet(
-				@AncestorInPath final AbstractProject<?, ?> project,
-				@QueryParameter final String testSet) throws IOException,
-				ServletException {
+		public FormValidation doCheckTestSet(@AncestorInPath final AbstractProject<?, ?> project, @QueryParameter final String testSet)
+				throws IOException, ServletException {
 			project.checkPermission(Job.CONFIGURE);
 			return BumblebeeUtils.validateTestSet(testSet);
 		}
 
-		public FormValidation doCheckFormat(
-				@AncestorInPath final AbstractProject<?, ?> project,
-				@QueryParameter final String format) throws IOException,
-				ServletException {
+		public FormValidation doCheckFormat(@AncestorInPath final AbstractProject<?, ?> project, @QueryParameter final String format)
+				throws IOException, ServletException {
 			project.checkPermission(Job.CONFIGURE);
 			return BumblebeeUtils.validateRequiredField(format);
 		}
 
-		public FormValidation doCheckbumblebeeUrl(
-				@AncestorInPath final AbstractProject<?, ?> project,
-				@QueryParameter final String bumblebeeUrl) throws IOException,
-				ServletException {
+		public FormValidation doCheckbumblebeeUrl(@AncestorInPath final AbstractProject<?, ?> project, @QueryParameter final String bumblebeeUrl)
+				throws IOException, ServletException {
 			return BumblebeeUtils.validatebumblebeeUrl(bumblebeeUrl);
 		}
 
-		public FormValidation doCheckqcUrl(
-				@AncestorInPath final AbstractProject<?, ?> project,
-				@QueryParameter final String qcUrl) throws IOException,
-				ServletException {
+		public FormValidation doCheckqcUrl(@AncestorInPath final AbstractProject<?, ?> project, @QueryParameter final String qcUrl)
+				throws IOException, ServletException {
 			return BumblebeeUtils.validateqcUrl(qcUrl);
 		}
 
-		public FormValidation doCheckqcUserName(
-				@AncestorInPath final AbstractProject<?, ?> project,
-				@QueryParameter final String qcUserName) throws IOException,
-				ServletException {
+		public FormValidation doCheckqcUserName(@AncestorInPath final AbstractProject<?, ?> project, @QueryParameter final String qcUserName)
+				throws IOException, ServletException {
 			return BumblebeeUtils.validateRequiredField(qcUserName);
 		}
 
