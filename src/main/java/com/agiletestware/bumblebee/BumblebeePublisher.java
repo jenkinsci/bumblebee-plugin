@@ -3,19 +3,6 @@
  */
 package com.agiletestware.bumblebee;
 
-import hudson.EnvVars;
-import hudson.Extension;
-import hudson.Launcher;
-import hudson.model.BuildListener;
-import hudson.model.AbstractBuild;
-import hudson.model.AbstractProject;
-import hudson.model.Job;
-import hudson.tasks.BuildStepDescriptor;
-import hudson.tasks.BuildStepMonitor;
-import hudson.tasks.Publisher;
-import hudson.tasks.Recorder;
-import hudson.util.FormValidation;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,8 +13,6 @@ import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 
-import net.sf.json.JSONObject;
-
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.QueryParameter;
@@ -37,6 +22,20 @@ import com.agiletestware.bumblebee.BumblebeeRemoteExecutor.Parameters;
 import com.agiletestware.bumblebee.api.BumbleBeeApi;
 import com.agiletestware.bumblebee.util.BumblebeeUtils;
 import com.agiletestware.bumblebee.util.ThreadLocalMessageFormat;
+
+import hudson.EnvVars;
+import hudson.Extension;
+import hudson.Launcher;
+import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
+import hudson.model.BuildListener;
+import hudson.model.Job;
+import hudson.tasks.BuildStepDescriptor;
+import hudson.tasks.BuildStepMonitor;
+import hudson.tasks.Publisher;
+import hudson.tasks.Recorder;
+import hudson.util.FormValidation;
+import net.sf.json.JSONObject;
 
 /**
  * Main class for the plugin.
@@ -283,7 +282,6 @@ public class BumblebeePublisher extends Recorder {
 					this.password = bmapi.getEncryptedPassword(StringUtils
 							.trim(password));
 				}
-				bmapi.validateLicense();
 				save();
 			} catch (final Exception e) {
 				LOGGER.log(Level.SEVERE, null, e);
