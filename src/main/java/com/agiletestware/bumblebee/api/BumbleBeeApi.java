@@ -1,18 +1,12 @@
 package com.agiletestware.bumblebee.api;
 
-import hudson.FilePath;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.text.MessageFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -27,6 +21,7 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
@@ -41,6 +36,8 @@ import com.agiletestware.bumblebee.BumblebeeRemoteExecutor.Parameters;
 import com.agiletestware.bumblebee.util.BumblebeeUtils;
 import com.agiletestware.bumblebee.util.StringBuilderWrapper;
 
+import hudson.FilePath;
+
 /**
  * Class to communicate with BumbleBee Webservice API.
  *
@@ -49,9 +46,7 @@ import com.agiletestware.bumblebee.util.StringBuilderWrapper;
  */
 public class BumbleBeeApi {
 
-	private static final String DATE_FORMAT_PATTERN = "MM/dd/yyyy";
 	private static final String EXPIRE_DATE = "ExpireDate";
-	private static final String CREATE_DATE = "CreateDate";
 	private final String bumblebeeUrl;
 	private final int timeOut;
 
@@ -70,55 +65,6 @@ public class BumbleBeeApi {
 	}
 
 	/**
-	 * Validates the bumblebee server license. Throws {@link BumbleBeeException}
-	 * if license is expired or invalid.
-	 *
-	 * @throws IOException
-	 * @throws BumbleBeeException
-	 * @throws JSONException
-	 */
-	public void validateLicense() throws IOException, BumbleBeeException,
-			JSONException {
-		final String uri = "/licenseinfo";
-		final JSONObject responseBody = executeSimpleGetRequest(uri);
-		final SimpleDateFormat dateFormat = new SimpleDateFormat(
-				DATE_FORMAT_PATTERN);
-		final String createDateStr = responseBody.optString(CREATE_DATE);
-		final String expireDateStr = responseBody.optString(EXPIRE_DATE);
-
-		if (StringUtils.isBlank(createDateStr)
-				|| StringUtils.isBlank(expireDateStr)) {
-			throw new BumbleBeeException(
-					"Cannot retrieve CreateDate or ExpireDate from bumblebee server. Please contact Agiletestware support at contact@agiletestware.com");
-		}
-		try {
-			final Date createDate = dateFormat.parse(createDateStr);
-			final Date expireDate = dateFormat.parse(expireDateStr);
-			final Calendar calendar = Calendar.getInstance();
-			// do not count time differences
-			calendar.set(Calendar.HOUR_OF_DAY, 0);
-			calendar.set(Calendar.MINUTE, 0);
-			calendar.set(Calendar.SECOND, 0);
-			calendar.set(Calendar.MILLISECOND, 0);
-			final Date currentDate = calendar.getTime();
-			if ( // if license create date is a future date
-			(currentDate.compareTo(createDate) < 0) ||
-			// OR if expire date has passed
-					(currentDate.compareTo(expireDate) > 0)) {
-				throw new BumbleBeeException(
-						"Invalid or expired license. Please contact Agiletestware support at contact@agiletestware.com");
-			}
-
-		} catch (final ParseException ex) {
-			throw new BumbleBeeException(
-					MessageFormat
-							.format("Bumblebee returned either {0}:''{1}'' or {2}:''{3}'' has invalid format: {4}",
-									CREATE_DATE, createDateStr, EXPIRE_DATE,
-									expireDateStr, DATE_FORMAT_PATTERN));
-		}
-	}
-
-	/**
 	 * Get the license expiration date.
 	 *
 	 * @return the license expiration date.
@@ -126,8 +72,7 @@ public class BumbleBeeApi {
 	 * @throws BumbleBeeException
 	 * @throws JSONException
 	 */
-	public String getLicenseExpirationDate() throws IOException,
-			BumbleBeeException, JSONException {
+	public String getLicenseExpirationDate() throws IOException, BumbleBeeException, JSONException {
 		final String uri = "/licenseinfo";
 		final JSONObject responseBody = executeSimpleGetRequest(uri);
 		return responseBody.optString(EXPIRE_DATE);
@@ -143,8 +88,7 @@ public class BumbleBeeApi {
 	 * @throws BumbleBeeException
 	 * @throws JSONException
 	 */
-	public String getEncryptedPassword(final String password)
-			throws IOException, BumbleBeeException, JSONException {
+	public String getEncryptedPassword(final String password) throws IOException, BumbleBeeException, JSONException {
 		final String uri = "/password?password=" + password;
 		final JSONObject responseBody = executeSimpleGetRequest(uri);
 		return responseBody.optString("message");
@@ -161,13 +105,10 @@ public class BumbleBeeApi {
 	 * @throws BumbleBeeException
 	 * @throws JSONException
 	 */
-	private JSONObject executeSimpleGetRequest(final String uri)
-			throws IOException, BumbleBeeException, JSONException {
+	private JSONObject executeSimpleGetRequest(final String uri) throws IOException, BumbleBeeException, JSONException {
 		final String url = bumblebeeUrl + uri;
 		try (CloseableHttpClient client = HttpClients.createDefault()) {
-			final RequestConfig requestConfig = RequestConfig.custom()
-					.setSocketTimeout(timeOut).setConnectTimeout(timeOut)
-					.build();
+			final RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(timeOut).setConnectTimeout(timeOut).build();
 			final HttpGet httpGet = new HttpGet(url);
 			httpGet.setConfig(requestConfig);
 			httpGet.addHeader("accept", "application/json");
@@ -177,19 +118,15 @@ public class BumbleBeeApi {
 				final int statusCode = statusLine.getStatusCode();
 				final String errorReason = statusLine.getReasonPhrase();
 				if (statusCode == 255) {
-					throw new BumbleBeeException(
-							String.format(
-									"Invalid or expired license. Please contact Agiletestware support at contact@agiletestware.com :%d %s",
-									statusCode, errorReason));
+					throw new BumbleBeeException(String.format(
+							"Invalid or expired license. Please contact Agiletestware support at contact@agiletestware.com :%d %s", statusCode, errorReason));
 				}
 				if ((statusCode >= 300) || (statusCode < 200)) {
-					throw new BumbleBeeException(String.format("Failed: %d %s",
-							statusCode, errorReason));
+					throw new BumbleBeeException(String.format("Failed: %d %s", statusCode, errorReason));
 				}
 				final HttpEntity entity = response.getEntity();
 				if (entity == null || entity.getContentLength() == 0) {
-					throw new BumbleBeeException(
-							"HTTP Response does not have content");
+					throw new BumbleBeeException("HTTP Response does not have content");
 				}
 				final String entityContent = EntityUtils.toString(entity);
 				return new JSONObject(entityContent);
@@ -214,33 +151,34 @@ public class BumbleBeeApi {
 	 * @throws BumbleBeeException
 	 * @throws JSONException
 	 */
-	public boolean uploadSingleFile(final FilePath filePath,
-			final Parameters parameters, final StringBuilderWrapper log)
+	public boolean uploadSingleFile(final FilePath filePath, final Parameters parameters, final StringBuilderWrapper log)
 			throws IOException, BumbleBeeException, JSONException {
 		boolean fileUploaded = false;
 		log.println("Uploading file :" + filePath.getRemote() + "\n");
 		try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
 			final HttpPost post = createPostRequest(filePath, parameters);
-			log.println(BumblebeeUtils
-					.maskPasswordInString("Request POST URL : "
-							+ post.getRequestLine()));
+			log.println(BumblebeeUtils.maskPasswordInString("Request POST URL : " + post.getRequestLine()));
 			try (CloseableHttpResponse response = httpclient.execute(post)) {
+				// FIXME: clean up code and get rid of old bumblebee version
+				// support.
 				final StatusLine statusLine = response.getStatusLine();
 				final int statusCode = statusLine.getStatusCode();
+				// old bumblebee
 				if (statusCode == 255) {
 					throw new BumbleBeeException(
-							"The bumblebee license expired on "
-									+ getLicenseExpirationDate()
-									+ ". Please email contact@agiletestware.com for license renewal");
+							"The bumblebee license expired on " + getLicenseExpirationDate() + ". Please email contact@agiletestware.com for license renewal");
 				}
 				final HttpEntity resEntity = response.getEntity();
+				if (statusCode == 500) {
+
+					throw new BumbleBeeException(resEntity != null ? EntityUtils.toString(resEntity) : statusLine.getReasonPhrase());
+				}
 				if (resEntity != null) {
-					final String page = StringEscapeUtils
-							.unescapeXml(EntityUtils.toString(resEntity));
-					fileUploaded = page
-							.contains("<message>FULL BULK UPDATE SUCCESS</message>");
-					log.println("Response :"
-							+ extractMessageStringFromResponseForLogging(page));
+					final String page = StringEscapeUtils.unescapeXml(EntityUtils.toString(resEntity));
+					fileUploaded = page.contains("<message>FULL BULK UPDATE SUCCESS</message>") || page.contains("<message>OK</message>");
+					log.println("Response :" + extractMessageStringFromResponseForLogging(page));
+				} else {
+					log.println("Response is empty");
 				}
 			}
 		}
@@ -257,30 +195,13 @@ public class BumbleBeeApi {
 	 * @return prepared http post request.
 	 * @throws UnsupportedEncodingException
 	 */
-	private HttpPost createPostRequest(final FilePath filePath,
-			final Parameters parameters) throws UnsupportedEncodingException {
+	private HttpPost createPostRequest(final FilePath filePath, final Parameters parameters) throws UnsupportedEncodingException {
 		final String bulkUpdateUrl = getUrlForQcUpdate(parameters);
 		final HttpPost post = new HttpPost(bulkUpdateUrl);
-		final RequestConfig requestConfig = RequestConfig.custom()
-				.setSocketTimeout(timeOut).setConnectTimeout(timeOut).build();
+		final RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(timeOut).setConnectTimeout(timeOut).build();
 		post.setConfig(requestConfig);
-		final MultipartEntityBuilder reqEntity = MultipartEntityBuilder
-				.create();
+		final MultipartEntityBuilder reqEntity = MultipartEntityBuilder.create();
 		reqEntity.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
-		reqEntity.addTextBody("url", parameters.getQcUrl());
-		reqEntity.addTextBody("qcUserName", parameters.getQcUserName());
-		reqEntity.addTextBody("format", parameters.getFormat());
-		reqEntity.addTextBody("domain", parameters.getDomain());
-		reqEntity.addTextBody("project", parameters.getProject());
-		reqEntity.addTextBody("testplandirectory",
-				parameters.getTestplandirectory());
-		reqEntity.addTextBody("testlabdirectory",
-				parameters.getTestlabdirectory());
-		reqEntity.addTextBody("testset", parameters.getTestSet());
-		reqEntity.addTextBody("mode", parameters.getMode());
-		reqEntity.addTextBody("encrypted_password",
-				parameters.getEncryptedPassword());
-
 		final FileBody bin = new FileBody(new File(filePath.getRemote()));
 		reqEntity.addPart("attachment", bin);
 		post.setEntity(reqEntity.build());
@@ -298,10 +219,8 @@ public class BumbleBeeApi {
 	 *         the given string then the whole response string is returned.
 	 *         Password is masked.
 	 */
-	private String extractMessageStringFromResponseForLogging(
-			final String response) {
-		final DocumentBuilderFactory factory = DocumentBuilderFactory
-				.newInstance();
+	private String extractMessageStringFromResponseForLogging(final String response) {
+		final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		factory.setValidating(false);
 		try (InputStream stream = new StringInputStream(response)) {
 			final DocumentBuilder builder = factory.newDocumentBuilder();
@@ -324,46 +243,30 @@ public class BumbleBeeApi {
 	 * @return created URL.
 	 * @throws UnsupportedEncodingException
 	 */
-	public String getUrlForQcUpdate(final Parameters parameters)
-			throws UnsupportedEncodingException {
+	public String getUrlForQcUpdate(final Parameters parameters) throws UnsupportedEncodingException {
 		final String utf8Encoding = StandardCharsets.UTF_8.name();
-		final String encryptedPass = URLEncoder.encode(
-				parameters.getEncryptedPassword(), utf8Encoding);
-		final String qcUrl = URLEncoder.encode(parameters.getQcUrl(),
-				utf8Encoding);
-		final String qcUserName = URLEncoder.encode(parameters.getQcUserName(),
-				utf8Encoding);
-		final String domain = URLEncoder.encode(parameters.getDomain(),
-				utf8Encoding);
-		final String project = URLEncoder.encode(parameters.getProject(),
-				utf8Encoding);
-		final String testPlanDirectory = URLEncoder.encode(
-				parameters.getTestplandirectory(), utf8Encoding);
-		final String testLabDirectory = URLEncoder.encode(
-				parameters.getTestlabdirectory(), utf8Encoding);
-		final String testSet = URLEncoder.encode(parameters.getTestSet(),
-				utf8Encoding);
-		final String format = URLEncoder.encode(parameters.getFormat(),
-				utf8Encoding);
+		final String encryptedPass = URLEncoder.encode(parameters.getEncryptedPassword(), utf8Encoding);
+		final String qcUrl = URLEncoder.encode(parameters.getQcUrl(), utf8Encoding);
+		final String qcUserName = URLEncoder.encode(parameters.getQcUserName(), utf8Encoding);
+		final String domain = URLEncoder.encode(parameters.getDomain(), utf8Encoding);
+		final String project = URLEncoder.encode(parameters.getProject(), utf8Encoding);
+		final String testPlanDirectory = URLEncoder.encode(parameters.getTestplandirectory(), utf8Encoding);
+		final String testLabDirectory = URLEncoder.encode(parameters.getTestlabdirectory(), utf8Encoding);
+		final String testSet = URLEncoder.encode(parameters.getTestSet(), utf8Encoding);
+		final String format = URLEncoder.encode(parameters.getFormat(), utf8Encoding);
 		String customProperties = parameters.getCustomProperties();
 		if (customProperties != null) {
-			customProperties = URLEncoder
-					.encode(customProperties, utf8Encoding);
-			customProperties = customProperties.replaceAll("%3D", "=")
-					.replaceAll("%2C", "&");
+			customProperties = URLEncoder.encode(customProperties, utf8Encoding);
+			customProperties = customProperties.replaceAll("%3D", "=").replaceAll("%2C", "&");
 		}
 		if (customProperties != null) {
-			return String
-					.format("%s/updateqcbulk?url=%s&user=%s&encrypted_password=%s&domain=%s&project=%s&testplandirectory=%s&testlabdirectory=%s&testset=%s&format=%s&mode=FULL&%s",
-							bumblebeeUrl, qcUrl, qcUserName, encryptedPass,
-							domain, project, testPlanDirectory,
-							testLabDirectory, testSet, format, customProperties);
+			return String.format(
+					"%s/updateqcbulk?url=%s&user=%s&encrypted_password=%s&domain=%s&project=%s&testplandirectory=%s&testlabdirectory=%s&testset=%s&format=%s&mode=FULL&%s",
+					bumblebeeUrl, qcUrl, qcUserName, encryptedPass, domain, project, testPlanDirectory, testLabDirectory, testSet, format, customProperties);
 		} else {
-			return String
-					.format("%s/updateqcbulk?url=%s&user=%s&encrypted_password=%s&domain=%s&project=%s&testplandirectory=%s&testlabdirectory=%s&testset=%s&format=%s&mode=FULL",
-							bumblebeeUrl, qcUrl, qcUserName, encryptedPass,
-							domain, project, testPlanDirectory,
-							testLabDirectory, testSet, format);
+			return String.format(
+					"%s/updateqcbulk?url=%s&user=%s&encrypted_password=%s&domain=%s&project=%s&testplandirectory=%s&testlabdirectory=%s&testset=%s&format=%s&mode=FULL",
+					bumblebeeUrl, qcUrl, qcUserName, encryptedPass, domain, project, testPlanDirectory, testLabDirectory, testSet, format);
 		}
 
 	}
