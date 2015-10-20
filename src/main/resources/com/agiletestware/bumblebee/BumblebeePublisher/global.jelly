@@ -10,16 +10,16 @@
             <f:textbox name="bumblebeeUrl" value="${descriptor.getBumblebeeUrl()}" checkUrl="'descriptorByName/BumblebeePublisher/checkbumblebeeUrl?bumblebeeUrl='+encodeURIComponent(this.value)" />
           </f:entry>
           
-          <f:entry title="Quality Center URL:"  field="qcUrl">
+          <f:entry title="HP ALM URL:"  field="qcUrl">
             <f:textbox name="qcUrl" value="${descriptor.getQcUrl()}" checkUrl="'descriptorByName/BumblebeePublisher/checkqcUrl?qcUrl='+encodeURIComponent(this.value)" />
           </f:entry>
           
           
-          <f:entry title="Quality Center login:"   field="qcUserName" >
+          <f:entry title="HP ALM login:"   field="qcUserName" >
             <f:textbox name="qcUserName" value="${descriptor.getQcUserName()}"    checkUrl="'descriptorByName/BumblebeePublisher/checkqcUserName?qcUserName='+encodeURIComponent(this.value)" />
           </f:entry>
           
-          <f:entry title="Quality Center Password:"  field="password"  >
+          <f:entry title="HP ALM Password:"  field="password"  >
           	<f:password name="password"   value="${descriptor.getPassword()}"  />
           </f:entry>
           
