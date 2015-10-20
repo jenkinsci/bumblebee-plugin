@@ -1,12 +1,7 @@
 package com.agiletestware.bumblebee;
 
-import hudson.FilePath;
-import hudson.remoting.Callable;
-
 import java.io.IOException;
 import java.io.Serializable;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -14,6 +9,9 @@ import java.util.List;
 import com.agiletestware.bumblebee.api.BumbleBeeApi;
 import com.agiletestware.bumblebee.util.BumblebeeUtils;
 import com.agiletestware.bumblebee.util.StringBuilderWrapper;
+
+import hudson.FilePath;
+import hudson.remoting.Callable;
 
 public class BumblebeeRemoteExecutor implements
 		Callable<String, RemoteExecutorException>, Serializable {
@@ -47,9 +45,7 @@ public class BumblebeeRemoteExecutor implements
 		final BumbleBeeApi api = new BumbleBeeApi(parameters.getBumbleBeeUrl(),
 				parameters.getTimeOut());
 		final String bulkUpdateURL = api.getUrlForQcUpdate(parameters);
-		log.println("Start remote executing: "
-				+ BumblebeeUtils.maskPasswordInString(bulkUpdateURL));
-		logLocalHostName();
+
 		boolean errorSeen = false;
 
 		final List<FilePath> filesToBeUploaded = locateBumbleBeeReports(
@@ -81,36 +77,14 @@ public class BumblebeeRemoteExecutor implements
 		return log.toString();
 	}
 
-	private void logLocalHostName() {
-		String hostname = "Unknown";
-		InetAddress addr = null;
-		try {
-			addr = InetAddress.getLocalHost();
-			log.println("Addr: " + addr);
-			hostname = addr.getHostName();
-
-		} catch (final UnknownHostException ex) {
-			log.println("Hostname can not be resolved");
-		}
-		log.println("Host Address : " + addr != null ? addr.getHostAddress()
-				: "Unknown");
-		log.println("Host Name : " + hostname);
-	}
-
 	// XXX legacy code, but working
 	private List<FilePath> locateBumbleBeeReports(final FilePath workspace,
 			final String includes) throws IOException, InterruptedException {
 
 		// First use ant-style pattern
-
-		log.println("includes: " + includes + " workspace " + workspace);
 		try {
 			final FilePath[] ret = workspace.list(includes);
 			if (ret.length > 0) {
-				log.print("Ret: ");
-				for (final FilePath filePath : ret) {
-					log.println(filePath.getRemote());
-				}
 				return Arrays.asList(ret);
 			}
 		} catch (final IOException e) {

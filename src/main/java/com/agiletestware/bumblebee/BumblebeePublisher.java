@@ -23,7 +23,6 @@ import org.kohsuke.stapler.StaplerRequest;
 import com.agiletestware.bumblebee.BumblebeeRemoteExecutor.Parameters;
 import com.agiletestware.bumblebee.api.BumbleBeeApi;
 import com.agiletestware.bumblebee.util.BumblebeeUtils;
-import com.agiletestware.bumblebee.util.ThreadLocalMessageFormat;
 
 import hudson.EnvVars;
 import hudson.Extension;
@@ -52,11 +51,6 @@ public class BumblebeePublisher extends Recorder {
 
 	/** Logger. */
 	private static final Logger LOGGER = Logger.getLogger(BumblebeePublisher.class.getName());
-
-	/** Message format for log messages. */
-	private static final ThreadLocalMessageFormat LOG_FORMAT = new ThreadLocalMessageFormat("\nQC  Configuration:\nBumblebeeUrl: {0}" + "\nPassword: *******"
-			+ "\nQCURL : {1}" + "\nQC UserName: {2}" + "\n Domain: {3}" + "\nResults Pattern: {4}" + "\n Format: {5}" + "\nProjectName: {6}"
-			+ "\nTestSetName: {7}" + "\nTestLab: {8}" + "\nTestPlanDirectory:  {9}" + "\nTest Type: {10}" + "\nCustom Properties: {11}\n");
 
 	/** Configurations. */
 	private final BumblebeeConfiguration[] configs;
@@ -106,10 +100,6 @@ public class BumblebeePublisher extends Recorder {
 
 		boolean success = true;
 		for (final EnvDependentConfigurationWrapper config : configWrappers) {
-			listener.getLogger()
-					.println(LOG_FORMAT.format(DESCRIPTOR.bumblebeeUrl, DESCRIPTOR.qcUrl, DESCRIPTOR.qcUserName, config.getDomain(), config.getResultPattern(),
-							config.getFormat(), config.getProjectName(), config.getProjectName(), config.getTestLab(), config.getTestPlan(), config.getFormat(),
-							config.getCustomProperties()));
 			try {
 				doBulkUpdate(config, build, launcher, listener);
 
@@ -161,7 +151,6 @@ public class BumblebeePublisher extends Recorder {
 	 */
 	public void doBulkUpdate(final EnvDependentConfigurationWrapper config, final AbstractBuild build, final Launcher launcher, final BuildListener listener)
 			throws Exception {
-		listener.getLogger().println("Invoking the remote executor");
 		final Parameters params = new Parameters();
 		params.setBumbleBeeUrl(DESCRIPTOR.bumblebeeUrl);
 		params.setDomain(config.getDomain());
