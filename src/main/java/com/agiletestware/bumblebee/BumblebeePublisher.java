@@ -275,10 +275,9 @@ public class BumblebeePublisher extends Recorder {
 				connection.setRequestMethod("HEAD");
 				final int responseCode = connection.getResponseCode();
 				LOGGER.log(Level.INFO, url + " --> HTTP " + responseCode);
-				return responseCode == 200 || responseCode == 501;
-
+				return true;
 			} catch (final Exception ex) {
-				LOGGER.log(Level.SEVERE, "Could not get HTTP 200 response code from: " + url, ex);
+				LOGGER.log(Level.SEVERE, "Could not get response from URL: " + url, ex);
 			}
 			return false;
 		}
