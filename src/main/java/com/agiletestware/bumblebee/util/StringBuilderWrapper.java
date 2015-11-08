@@ -15,7 +15,7 @@ public class StringBuilderWrapper implements Serializable {
 	 */
 	private static final long serialVersionUID = -4663937071045469032L;
 	private final StringBuilder wrappedBuilder;
-	private final String lineSeparator = System.lineSeparator();
+	private final String lineSeparator = System.getProperty("line.separator");
 
 	public StringBuilderWrapper() {
 		this.wrappedBuilder = new StringBuilder();

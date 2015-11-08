@@ -127,7 +127,7 @@ public class BumblebeePublisher extends Recorder {
 	 */
 	private List<EnvDependentConfigurationWrapper> getConfigWrappers(final EnvVars envVars) {
 		final List<BumblebeeConfiguration> configList = getConfigs();
-		final List<EnvDependentConfigurationWrapper> configWrappers = new ArrayList<>();
+		final List<EnvDependentConfigurationWrapper> configWrappers = new ArrayList<EnvDependentConfigurationWrapper>();
 		for (final BumblebeeConfiguration config : configList) {
 			configWrappers.add(new EnvDependentConfigurationWrapper(config, envVars));
 		}

@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -44,6 +43,7 @@ import hudson.FilePath;
  */
 public class BumbleBeeApi {
 
+	private static final String UTF_8_ENCODING = "UTF-8";
 	private static final String EXPIRE_DATE = "ExpireDate";
 	private static final String ALM_MAPPINGS_DELIMETER = ",";
 	private final String bumblebeeUrl;
@@ -106,13 +106,15 @@ public class BumbleBeeApi {
 	 */
 	private JSONObject executeSimpleGetRequest(final String uri) throws IOException, BumbleBeeException, JSONException {
 		final String url = bumblebeeUrl + uri;
-		try (CloseableHttpClient client = HttpClients.createDefault()) {
+		final CloseableHttpClient client = HttpClients.createDefault();
+		try {
 			final RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(timeOut).setConnectTimeout(timeOut).build();
 			final HttpGet httpGet = new HttpGet(url);
 			httpGet.setConfig(requestConfig);
 			httpGet.addHeader("accept", "application/json");
 			httpGet.addHeader("Content-type", "application/json; charset=UTF-8");
-			try (CloseableHttpResponse response = client.execute(httpGet)) {
+			final CloseableHttpResponse response = client.execute(httpGet);
+			try {
 				final StatusLine statusLine = response.getStatusLine();
 				final int statusCode = statusLine.getStatusCode();
 				final String errorReason = statusLine.getReasonPhrase();
@@ -129,8 +131,12 @@ public class BumbleBeeApi {
 				}
 				final String entityContent = EntityUtils.toString(entity);
 				return new JSONObject(entityContent);
+			} finally {
+				response.close();
 			}
 
+		} finally {
+			client.close();
 		}
 
 	}
@@ -154,10 +160,12 @@ public class BumbleBeeApi {
 			throws IOException, BumbleBeeException, JSONException {
 		boolean fileUploaded = false;
 		log.println("Bumblebee: Processing:" + filePath.getRemote() + "\n");
-		try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
+		final CloseableHttpClient httpClient = HttpClients.createDefault();
+		try {
 			final HttpPost post = createPostRequest(filePath, parameters);
 			log.println(BumblebeeUtils.maskPasswordInString("Request POST URL : " + post.getRequestLine()));
-			try (CloseableHttpResponse response = httpclient.execute(post)) {
+			final CloseableHttpResponse response = httpClient.execute(post);
+			try {
 				// FIXME: clean up code and get rid of old bumblebee version
 				// support.
 				final StatusLine statusLine = response.getStatusLine();
@@ -179,7 +187,11 @@ public class BumbleBeeApi {
 				} else {
 					log.println("Response is empty");
 				}
+			} finally {
+				response.close();
 			}
+		} finally {
+			httpClient.close();
 		}
 		return fileUploaded;
 	}
@@ -217,11 +229,13 @@ public class BumbleBeeApi {
 	 * @return message from response string. If there is no message element in
 	 *         the given string then the whole response string is returned.
 	 *         Password is masked.
+	 * @throws IOException
 	 */
-	private String extractMessageStringFromResponseForLogging(final String response) {
+	private String extractMessageStringFromResponseForLogging(final String response) throws IOException {
 		final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		factory.setValidating(false);
-		try (InputStream stream = new StringInputStream(response)) {
+		final InputStream stream = new StringInputStream(response);
+		try {
 			final DocumentBuilder builder = factory.newDocumentBuilder();
 			final XPath xPath = XPathFactory.newInstance().newXPath();
 			final String message = xPath.compile("//message").evaluate(builder);
@@ -230,6 +244,8 @@ public class BumbleBeeApi {
 			}
 		} catch (final Exception ex) {
 			// do nothing
+		} finally {
+			stream.close();
 		}
 		return BumblebeeUtils.maskPasswordInResponse(response);
 	}
@@ -243,7 +259,7 @@ public class BumbleBeeApi {
 	 * @throws UnsupportedEncodingException
 	 */
 	public String getUrlForQcUpdate(final Parameters parameters) throws UnsupportedEncodingException {
-		final String utf8Encoding = StandardCharsets.UTF_8.name();
+		final String utf8Encoding = UTF_8_ENCODING;
 		final String encryptedPass = URLEncoder.encode(parameters.getEncryptedPassword(), utf8Encoding);
 		final String qcUrl = URLEncoder.encode(parameters.getQcUrl(), utf8Encoding);
 		final String qcUserName = URLEncoder.encode(parameters.getQcUserName(), utf8Encoding);
@@ -273,7 +289,7 @@ public class BumbleBeeApi {
 			}
 			builder.append(customPropsArray[i].trim());
 		}
-		return URLEncoder.encode(builder.toString(), StandardCharsets.UTF_8.name()).replaceAll("%3D", "=").replaceAll("%2C", "&");
+		return URLEncoder.encode(builder.toString(), UTF_8_ENCODING).replaceAll("%3D", "=").replaceAll("%2C", "&");
 	}
 
 }
