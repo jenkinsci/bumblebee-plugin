@@ -268,16 +268,25 @@ public class BumblebeePublisher extends Recorder {
 		 * @return
 		 */
 		private boolean isUrlReachable(final String url, final int timeout) {
+			if (isUrlReachable(url, "HEAD", timeout)) {
+				return true;
+			}
+			// maybe HEAD is blocked by http server, try GET as a last
+			// resort.
+			return isUrlReachable(url, "GET", timeout);
+		}
+
+		private boolean isUrlReachable(final String url, final String method, final int timeout) {
 			try {
 				final HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
 				connection.setConnectTimeout(timeout);
 				connection.setReadTimeout(timeout);
-				connection.setRequestMethod("HEAD");
+				connection.setRequestMethod(method);
 				final int responseCode = connection.getResponseCode();
-				LOGGER.log(Level.INFO, url + " --> HTTP " + responseCode);
+				LOGGER.log(Level.INFO, url + " " + method + " --> HTTP " + responseCode);
 				return true;
 			} catch (final Exception ex) {
-				LOGGER.log(Level.SEVERE, "Could not get response from URL: " + url, ex);
+				LOGGER.log(Level.SEVERE, "Could not get response from URL: " + url + ", method: " + method, ex);
 			}
 			return false;
 		}
