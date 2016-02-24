@@ -43,7 +43,7 @@ public class BumblebeeRemoteExecutor implements
 
 	public String execute() throws Exception {
 		final BumbleBeeApi api = new BumbleBeeApi(parameters.getBumbleBeeUrl(),
-				parameters.getTimeOut());
+				parameters.getTimeOut()*60);
 		final String bulkUpdateURL = api.getUrlForQcUpdate(parameters);
 
 		boolean errorSeen = false;
