@@ -1,5 +1,6 @@
 package com.agiletestware.bumblebee;
 
+import com.agiletestware.bumblebee.client.utils.BuildLogger;
 import com.agiletestware.bumblebee.util.StringBuilderWrapper;
 
 /**
