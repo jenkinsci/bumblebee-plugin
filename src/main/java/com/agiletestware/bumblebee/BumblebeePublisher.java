@@ -20,8 +20,8 @@ import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
-import com.agiletestware.bumblebee.BumblebeeRemoteExecutor.Parameters;
-import com.agiletestware.bumblebee.api.BumbleBeeApi;
+import com.agiletestware.bumblebee.client.api.BumblebeeApi;
+import com.agiletestware.bumblebee.client.api.BumblebeeUpdateParameters;
 import com.agiletestware.bumblebee.util.BumblebeeUtils;
 
 import hudson.EnvVars;
@@ -151,16 +151,16 @@ public class BumblebeePublisher extends Recorder {
 	 */
 	public void doBulkUpdate(final EnvDependentConfigurationWrapper config, final AbstractBuild build, final Launcher launcher, final BuildListener listener)
 			throws Exception {
-		final Parameters params = new Parameters();
+		final BumblebeeUpdateParameters params = new BumblebeeUpdateParameters();
 		params.setBumbleBeeUrl(DESCRIPTOR.bumblebeeUrl);
 		params.setDomain(config.getDomain());
 		params.setProject(config.getProjectName());
 		params.setEncryptedPassword(DESCRIPTOR.password);
 		params.setFormat(config.getFormat());
-		params.setQcUserName(DESCRIPTOR.qcUserName);
-		params.setQcUrl(DESCRIPTOR.qcUrl);
-		params.setTestplandirectory(config.getTestPlan());
-		params.setTestlabdirectory(config.getTestLab());
+		params.setAlmUserName(DESCRIPTOR.qcUserName);
+		params.setAlmUrl(DESCRIPTOR.qcUrl);
+		params.setTestPlanDirectory(config.getTestPlan());
+		params.setTestLabDirectory(config.getTestLab());
 		params.setTestSet(config.getTestSet());
 		params.setResultPattern(config.getResultPattern());
 		params.setMode(config.getMode());
@@ -190,7 +190,7 @@ public class BumblebeePublisher extends Recorder {
 		private String password;
 		private String qcUrl;
 		private int timeOut;
-		private BumbleBeeApi bmapi;
+		private BumblebeeApi bmapi;
 
 		/**
 		 * Constructor.
@@ -244,7 +244,7 @@ public class BumblebeePublisher extends Recorder {
 				this.qcUrl = qcUrlTrimmed;
 				this.bumblebeeUrl = bumblebeeUrl;
 				this.timeOut = timeOut;
-				bmapi = new BumbleBeeApi(this.bumblebeeUrl, this.timeOut);
+				bmapi = new BumblebeeApi(this.bumblebeeUrl, this.timeOut);
 				// Set password only if old value is null/empty/blank OR if new
 				// value is not equal to old
 				if (StringUtils.isBlank(this.password) || !this.password.equals(password)) {

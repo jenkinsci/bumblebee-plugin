@@ -76,24 +76,21 @@
   </scm>
 	<dependencies>
 		<dependency>
-			<groupId>org.json</groupId>
-			<artifactId>json</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpmime</artifactId>
-			<version>4.3.1</version>
-			<type>jar</type>
+			<groupId>com.agiletestware</groupId>
+			<artifactId>bumblebee-client</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 	<repositories>
 		<repository>
 			<id>repo.jenkins-ci.org</id>
 			<url>http://repo.jenkins-ci.org/public/</url>
+		</repository>
+		<repository>
+			<id>com.agiletestware</id>
+			<name>Agiletestware Maven Repository</name>
+			<url>http://www.agiletestware.com/maven/</url>
+			<layout>default</layout>
 		</repository>
 	</repositories>
 	<pluginRepositories>

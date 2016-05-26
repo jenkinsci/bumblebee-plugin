@@ -1,13 +1,14 @@
 package com.agiletestware.bumblebee;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.agiletestware.bumblebee.api.BumbleBeeApi;
-import com.agiletestware.bumblebee.util.BumblebeeUtils;
+import com.agiletestware.bumblebee.client.api.BumblebeeApi;
+import com.agiletestware.bumblebee.client.api.BumblebeeUpdateParameters;
 import com.agiletestware.bumblebee.util.StringBuilderWrapper;
 
 import hudson.FilePath;
@@ -21,12 +22,12 @@ public class BumblebeeRemoteExecutor implements
 	 */
 	private static final long serialVersionUID = 3670838509646174454L;
 
-	private final StringBuilderWrapper log = new StringBuilderWrapper();
+	private final JenkinsBuildLogger log = new JenkinsBuildLogger(new StringBuilderWrapper());
 	private final FilePath workspace;
-	private final Parameters parameters;
+	private final BumblebeeUpdateParameters parameters;
 
 	public BumblebeeRemoteExecutor(final FilePath workspace,
-			final Parameters parameters) {
+			final BumblebeeUpdateParameters parameters) {
 		this.workspace = workspace;
 		this.parameters = parameters;
 	}
@@ -42,9 +43,8 @@ public class BumblebeeRemoteExecutor implements
 	}
 
 	public String execute() throws Exception {
-		final BumbleBeeApi api = new BumbleBeeApi(parameters.getBumbleBeeUrl(),
-				parameters.getTimeOut()*60);
-		final String bulkUpdateURL = api.getUrlForQcUpdate(parameters);
+		final BumblebeeApi api = new BumblebeeApi(parameters.getBumbleBeeUrl(),
+				parameters.getTimeOut() * 60);
 
 		boolean errorSeen = false;
 
@@ -56,24 +56,22 @@ public class BumblebeeRemoteExecutor implements
 		}
 
 		for (final FilePath filePath : filesToBeUploaded) {
-			final boolean fileUploaded = api.uploadSingleFile(filePath,
-					parameters, log);
+			final boolean fileUploaded = api.sendSingleTestReport(parameters, new File(filePath.getRemote()),
+					log);
 			if (!fileUploaded && !errorSeen) {
 				errorSeen = true;
 			}
-			log.println("--------------------------");
+			log.info("--------------------------");
 		}
 
 		if (errorSeen) {
 			throw new Exception(
-					"[Bumblebee] Could not upload results to HP ALM using Bumblebee URL: "
-							+ BumblebeeUtils
-									.maskPasswordInString(bulkUpdateURL)
-							+ " , HP URL " + parameters.getQcUrl()
+					"[Bumblebee] Could not upload results to HP ALM using the following arameters: " + parameters
+							+ " , HP URL " + parameters.getAlmUrl()
 							+ ". Please check settings.");
 		}
 
-		log.println("Upload done");
+		log.info("Upload done");
 		return log.toString();
 	}
 
