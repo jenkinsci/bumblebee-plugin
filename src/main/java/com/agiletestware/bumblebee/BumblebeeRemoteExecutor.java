@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.jenkinsci.remoting.RoleChecker;
+
 import com.agiletestware.bumblebee.client.api.BumblebeeApi;
 import com.agiletestware.bumblebee.client.api.BumblebeeUpdateParameters;
 import com.agiletestware.bumblebee.util.StringBuilderWrapper;
@@ -238,6 +240,10 @@ public class BumblebeeRemoteExecutor implements
 			return this.customProperties;
 		}
 
+	}
+
+	@Override
+	public void checkRoles(final RoleChecker arg0) throws SecurityException {
 	}
 
 }
