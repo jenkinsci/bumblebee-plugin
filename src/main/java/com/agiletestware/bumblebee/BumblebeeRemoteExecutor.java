@@ -10,7 +10,7 @@ import java.util.List;
 import org.jenkinsci.remoting.RoleChecker;
 
 import com.agiletestware.bumblebee.client.api.BumblebeeApi;
-import com.agiletestware.bumblebee.client.api.BumblebeeUpdateParameters;
+import com.agiletestware.bumblebee.client.api.BulkUpdateParameters;
 import com.agiletestware.bumblebee.util.StringBuilderWrapper;
 
 import hudson.FilePath;
@@ -26,10 +26,10 @@ public class BumblebeeRemoteExecutor implements
 
 	private final JenkinsBuildLogger log = new JenkinsBuildLogger(new StringBuilderWrapper());
 	private final FilePath workspace;
-	private final BumblebeeUpdateParameters parameters;
+	private final BulkUpdateParameters parameters;
 
 	public BumblebeeRemoteExecutor(final FilePath workspace,
-			final BumblebeeUpdateParameters parameters) {
+			final BulkUpdateParameters parameters) {
 		this.workspace = workspace;
 		this.parameters = parameters;
 	}

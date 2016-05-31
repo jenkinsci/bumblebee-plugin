@@ -21,7 +21,7 @@ import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
 import com.agiletestware.bumblebee.client.api.BumblebeeApi;
-import com.agiletestware.bumblebee.client.api.BumblebeeUpdateParameters;
+import com.agiletestware.bumblebee.client.api.BulkUpdateParameters;
 import com.agiletestware.bumblebee.util.BumblebeeUtils;
 
 import hudson.EnvVars;
@@ -151,7 +151,7 @@ public class BumblebeePublisher extends Recorder {
 	 */
 	public void doBulkUpdate(final EnvDependentConfigurationWrapper config, final AbstractBuild build, final Launcher launcher, final BuildListener listener)
 			throws Exception {
-		final BumblebeeUpdateParameters params = new BumblebeeUpdateParameters();
+		final BulkUpdateParameters params = new BulkUpdateParameters();
 		params.setBumbleBeeUrl(DESCRIPTOR.bumblebeeUrl);
 		params.setDomain(config.getDomain());
 		params.setProject(config.getProjectName());
