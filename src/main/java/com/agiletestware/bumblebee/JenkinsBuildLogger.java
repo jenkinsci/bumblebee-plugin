@@ -4,7 +4,7 @@ import com.agiletestware.bumblebee.client.utils.BuildLogger;
 import com.agiletestware.bumblebee.util.StringBuilderWrapper;
 
 /**
- * Implementation of {@link BuildLogger.
+ * Implementation of {@link BuildLogger}.
  *
  * @author Sergey Oplavin
  *
