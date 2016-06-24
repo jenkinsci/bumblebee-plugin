@@ -20,8 +20,8 @@ import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
-import com.agiletestware.bumblebee.client.api.BumblebeeApi;
 import com.agiletestware.bumblebee.client.api.BulkUpdateParameters;
+import com.agiletestware.bumblebee.client.api.BumblebeeApi;
 import com.agiletestware.bumblebee.util.BumblebeeUtils;
 
 import hudson.EnvVars;
@@ -166,6 +166,7 @@ public class BumblebeePublisher extends Recorder {
 		params.setMode(config.getMode());
 		params.setTimeOut(DESCRIPTOR.timeOut);
 		params.setCustomProperties(config.getCustomProperties());
+		params.setOffline(config.getOffline());
 		final BumblebeeRemoteExecutor remoteExecutor = new BumblebeeRemoteExecutor(BumblebeeUtils.getWorkspace(build), params);
 		try {
 			listener.getLogger().println(launcher.getChannel().call(remoteExecutor));
@@ -190,7 +191,6 @@ public class BumblebeePublisher extends Recorder {
 		private String password;
 		private String qcUrl;
 		private int timeOut;
-		private BumblebeeApi bmapi;
 
 		/**
 		 * Constructor.
@@ -244,7 +244,7 @@ public class BumblebeePublisher extends Recorder {
 				this.qcUrl = qcUrlTrimmed;
 				this.bumblebeeUrl = bumblebeeUrl;
 				this.timeOut = timeOut;
-				bmapi = new BumblebeeApi(this.bumblebeeUrl, this.timeOut);
+				final BumblebeeApi bmapi = new BumblebeeApi(this.bumblebeeUrl, this.timeOut);
 				// Set password only if old value is null/empty/blank OR if new
 				// value is not equal to old
 				if (StringUtils.isBlank(this.password) || !this.password.equals(password)) {

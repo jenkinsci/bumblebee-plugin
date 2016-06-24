@@ -31,6 +31,9 @@
          <f:entry title="Fail build if upload unsuccessful" field="failIfUploadFailed">
 			<f:checkbox name="Bumblebee.bumblebeeConfiguration.failIfUploadFailed" checked="${c.getFailIfUploadFailed()}"/>
 		  </f:entry>
+		  <f:entry title="Process offline" field="offline">
+			<f:checkbox name="Bumblebee.bumblebeeConfiguration.offline" checked="${c.isOffline()}"/>
+		  </f:entry>
   <f:entry title="">
     <div align="right">
       <f:repeatableDeleteButton />

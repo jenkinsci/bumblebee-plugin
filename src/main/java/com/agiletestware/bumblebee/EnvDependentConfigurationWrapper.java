@@ -118,4 +118,11 @@ public class EnvDependentConfigurationWrapper {
 		return wrappedConfig.getFailIfUploadFailed();
 	}
 
+	/**
+	 * @return offline parameter.
+	 */
+	public boolean getOffline() {
+		return wrappedConfig.isOffline();
+	}
+
 }

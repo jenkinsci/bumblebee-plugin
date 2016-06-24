@@ -3,11 +3,11 @@
  */
 package com.agiletestware.bumblebee;
 
-import hudson.Util;
-
 import java.io.Serializable;
 
 import org.kohsuke.stapler.DataBoundConstructor;
+
+import hudson.Util;
 
 /**
  * Class which holds configuration for each bumblebee step.
@@ -28,6 +28,7 @@ public final class BumblebeeConfiguration implements Serializable {
 	private final String resultPattern;
 	private final String customProperties;
 	private final boolean failIfUploadFailed;
+	private final boolean offline;
 
 	/**
 	 * Creates new instance.
@@ -54,7 +55,8 @@ public final class BumblebeeConfiguration implements Serializable {
 			final String projectName, final String testPlan,
 			final String testLab, final String testSet, final String format,
 			final String resultPattern, final String customProperties,
-			final boolean failIfUploadFailed) {
+			final boolean failIfUploadFailed,
+			final boolean offline) {
 		super();
 		this.domain = Util.fixEmptyAndTrim(domain);
 		this.projectName = Util.fixEmptyAndTrim(projectName);
@@ -65,6 +67,7 @@ public final class BumblebeeConfiguration implements Serializable {
 		this.resultPattern = Util.fixEmptyAndTrim(resultPattern);
 		this.customProperties = Util.fixEmptyAndTrim(customProperties);
 		this.failIfUploadFailed = failIfUploadFailed;
+		this.offline=offline;
 
 	}
 
@@ -146,5 +149,12 @@ public final class BumblebeeConfiguration implements Serializable {
 	 */
 	public boolean getFailIfUploadFailed() {
 		return failIfUploadFailed;
+	}
+
+	/**
+	 * @return the offline
+	 */
+	public boolean isOffline() {
+		return offline;
 	}
 }
