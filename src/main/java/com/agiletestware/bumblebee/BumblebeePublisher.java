@@ -4,6 +4,7 @@
 package com.agiletestware.bumblebee;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -167,11 +168,14 @@ public class BumblebeePublisher extends Recorder {
 		params.setTimeOut(DESCRIPTOR.timeOut);
 		params.setCustomProperties(config.getCustomProperties());
 		params.setOffline(config.getOffline());
-		final BumblebeeRemoteExecutor remoteExecutor = new BumblebeeRemoteExecutor(BumblebeeUtils.getWorkspace(build), params);
+
+		final PrintStream logger = listener.getLogger();
+		final BumblebeeRemoteExecutor remoteExecutor = new BumblebeeRemoteExecutor(BumblebeeUtils.getWorkspace(build), params, listener);
 		try {
-			listener.getLogger().println(launcher.getChannel().call(remoteExecutor));
-		} catch (final RemoteExecutorException e) {
-			listener.getLogger().println(e.getRemoteExecutionLog());
+			logger.println(launcher.getChannel().call(remoteExecutor));
+		} catch (final Throwable e) {
+			logger.println(e);
+			e.printStackTrace(logger);
 			throw e;
 		}
 	}

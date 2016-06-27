@@ -9,39 +9,35 @@ import java.util.List;
 
 import org.jenkinsci.remoting.RoleChecker;
 
-import com.agiletestware.bumblebee.client.api.BumblebeeApi;
 import com.agiletestware.bumblebee.client.api.BulkUpdateParameters;
-import com.agiletestware.bumblebee.util.StringBuilderWrapper;
+import com.agiletestware.bumblebee.client.api.BumblebeeApi;
 
 import hudson.FilePath;
+import hudson.model.TaskListener;
 import hudson.remoting.Callable;
 
 public class BumblebeeRemoteExecutor implements
-		Callable<String, RemoteExecutorException>, Serializable {
+		Callable<String, Exception>, Serializable {
 
 	/**
 	 *
 	 */
 	private static final long serialVersionUID = 3670838509646174454L;
 
-	private final JenkinsBuildLogger log = new JenkinsBuildLogger(new StringBuilderWrapper());
+	private final JenkinsBuildLogger log;
 	private final FilePath workspace;
 	private final BulkUpdateParameters parameters;
 
 	public BumblebeeRemoteExecutor(final FilePath workspace,
-			final BulkUpdateParameters parameters) {
+			final BulkUpdateParameters parameters, final TaskListener listener) {
 		this.workspace = workspace;
 		this.parameters = parameters;
+		log = new JenkinsBuildLogger(listener);
 	}
 
 	@Override
-	public String call() throws RemoteExecutorException {
-		try {
-			return execute();
-		} catch (final Throwable t) {
-			// return execution log to caller
-			throw new RemoteExecutorException(t, log.toString());
-		}
+	public String call() throws Exception {
+		return execute();
 	}
 
 	public String execute() throws Exception {
@@ -105,141 +101,6 @@ public class BumblebeeRemoteExecutor implements
 			}
 		}
 		return files;
-	}
-
-	public static class Parameters implements Serializable {
-
-		/**
-		 *
-		 */
-		private static final long serialVersionUID = 7098445803055973230L;
-		private String bumbleBeeUrl;
-		private String domain;
-		private String project;
-		private String testplandirectory;
-		private String testlabdirectory;
-		private String format;
-		private String qcUserName;
-		private String testSet;
-		private String resultPattern;
-		private String qcUrl;
-		private String mode;
-		private String encryptedPassword;
-		private String customProperties;
-		private int timeOut;
-
-		public String getBumbleBeeUrl() {
-			return bumbleBeeUrl;
-		}
-
-		public void setBumbleBeeUrl(final String bumbleBeeUrl) {
-			this.bumbleBeeUrl = bumbleBeeUrl;
-		}
-
-		public String getDomain() {
-			return domain;
-		}
-
-		public void setDomain(final String domain) {
-			this.domain = domain;
-		}
-
-		public String getProject() {
-			return project;
-		}
-
-		public void setProject(final String project) {
-			this.project = project;
-		}
-
-		public String getTestplandirectory() {
-			return testplandirectory;
-		}
-
-		public void setTestplandirectory(final String testplandirectory) {
-			this.testplandirectory = testplandirectory;
-		}
-
-		public String getTestlabdirectory() {
-			return testlabdirectory;
-		}
-
-		public void setTestlabdirectory(final String testlabdirectory) {
-			this.testlabdirectory = testlabdirectory;
-		}
-
-		public String getFormat() {
-			return format;
-		}
-
-		public void setFormat(final String format) {
-			this.format = format;
-		}
-
-		public String getQcUserName() {
-			return qcUserName;
-		}
-
-		public void setQcUserName(final String qcUserName) {
-			this.qcUserName = qcUserName;
-		}
-
-		public String getTestSet() {
-			return testSet;
-		}
-
-		public void setTestSet(final String testSet) {
-			this.testSet = testSet;
-		}
-
-		public String getResultPattern() {
-			return resultPattern;
-		}
-
-		public void setResultPattern(final String resultPattern) {
-			this.resultPattern = resultPattern;
-		}
-
-		public String getQcUrl() {
-			return qcUrl;
-		}
-
-		public void setQcUrl(final String qcUrl) {
-			this.qcUrl = qcUrl;
-		}
-
-		public String getEncryptedPassword() {
-			return encryptedPassword;
-		}
-
-		public void setEncryptedPassword(final String encryptedPassword) {
-			this.encryptedPassword = encryptedPassword;
-		}
-
-		public void setMode(final String mode) {
-			this.mode = mode;
-		}
-
-		public String getMode() {
-			return mode;
-		}
-
-		public void setTimeOut(final int timeOut) {
-			this.timeOut = timeOut;
-		}
-
-		public int getTimeOut() {
-			return timeOut;
-		}
-
-		public void setCustomProperties(final String customProperties) {
-			this.customProperties = customProperties;
-		}
-
-		public String getCustomProperties() {
-			return this.customProperties;
-		}
-
 	}
 
 	@Override
