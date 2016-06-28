@@ -94,6 +94,7 @@ public class BumblebeePublisher extends Recorder {
 		return BuildStepMonitor.NONE;
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public boolean perform(final AbstractBuild build, final Launcher launcher, final BuildListener listener) throws InterruptedException, IOException {
 		final EnvVars envVars = build.getEnvironment(listener);
@@ -150,6 +151,7 @@ public class BumblebeePublisher extends Recorder {
 	 *            what it says
 	 * @throws Exception
 	 */
+	@SuppressWarnings("rawtypes")
 	public void doBulkUpdate(final EnvDependentConfigurationWrapper config, final AbstractBuild build, final Launcher launcher, final BuildListener listener)
 			throws Exception {
 		final BulkUpdateParameters params = new BulkUpdateParameters();
@@ -214,6 +216,7 @@ public class BumblebeePublisher extends Recorder {
 			return PLUGIN_HELP_PAGE_URI;
 		}
 
+		@SuppressWarnings("rawtypes")
 		@Override
 		public boolean isApplicable(final Class<? extends AbstractProject> jobType) {
 			return true;
