@@ -43,10 +43,6 @@ import net.sf.json.JSONObject;
  */
 public class BumblebeePublisher extends Recorder {
 
-	/** Descriptor instance. */
-	@Extension
-	public static final DescriptorImpl DESCRIPTOR = new DescriptorImpl();
-
 	/** Logger. */
 	private static final Logger LOGGER = Logger.getLogger(BumblebeePublisher.class.getName());
 
@@ -187,6 +183,7 @@ public class BumblebeePublisher extends Recorder {
 	 * @author Sergey Oplavin (oplavin.sergei@gmail.com) (refactored)
 	 *
 	 */
+	@Extension
 	public static final class DescriptorImpl extends BuildStepDescriptor<Publisher> {
 		private static final String PLUGIN_HELP_PAGE_URI = "/plugin/bumblebee/help/main.html";
 		private static final String PLUGIN_DISPLAY_NAME = "Bumblebee  HP  ALM  Uploader";
