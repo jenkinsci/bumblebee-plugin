@@ -17,7 +17,7 @@ import hudson.model.TaskListener;
 import hudson.remoting.Callable;
 
 public class BumblebeeRemoteExecutor implements
-		Callable<String, Exception>, Serializable {
+		Callable<Void, Exception>, Serializable {
 
 	/**
 	 *
@@ -36,11 +36,12 @@ public class BumblebeeRemoteExecutor implements
 	}
 
 	@Override
-	public String call() throws Exception {
-		return execute();
+	public Void call() throws Exception {
+		execute();
+		return null;
 	}
 
-	public String execute() throws Exception {
+	public void execute() throws Exception {
 		final BumblebeeApi api = new BumblebeeApi(parameters.getBumbleBeeUrl(),
 				parameters.getTimeOut() * 60);
 
@@ -70,7 +71,6 @@ public class BumblebeeRemoteExecutor implements
 		}
 
 		log.info("Upload done");
-		return log.toString();
 	}
 
 	// XXX legacy code, but working

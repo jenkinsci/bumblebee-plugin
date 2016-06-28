@@ -174,7 +174,7 @@ public class BumblebeePublisher extends Recorder {
 		final PrintStream logger = listener.getLogger();
 		final BumblebeeRemoteExecutor remoteExecutor = new BumblebeeRemoteExecutor(BumblebeeUtils.getWorkspace(build), params, listener);
 		try {
-			logger.println(launcher.getChannel().call(remoteExecutor));
+			launcher.getChannel().call(remoteExecutor);
 		} catch (final Throwable e) {
 			logger.println(e);
 			e.printStackTrace(logger);
