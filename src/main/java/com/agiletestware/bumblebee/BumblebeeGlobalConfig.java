@@ -12,6 +12,7 @@ import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.QueryParameter;
 
+import com.agiletestware.bumblebee.client.api.BaseParameters;
 import com.agiletestware.bumblebee.client.api.BumblebeeApi;
 import com.agiletestware.bumblebee.util.BumblebeeUtils;
 
@@ -53,6 +54,13 @@ public class BumblebeeGlobalConfig extends GlobalConfiguration {
 	@Override
 	public String getHelpFile() {
 		return PLUGIN_HELP_PAGE_URI;
+	}
+
+	public void populateBaseParameters(final BaseParameters params) {
+		params.setBumbleBeeUrl(this.getBumblebeeUrl());
+		params.setEncryptedPassword(this.getPassword());
+		params.setAlmUserName(this.getQcUserName());
+		params.setAlmUrl(this.getQcUrl());
 	}
 
 	// Used by global.jelly to authenticate User key
