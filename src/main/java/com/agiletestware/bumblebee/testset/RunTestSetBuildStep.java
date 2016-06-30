@@ -19,6 +19,7 @@ import com.agiletestware.bumblebee.client.testrunner.TestSetRunnerParametersImpl
 import com.agiletestware.bumblebee.util.BumblebeeUtils;
 
 import hudson.AbortException;
+import hudson.EnvVars;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
@@ -84,7 +85,8 @@ public class RunTestSetBuildStep extends Builder implements SimpleBuildStep {
 			throws InterruptedException, IOException {
 		listener.getLogger().println("Bumblebee: running test sets");
 		try {
-			final RunTestSetTask task = new RunTestSetTask(listener, run.getExecutor().getOwner().getNode().getRootPath(), workspace, createParameters());
+			final RunTestSetTask task = new RunTestSetTask(listener, run.getExecutor().getOwner().getNode().getRootPath(), workspace,
+					createParameters(run.getEnvironment(listener)));
 			final int returnCode = launcher.getChannel().call(task);
 			if (returnCode != 0) {
 				throw new AbortException("Test set execution failed. See logs for details.");
@@ -96,7 +98,7 @@ public class RunTestSetBuildStep extends Builder implements SimpleBuildStep {
 		}
 	}
 
-	private TestSetRunnerParameters createParameters() {
+	private TestSetRunnerParameters createParameters(final EnvVars envVars) {
 		final BumblebeeGlobalConfig globalConfig = GlobalConfiguration.all().get(BumblebeeGlobalConfig.class);
 		final TestSetRunnerParameters params = new TestSetRunnerParametersImpl();
 		globalConfig.populateBaseParameters(params);
@@ -113,7 +115,7 @@ public class RunTestSetBuildStep extends Builder implements SimpleBuildStep {
 			setsList.add(tokenizer.nextToken());
 		}
 		params.setTestSets(setsList);
-		return params;
+		return new TestSetEnvSpecificParameters(params, envVars);
 	}
 
 	/**
