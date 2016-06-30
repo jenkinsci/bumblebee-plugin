@@ -15,6 +15,7 @@ import org.kohsuke.stapler.QueryParameter;
 import com.agiletestware.bumblebee.BumblebeeGlobalConfig;
 import com.agiletestware.bumblebee.client.api.AlmRunMode;
 import com.agiletestware.bumblebee.client.testrunner.TestSetRunnerParameters;
+import com.agiletestware.bumblebee.client.testrunner.TestSetRunnerParametersImpl;
 import com.agiletestware.bumblebee.util.BumblebeeUtils;
 
 import hudson.AbortException;
@@ -97,7 +98,7 @@ public class RunTestSetBuildStep extends Builder implements SimpleBuildStep {
 
 	private TestSetRunnerParameters createParameters() {
 		final BumblebeeGlobalConfig globalConfig = GlobalConfiguration.all().get(BumblebeeGlobalConfig.class);
-		final TestSetRunnerParameters params = new TestSetRunnerParameters();
+		final TestSetRunnerParameters params = new TestSetRunnerParametersImpl();
 		globalConfig.populateBaseParameters(params);
 		params.setDomain(getDomain());
 		params.setProject(getProject());
