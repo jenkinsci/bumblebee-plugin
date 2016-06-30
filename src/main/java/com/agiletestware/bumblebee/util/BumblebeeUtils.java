@@ -3,12 +3,12 @@
  */
 package com.agiletestware.bumblebee.util;
 
+import java.util.regex.Pattern;
+
 import hudson.FilePath;
 import hudson.Util;
 import hudson.model.AbstractBuild;
 import hudson.util.FormValidation;
-
-import java.util.regex.Pattern;
 
 /**
  * @author c_rsharv
@@ -16,6 +16,8 @@ import java.util.regex.Pattern;
  *
  */
 public class BumblebeeUtils {
+
+	private static final String REQUIRED = "Required";
 
 	public static FormValidation validatebumblebeeUrl(final String bumblebeeUrl) {
 		final String t = Util.fixEmptyAndTrim(bumblebeeUrl);
@@ -92,7 +94,7 @@ public class BumblebeeUtils {
 	public static FormValidation validateRequiredField(final String fieldValue) {
 		final String preparedVal = Util.fixEmptyAndTrim(fieldValue);
 		if (preparedVal == null) {
-			return FormValidation.error("Required.");
+			return FormValidation.error(REQUIRED);
 		}
 		return FormValidation.ok();
 	}
@@ -100,7 +102,7 @@ public class BumblebeeUtils {
 	public static FormValidation validateTestPlan(final String testPlan) {
 		final String t = Util.fixEmptyAndTrim(testPlan);
 		if (t == null) {
-			return FormValidation.error("Required.");
+			return FormValidation.error(REQUIRED);
 		}
 
 		if (!t.startsWith("Subject\\") || t.contains("^") || t.contains("*")) {
@@ -113,7 +115,7 @@ public class BumblebeeUtils {
 	public static FormValidation validateTestLab(final String testLab) {
 		final String t = Util.fixEmptyAndTrim(testLab);
 		if (t == null) {
-			return FormValidation.error("Required.");
+			return FormValidation.error(REQUIRED);
 		}
 		if (!t.startsWith("Root\\") || t.contains("^") || t.contains("*")) {
 			return FormValidation
@@ -125,7 +127,7 @@ public class BumblebeeUtils {
 	public static FormValidation validateTestSet(final String testSet) {
 		final String t = Util.fixEmptyAndTrim(testSet);
 		if (t == null) {
-			return FormValidation.error("Required.");
+			return FormValidation.error(REQUIRED);
 		}
 		if (t.contains("^") || t.contains(",") || t.contains("\"")
 				|| t.contains("*")) {
