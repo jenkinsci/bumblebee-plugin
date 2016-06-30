@@ -24,7 +24,7 @@ public class BumblebeeUtils {
 		if ((t == null)
 				|| (!t.matches("^(https?)://[0-9a-zA-Z]([-.\\w]*[0-9a-zA-Z])*(:\\d*[^/])?\\/bumblebee$"))) {
 			return FormValidation
-					.error("URL  should be  http(s)://<bumblebee_server>:<port>/bumblebee");
+					.error("URL should be http(s)://<bumblebee_server>:<port>/bumblebee");
 		}
 		return FormValidation.ok();
 	}
@@ -42,10 +42,10 @@ public class BumblebeeUtils {
 			}
 
 			return FormValidation
-					.error("Custom properties  should  be  name=value and    seperated  by  commas ");
+					.error("Custom properties should be name=value and seperated by commas");
 		} catch (final Exception anye) {
 			return FormValidation
-					.error("Custom properties  should  be  name=value and    seperated  by  commas "
+					.error("Custom properties should be name=value and seperated by commas "
 							+ anye.getMessage());
 
 		}
@@ -61,10 +61,10 @@ public class BumblebeeUtils {
 				return FormValidation.ok();
 			}
 
-			return FormValidation.error("TimeOut needs   to be   a  integer ");
+			return FormValidation.error("TimeOut needs to be a integer");
 		} catch (final Exception anye) {
 			timeOut = "0";
-			return FormValidation.error("TimeOut needs   to be   a  integer  "
+			return FormValidation.error("TimeOut needs to be a integer "
 					+ anye.getMessage());
 
 		}
@@ -76,7 +76,7 @@ public class BumblebeeUtils {
 		if ((t == null)
 				|| !t.matches("^(https?)\\:\\/\\/[0-9a-zA-Z]([-.\\w]*[0-9a-zA-Z])*(:\\d*[^\\/])?\\/qcbin$")) {
 			return FormValidation
-					.error("Url should  be  http(s)://<qcserver>:<qcport>/qcbin");
+					.error("Url should be http(s)://<qcserver>:<qcport>/qcbin");
 		}
 
 		return FormValidation.ok();
@@ -107,7 +107,7 @@ public class BumblebeeUtils {
 
 		if (!t.startsWith("Subject\\") || t.contains("^") || t.contains("*")) {
 			return FormValidation
-					.error("Test Plan must begin with 'Subject\\' and  cannot  contain  '^' or  '*'");
+					.error("Test Plan must begin with 'Subject\\' and cannot contain '^' or '*'");
 		}
 		return FormValidation.ok();
 	}
@@ -119,7 +119,7 @@ public class BumblebeeUtils {
 		}
 		if (!t.startsWith("Root\\") || t.contains("^") || t.contains("*")) {
 			return FormValidation
-					.error("Test Lab must begin with 'Root\\' and  cannot contain  '^' or '*'");
+					.error("Test Lab must begin with 'Root\\' and cannot contain '^' or '*'");
 		}
 		return FormValidation.ok();
 	}
