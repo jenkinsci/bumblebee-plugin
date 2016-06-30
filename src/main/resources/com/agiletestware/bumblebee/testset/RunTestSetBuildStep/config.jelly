@@ -1,0 +1,35 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+	<f:block>
+		<d:taglib uri="local">			
+			<table width="100%" title="${%Test Set Runner Configuration}">
+				<f:entry title="Domain" field="domain">
+					<f:textbox name="domain" default="DEFAULT" value="${instance.getDomain()}"/>
+				</f:entry>          
+				<f:entry title="Project" field="project">
+					<f:textbox name="project" default="project"    value="${c.getProject()}"/>
+				</f:entry>
+				<f:entry title="Run Mode" field="runMode">						
+					<select name="runMode">
+						<j:forEach var="runMode" items="${descriptor.runModes}">
+							<f:option selected="${runMode == instance.runMode}" value="${runMode}">
+									${runMode}
+							</f:option>
+						</j:forEach>
+					</select>						
+				</f:entry>
+				<f:entry title="ALM Host" field="host">						
+					<f:textbox name="host" value="${instance.getHost()}"/>					
+				</f:entry>		
+				<f:entry title="Test Sets" field="testSets">
+					<f:textarea name="testSets" value="${instance.getTestSets()}"/>
+				</f:entry>
+				<f:entry title="JUnit Results Directory" field="outputDirPath">
+					<f:textbox name="outputDirPath" value="${instance.getOutputDirPath()}"/>
+				</f:entry>
+				<f:entry title="Execution Timeout"  field="timeOut"  >
+					<f:number name="timeOut"  default="0"  value="${instance.getTimeOut()}" clazz="required" checkMessage="Must be a valid integer" />
+				</f:entry>				
+			</table>			
+		</d:taglib>
+	</f:block>
+</j:jelly>
