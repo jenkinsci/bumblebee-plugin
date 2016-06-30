@@ -149,13 +149,10 @@ public class BumblebeePublisher extends Recorder {
 			throws Exception {
 		final BumblebeeGlobalConfig globalConfig = GlobalConfiguration.all().get(BumblebeeGlobalConfig.class);
 		final BulkUpdateParameters params = new BulkUpdateParameters();
-		params.setBumbleBeeUrl(globalConfig.getBumblebeeUrl());
+		globalConfig.populateBaseParameters(params);
 		params.setDomain(config.getDomain());
 		params.setProject(config.getProjectName());
-		params.setEncryptedPassword(globalConfig.getPassword());
 		params.setFormat(config.getFormat());
-		params.setAlmUserName(globalConfig.getQcUserName());
-		params.setAlmUrl(globalConfig.getQcUrl());
 		params.setTestPlanDirectory(config.getTestPlan());
 		params.setTestLabDirectory(config.getTestLab());
 		params.setTestSet(config.getTestSet());
@@ -212,13 +209,11 @@ public class BumblebeePublisher extends Recorder {
 			return true;
 		}
 
+		@SuppressWarnings("deprecation")
 		@Override
 		public BumblebeePublisher newInstance(final StaplerRequest req, final JSONObject formData) throws FormException {
-			final List<BumblebeeConfiguration> configs = req.bindParametersToList(BumblebeeConfiguration.class, "Bumblebee.bumblebeeConfiguration.");
-
-			return new BumblebeePublisher(configs);
+			return new BumblebeePublisher(req.bindParametersToList(BumblebeeConfiguration.class, "Bumblebee.bumblebeeConfiguration."));
 		}
-
 
 		public FormValidation doCheckDomain(@AncestorInPath final AbstractProject<?, ?> project, @QueryParameter final String domain)
 				throws IOException, ServletException {
