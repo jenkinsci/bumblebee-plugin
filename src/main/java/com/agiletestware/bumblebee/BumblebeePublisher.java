@@ -5,9 +5,9 @@ package com.agiletestware.bumblebee;
 
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -76,7 +76,7 @@ public class BumblebeePublisher extends Recorder {
 	 */
 	public List<BumblebeeConfiguration> getConfigs() {
 		if (configs == null) {
-			return new ArrayList<BumblebeeConfiguration>();
+			return Collections.emptyList();
 		} else {
 			return Arrays.asList(configs);
 		}
@@ -91,7 +91,7 @@ public class BumblebeePublisher extends Recorder {
 	@Override
 	public boolean perform(final AbstractBuild build, final Launcher launcher, final BuildListener listener) throws InterruptedException, IOException {
 		boolean success = true;
-		for (final BumblebeeConfiguration config : configs) {
+		for (final BumblebeeConfiguration config : getConfigs()) {
 			try {
 				doBulkUpdate(config, build, launcher, listener);
 			} catch (final Throwable ex) {
