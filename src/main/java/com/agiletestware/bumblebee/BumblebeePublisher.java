@@ -19,9 +19,9 @@ import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
 import com.agiletestware.bumblebee.client.api.BulkUpdateParameters;
+import com.agiletestware.bumblebee.client.api.BulkUpdateParametersImpl;
 import com.agiletestware.bumblebee.util.BumblebeeUtils;
 
-import hudson.EnvVars;
 import hudson.Extension;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
@@ -90,14 +90,10 @@ public class BumblebeePublisher extends Recorder {
 	@SuppressWarnings("rawtypes")
 	@Override
 	public boolean perform(final AbstractBuild build, final Launcher launcher, final BuildListener listener) throws InterruptedException, IOException {
-		final EnvVars envVars = build.getEnvironment(listener);
-		final List<EnvDependentConfigurationWrapper> configWrappers = getConfigWrappers(envVars);
-
 		boolean success = true;
-		for (final EnvDependentConfigurationWrapper config : configWrappers) {
+		for (final BumblebeeConfiguration config : configs) {
 			try {
 				doBulkUpdate(config, build, launcher, listener);
-
 			} catch (final Throwable ex) {
 				listener.getLogger().println(ex.getMessage());
 				LOGGER.log(Level.SEVERE, null, ex);
@@ -111,22 +107,6 @@ public class BumblebeePublisher extends Recorder {
 			}
 		}
 		return success;
-	}
-
-	/**
-	 *
-	 * @param envVars
-	 *            Env variables map.
-	 * @return A list of configuration wrappers which allow consumer to resolve
-	 *         env variables in configuration values.
-	 */
-	private List<EnvDependentConfigurationWrapper> getConfigWrappers(final EnvVars envVars) {
-		final List<BumblebeeConfiguration> configList = getConfigs();
-		final List<EnvDependentConfigurationWrapper> configWrappers = new ArrayList<EnvDependentConfigurationWrapper>();
-		for (final BumblebeeConfiguration config : configList) {
-			configWrappers.add(new EnvDependentConfigurationWrapper(config, envVars));
-		}
-		return configWrappers;
 	}
 
 	/**
@@ -145,10 +125,10 @@ public class BumblebeePublisher extends Recorder {
 	 * @throws Exception
 	 */
 	@SuppressWarnings("rawtypes")
-	public void doBulkUpdate(final EnvDependentConfigurationWrapper config, final AbstractBuild build, final Launcher launcher, final BuildListener listener)
+	public void doBulkUpdate(final BumblebeeConfiguration config, final AbstractBuild build, final Launcher launcher, final BuildListener listener)
 			throws Exception {
 		final BumblebeeGlobalConfig globalConfig = GlobalConfiguration.all().get(BumblebeeGlobalConfig.class);
-		final BulkUpdateParameters params = new BulkUpdateParameters();
+		final BulkUpdateParameters params = new BulkUpdateParametersImpl();
 		globalConfig.populateBaseParameters(params);
 		params.setDomain(config.getDomain());
 		params.setProject(config.getProjectName());
@@ -160,10 +140,11 @@ public class BumblebeePublisher extends Recorder {
 		params.setMode(config.getMode());
 		params.setTimeOut(globalConfig.getTimeOut());
 		params.setCustomProperties(config.getCustomProperties());
-		params.setOffline(config.getOffline());
+		params.setOffline(config.isOffline());
 
 		final PrintStream logger = listener.getLogger();
-		final BumblebeeRemoteExecutor remoteExecutor = new BumblebeeRemoteExecutor(BumblebeeUtils.getWorkspace(build), params, listener);
+		final BumblebeeRemoteExecutor remoteExecutor = new BumblebeeRemoteExecutor(BumblebeeUtils.getWorkspace(build),
+				new BulkUpdateEnvSpecificParameters(params, build.getEnvironment(listener)), listener);
 		try {
 			launcher.getChannel().call(remoteExecutor);
 		} catch (final Throwable e) {

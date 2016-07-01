@@ -3,6 +3,7 @@ package com.agiletestware.bumblebee.testset;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.agiletestware.bumblebee.BaseEnvSpecificParameters;
 import com.agiletestware.bumblebee.client.api.AlmRunMode;
 import com.agiletestware.bumblebee.client.testrunner.TestSetRunnerParameters;
 
@@ -15,12 +16,10 @@ import hudson.EnvVars;
  * @author Sergey Oplavin
  *
  */
-public class TestSetEnvSpecificParameters implements TestSetRunnerParameters {
+public class TestSetEnvSpecificParameters extends BaseEnvSpecificParameters<TestSetRunnerParameters>implements TestSetRunnerParameters {
 
 	/** . */
 	private static final long serialVersionUID = 5224372037113848684L;
-	private final TestSetRunnerParameters parameters;
-	private final EnvVars envVars;
 
 	/**
 	 * Constructor.
@@ -32,85 +31,23 @@ public class TestSetEnvSpecificParameters implements TestSetRunnerParameters {
 	 *            original parameters.
 	 */
 	public TestSetEnvSpecificParameters(final TestSetRunnerParameters parameters, final EnvVars envVars) {
-		this.parameters = parameters;
-		this.envVars = envVars;
-	}
-
-	@Override
-	public String getBumbleBeeUrl() {
-		return expand(parameters.getBumbleBeeUrl());
-	}
-
-	@Override
-	public void setBumbleBeeUrl(final String bumbleBeeUrl) {
-		parameters.setAlmUrl(bumbleBeeUrl);
-	}
-
-	@Override
-	public String getAlmUrl() {
-		return expand(parameters.getAlmUrl());
-	}
-
-	@Override
-	public void setAlmUrl(final String almUrl) {
-		parameters.setAlmUrl(almUrl);
-	}
-
-	@Override
-	public String getDomain() {
-		return expand(parameters.getDomain());
-	}
-
-	@Override
-	public void setDomain(final String domain) {
-		parameters.setDomain(domain);
-	}
-
-	@Override
-	public String getProject() {
-		return expand(parameters.getProject());
-	}
-
-	@Override
-	public void setProject(final String project) {
-		parameters.setProject(project);
-	}
-
-	@Override
-	public String getAlmUserName() {
-		return expand(parameters.getAlmUserName());
-	}
-
-	@Override
-	public void setAlmUserName(final String almUserName) {
-		parameters.setAlmUserName(almUserName);
-	}
-
-	@Override
-	public String getEncryptedPassword() {
-		// no env variables allowed in password.
-		return parameters.getEncryptedPassword();
-	}
-
-	@Override
-	public void setEncryptedPassword(final String encryptedPassword) {
-		parameters.setEncryptedPassword(encryptedPassword);
+		super(parameters, envVars);
 	}
 
 	@Override
 	public AlmRunMode getRunMode() {
 		// no env variables, as this is a closed list.
-		return parameters.getRunMode();
+		return getParameters().getRunMode();
 	}
 
 	@Override
 	public String getHost() {
-		return expand(parameters.getHost());
+		return expand(getParameters().getHost());
 	}
 
 	@Override
 	public List<String> getTestSets() {
-		final List<String> testSets = parameters.getTestSets();
+		final List<String> testSets = getParameters().getTestSets();
 		// just in case
 		if (testSets == null) {
 			return null;
@@ -124,41 +61,36 @@ public class TestSetEnvSpecificParameters implements TestSetRunnerParameters {
 
 	@Override
 	public void setRunMode(final AlmRunMode runMode) {
-		parameters.setRunMode(runMode);
+		getParameters().setRunMode(runMode);
 	}
 
 	@Override
 	public void setHost(final String host) {
-		parameters.setHost(host);
+		getParameters().setHost(host);
 	}
 
 	@Override
 	public void setTestSets(final List<String> testSets) {
-		parameters.setTestSets(testSets);
+		getParameters().setTestSets(testSets);
 	}
 
 	@Override
 	public int getTimeOut() {
-		return parameters.getTimeOut();
+		return getParameters().getTimeOut();
 	}
 
 	@Override
 	public void setTimeOut(final int timeOut) {
-		parameters.setTimeOut(timeOut);
+		getParameters().setTimeOut(timeOut);
 	}
 
 	@Override
 	public String getOutputDirPath() {
-		return expand(parameters.getOutputDirPath());
+		return expand(getParameters().getOutputDirPath());
 	}
 
 	@Override
 	public void setOutputDirPath(final String outputDirPath) {
-		parameters.setOutputDirPath(outputDirPath);
+		getParameters().setOutputDirPath(outputDirPath);
 	}
-
-	private String expand(final String value) {
-		return envVars.expand(value);
-	}
-
 }
