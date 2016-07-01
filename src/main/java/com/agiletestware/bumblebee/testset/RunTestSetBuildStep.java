@@ -188,7 +188,7 @@ public class RunTestSetBuildStep extends Builder implements SimpleBuildStep {
 
 		@Override
 		public String getDisplayName() {
-			return "Bumblebee HP ALM Test Executer";
+			return "Bumblebee HP ALM Test Executor";
 		}
 
 		public AlmRunMode[] getRunModes() {
