@@ -7,7 +7,7 @@
 	</parent>
 	<packaging>hpi</packaging>
 	<artifactId>bumblebee</artifactId>
-	<version>4.0.2-SNAPSHOT</version>
+	<version>4.0.2</version>
 	<name>Bumblebee HP ALM Plugin</name>
 	<url>https://wiki.jenkins-ci.org/display/JENKINS/Bumblebee+HP+ALM+Plugin</url>
 	<developers>
@@ -72,13 +72,13 @@
 		<connection>scm:git:ssh://github.com/jenkinsci/bumblebee-plugin.git</connection>
 		<developerConnection>scm:git:ssh://git@github.com/jenkinsci/bumblebee-plugin.git</developerConnection>
 		<url>https://github.com/jenkinsci/bumblebee-plugin</url>
-	  <tag>HEAD</tag>
+	  <tag>bumblebee-4.0.2</tag>
   </scm>
 	<dependencies>
 		<dependency>
 			<groupId>com.agiletestware</groupId>
 			<artifactId>bumblebee-client</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>0.0.1</version>
 		</dependency>
 	</dependencies>
 	<repositories>
