@@ -17,7 +17,7 @@
 						</j:forEach>
 					</select>						
 				</f:entry>
-				<f:entry title="ALM Host" field="host">						
+				<f:entry title="Run Host" field="host">						
 					<f:textbox name="host" value="${instance.getHost()}"/>					
 				</f:entry>		
 				<f:entry title="Test Sets" field="testSets">
