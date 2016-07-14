@@ -209,7 +209,7 @@ public class RunTestSetBuildStep extends Builder implements SimpleBuildStep {
 				@QueryParameter final AlmRunMode runMode)
 						throws IOException, ServletException {
 			project.checkPermission(Job.CONFIGURE);
-			if (AlmRunMode.LOCAL == runMode || StringUtils.isNotEmpty(host)) {
+			if (AlmRunMode.LOCAL == runMode || AlmRunMode.SCHEDULED == runMode || StringUtils.isNotEmpty(host)) {
 				return FormValidation.ok();
 			}
 			return FormValidation.error("Host cannot be empty when ALM Run Mode is " + runMode);
