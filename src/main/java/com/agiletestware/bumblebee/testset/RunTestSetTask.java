@@ -9,6 +9,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableInt;
 import org.jenkinsci.remoting.RoleChecker;
 
@@ -83,9 +85,15 @@ public class RunTestSetTask implements Callable<Integer, Exception> {
 				returnCode.setValue(code);
 			}
 		};
+		final String outputDirPath = parameters.getOutputDirPath();
 		final Path outputDir = Paths.get(workspace.getRemote(), parameters.getOutputDirPath());
+		final File outDirFile = outputDir.toFile();
 		if (!Files.exists(outputDir)) {
 			Files.createDirectories(outputDir);
+		}
+		// clean directory if corresponding parameter is set.
+		else if (StringUtils.isNotEmpty(outputDirPath)) {
+			FileUtils.cleanDirectory(outDirFile);
 		}
 		runner.runTestSets(parameters, outputDir.toFile(), new JenkinsBuildLogger(listener));
 		return returnCode.intValue();

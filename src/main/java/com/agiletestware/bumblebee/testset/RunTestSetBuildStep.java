@@ -230,5 +230,10 @@ public class RunTestSetBuildStep extends Builder implements SimpleBuildStep {
 			return FormValidation.ok();
 		}
 
+		public FormValidation doCheckOutputDirPath(@AncestorInPath final AbstractProject<?, ?> project, @QueryParameter final String checkOutputDirPath) {
+			project.checkPermission(Job.CONFIGURE);
+			return BumblebeeUtils.validateRequiredField(checkOutputDirPath);
+		}
+
 	}
 }
