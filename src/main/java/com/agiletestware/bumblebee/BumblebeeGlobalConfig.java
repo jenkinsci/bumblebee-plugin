@@ -17,6 +17,7 @@ import com.agiletestware.bumblebee.client.api.BumblebeeApi;
 import com.agiletestware.bumblebee.util.BumblebeeUtils;
 
 import hudson.Extension;
+import hudson.ProxyConfiguration;
 import hudson.model.AbstractProject;
 import hudson.util.FormValidation;
 import jenkins.model.GlobalConfiguration;
@@ -105,7 +106,7 @@ public class BumblebeeGlobalConfig extends GlobalConfiguration {
 	 */
 	private boolean isUrlReachable(final String url, final int timeout) {
 		try {
-			final HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+			final HttpURLConnection connection = (HttpURLConnection) ProxyConfiguration.open(new URL(url));
 			connection.setConnectTimeout(timeout);
 			connection.setReadTimeout(timeout);
 			connection.setRequestMethod("GET");
