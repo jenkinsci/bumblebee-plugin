@@ -2,5 +2,5 @@
   This view is used to render the installed plugins page.
 -->
 <div>
-  This plugin allows you to publish result files that are created in build step.
+  This plugin allows you to publish result files that are created in build step in HP ALM. It also allows you to trigger HP ALM test set execution.
 </div>
