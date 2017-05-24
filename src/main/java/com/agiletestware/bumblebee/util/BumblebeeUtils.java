@@ -92,6 +92,7 @@ public class BumblebeeUtils {
 	 *         {@link FormValidation#error(String)} otherwise.
 	 */
 	public static FormValidation validateRequiredField(final String fieldValue) {
+		// Util.fixEmptyAndTrim returns null for empty or blank string
 		final String preparedVal = Util.fixEmptyAndTrim(fieldValue);
 		if (preparedVal == null) {
 			return FormValidation.error(REQUIRED);
