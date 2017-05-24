@@ -2,20 +2,20 @@ package com.agiletestware.bumblebee.testset;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableInt;
 import org.jenkinsci.remoting.RoleChecker;
 
 import com.agiletestware.bumblebee.JenkinsBuildLogger;
-import com.agiletestware.bumblebee.client.testrunner.CommandLineBuilder;
+import com.agiletestware.bumblebee.client.runner.ExternalProcessRunner;
+import com.agiletestware.bumblebee.client.runner.FileProvider;
+import com.agiletestware.bumblebee.client.runner.RunnerContext;
+import com.agiletestware.bumblebee.client.testrunner.TestSetCommandLineBuilder;
 import com.agiletestware.bumblebee.client.testrunner.TestSetRunner;
 import com.agiletestware.bumblebee.client.testrunner.TestSetRunnerParameters;
 import com.agiletestware.bumblebee.client.utils.BuildLogger;
@@ -64,15 +64,28 @@ public class RunTestSetTask implements Callable<Integer, Exception> {
 	public Integer call() throws Exception {
 		final File jenkinsDir = new File(jenkinsDirPath.getRemote());
 		final MutableInt returnCode = new MutableInt();
-		final TestSetRunner runner = new TestSetRunner(jenkinsDir) {
+		final TestSetRunner runner = new TestSetRunner(new FileProvider() {
 
 			@Override
-			protected void runTestSets(final CommandLineBuilder cmdBuilder, final File projectXml, final File outputDirectory, final BuildLogger logger)
-					throws Exception {
-				final List<String> cmdList = cmdBuilder.getCommandLineArguments(true);
+			public File getFile(final String fileName) throws IOException {
+				final File outputDir = new File(workspace.getRemote(), fileName);
+				if (outputDir.exists()) {
+					FileUtils.cleanDirectory(outputDir);
+				} else {
+					FileUtils.forceMkdir(outputDir);
+				}
+				return outputDir;
+			}
+		}) {
+
+			@Override
+			protected void runTestSets(final TestSetCommandLineBuilder cmdBuilder, final File projectXml, final File outputDirectory,
+					final RunnerContext context, final BuildLogger logger)
+							throws Exception {
+				final List<String> cmdList = cmdBuilder.getCommandLineArguments(parameters, true);
 				final Launcher launcher = new hudson.Launcher.LocalLauncher(listener);
 				launcher.launch().cmds(cmdList).pwd(projectXml.getParentFile());
-				final Proc proc = launcher.launch().cmds(cmdList).pwd(getBumblebeeDir()).readStdout().start();
+				final Proc proc = launcher.launch().cmds(cmdList).pwd(context.getBumblebeeDir()).readStdout().start();
 				final PrintStream stream = listener.getLogger();
 				try (final BufferedReader reader = new BufferedReader(new InputStreamReader(proc.getStdout()), 4096)) {
 					String line;
@@ -84,18 +97,9 @@ public class RunTestSetTask implements Callable<Integer, Exception> {
 				stream.println("Return code: " + code);
 				returnCode.setValue(code);
 			}
+
 		};
-		final String outputDirPath = parameters.getOutputDirPath();
-		final Path outputDir = Paths.get(workspace.getRemote(), parameters.getOutputDirPath());
-		final File outDirFile = outputDir.toFile();
-		if (!Files.exists(outputDir)) {
-			Files.createDirectories(outputDir);
-		}
-		// clean directory if corresponding parameter is set.
-		else if (StringUtils.isNotEmpty(outputDirPath)) {
-			FileUtils.cleanDirectory(outDirFile);
-		}
-		runner.runTestSets(parameters, outputDir.toFile(), new JenkinsBuildLogger(listener));
+		new ExternalProcessRunner<TestSetRunnerParameters>(jenkinsDir).run(runner, parameters, new JenkinsBuildLogger(listener));
 		return returnCode.intValue();
 	}
 

@@ -14,6 +14,7 @@ import org.kohsuke.stapler.QueryParameter;
 
 import com.agiletestware.bumblebee.client.api.BaseParameters;
 import com.agiletestware.bumblebee.client.api.BumblebeeApi;
+import com.agiletestware.bumblebee.client.api.BumblebeeApiImpl;
 import com.agiletestware.bumblebee.util.BumblebeeUtils;
 
 import hudson.Extension;
@@ -81,7 +82,7 @@ public class BumblebeeGlobalConfig extends GlobalConfiguration {
 			this.qcUrl = qcUrlTrimmed;
 			this.bumblebeeUrl = bumblebeeUrl;
 			this.timeOut = timeOut;
-			final BumblebeeApi bmapi = new BumblebeeApi(this.bumblebeeUrl, this.timeOut);
+			final BumblebeeApi bmapi = new BumblebeeApiImpl(this.bumblebeeUrl, this.timeOut);
 			// Set password only if old value is null/empty/blank OR if new
 			// value is not equal to old
 			if (StringUtils.isBlank(this.password) || !this.password.equals(password)) {

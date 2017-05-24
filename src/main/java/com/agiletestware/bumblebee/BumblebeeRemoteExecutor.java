@@ -11,13 +11,14 @@ import org.jenkinsci.remoting.RoleChecker;
 
 import com.agiletestware.bumblebee.client.api.BulkUpdateParameters;
 import com.agiletestware.bumblebee.client.api.BumblebeeApi;
+import com.agiletestware.bumblebee.client.api.BumblebeeApiImpl;
 
 import hudson.FilePath;
 import hudson.model.TaskListener;
 import hudson.remoting.Callable;
 
 public class BumblebeeRemoteExecutor implements
-		Callable<Void, Exception>, Serializable {
+Callable<Void, Exception>, Serializable {
 
 	/**
 	 *
@@ -42,7 +43,7 @@ public class BumblebeeRemoteExecutor implements
 	}
 
 	public void execute() throws Exception {
-		final BumblebeeApi api = new BumblebeeApi(parameters.getBumbleBeeUrl(),
+		final BumblebeeApi api = new BumblebeeApiImpl(parameters.getBumbleBeeUrl(),
 				parameters.getTimeOut() * 60);
 
 		boolean errorSeen = false;
@@ -66,8 +67,8 @@ public class BumblebeeRemoteExecutor implements
 		if (errorSeen) {
 			throw new Exception(
 					"[Bumblebee] Could not upload results to HP ALM using the following arameters: " + parameters
-							+ " , HP URL " + parameters.getAlmUrl()
-							+ ". Please check settings.");
+					+ " , HP URL " + parameters.getAlmUrl()
+					+ ". Please check settings.");
 		}
 
 		log.info("Upload done");
