@@ -19,8 +19,10 @@ import com.agiletestware.bumblebee.util.BumblebeeUtils;
 
 import hudson.Extension;
 import hudson.ProxyConfiguration;
+import hudson.Util;
 import hudson.model.AbstractProject;
 import hudson.util.FormValidation;
+import hudson.util.FormValidation.Kind;
 import jenkins.model.GlobalConfiguration;
 
 /**
@@ -31,6 +33,7 @@ import jenkins.model.GlobalConfiguration;
  */
 @Extension
 public class BumblebeeGlobalConfig extends GlobalConfiguration {
+	private static final String UFT_BATCH_RUNNER_CMD = "UFTBatchRunnerCMD.exe";
 	/** Logger. */
 	private static final Logger LOGGER = Logger.getLogger(BumblebeeGlobalConfig.class.getName());
 	private static final String PLUGIN_HELP_PAGE_URI = "/plugin/bumblebee/help/main.html";
@@ -40,6 +43,7 @@ public class BumblebeeGlobalConfig extends GlobalConfiguration {
 	private String password;
 	private String qcUrl;
 	private int timeOut;
+	private String uftRunnerPath;
 
 	/**
 	 * Constructor.
@@ -68,19 +72,33 @@ public class BumblebeeGlobalConfig extends GlobalConfiguration {
 	// Used by global.jelly to authenticate User key
 	public FormValidation doSaveConnection(@QueryParameter("bumblebeeUrl") final String bumblebeeUrl, @QueryParameter("qcUrl") final String qcUrl,
 			@QueryParameter("qcUserName") final String qcUserName, @QueryParameter("password") final String password,
-			@QueryParameter("timeOut") final int timeOut) {
+			@QueryParameter("timeOut") final int timeOut, @QueryParameter("uftRunnerPath") final String uftRunnerPath) {
 		try {
-			final String qcUrlTrimmed = StringUtils.trim(qcUrl);
-			if (!isUrlReachable(qcUrlTrimmed, timeOut)) {
-				return FormValidation.error("FAILED: Could not connect to " + qcUrlTrimmed);
-			}
 			final String bumblebeeUrlTrimmed = StringUtils.trim(bumblebeeUrl);
 			if (!isUrlReachable(bumblebeeUrlTrimmed, timeOut)) {
 				return FormValidation.error("FAILED: Could not connect to " + bumblebeeUrl);
 			}
-			this.qcUserName = qcUserName;
-			this.qcUrl = qcUrlTrimmed;
 			this.bumblebeeUrl = bumblebeeUrl;
+			final FormValidation uftValidation = doCheckUftRunnerPath(uftRunnerPath);
+			if (uftValidation.kind != Kind.OK) {
+				return uftValidation;
+			}
+			this.uftRunnerPath = uftRunnerPath;
+			if (StringUtils.isEmpty(qcUrl)) {
+				this.qcUrl = StringUtils.trim(qcUrl);
+				return FormValidation.ok("Configuration Saved");
+			}
+			final String qcUrlTrimmed = StringUtils.trim(qcUrl);
+			if (!isUrlReachable(qcUrlTrimmed, timeOut)) {
+				return FormValidation.error("FAILED: Could not connect to " + qcUrlTrimmed);
+			}
+			final String userNameTrimmed = Util.fixEmptyAndTrim(qcUserName);
+			if (userNameTrimmed == null) {
+				return FormValidation.error("Login required");
+			}
+			this.qcUserName = userNameTrimmed;
+			this.qcUrl = qcUrlTrimmed;
+
 			this.timeOut = timeOut;
 			final BumblebeeApi bmapi = new BumblebeeApiImpl(this.bumblebeeUrl, this.timeOut);
 			// Set password only if old value is null/empty/blank OR if new
@@ -93,7 +111,7 @@ public class BumblebeeGlobalConfig extends GlobalConfiguration {
 			LOGGER.log(Level.SEVERE, null, e);
 			return FormValidation.error("FAILED: " + e.getMessage());
 		}
-		return FormValidation.ok("Configuration  Saved");
+		return FormValidation.ok("Configuration Saved");
 	}
 
 	/**
@@ -140,19 +158,38 @@ public class BumblebeeGlobalConfig extends GlobalConfiguration {
 		return this.timeOut;
 	}
 
-	public FormValidation doCheckbumblebeeUrl(@AncestorInPath final AbstractProject<?, ?> project, @QueryParameter final String bumblebeeUrl)
+	public String getUftRunnerPath() {
+		return uftRunnerPath;
+	}
+
+	public FormValidation doCheckBumblebeeUrl(@AncestorInPath final AbstractProject<?, ?> project, @QueryParameter final String bumblebeeUrl)
 			throws IOException, ServletException {
 		return BumblebeeUtils.validatebumblebeeUrl(bumblebeeUrl);
 	}
 
-	public FormValidation doCheckqcUrl(@AncestorInPath final AbstractProject<?, ?> project, @QueryParameter final String qcUrl)
+	public FormValidation doCheckQcUrl(@AncestorInPath final AbstractProject<?, ?> project, @QueryParameter final String qcUrl)
 			throws IOException, ServletException {
+		if (StringUtils.isEmpty(qcUrl)) {
+			return FormValidation.ok();
+		}
 		return BumblebeeUtils.validateqcUrl(qcUrl);
 	}
 
-	public FormValidation doCheckqcUserName(@AncestorInPath final AbstractProject<?, ?> project, @QueryParameter final String qcUserName)
-			throws IOException, ServletException {
+	public FormValidation doCheckQcUserName(@AncestorInPath final AbstractProject<?, ?> project, @QueryParameter final String qcUserName,
+			@QueryParameter final String qcUrl)
+					throws IOException, ServletException {
+		// do not check ALM user if ALM URL is empty.
+		if (StringUtils.isEmpty(qcUrl)) {
+			return FormValidation.ok();
+		}
 		return BumblebeeUtils.validateRequiredField(qcUserName);
+	}
+
+	public FormValidation doCheckUftRunnerPath(@QueryParameter final String uftRunnerPath) {
+		if (StringUtils.isEmpty(uftRunnerPath)) {
+			return FormValidation.ok();
+		}
+		return uftRunnerPath.endsWith(UFT_BATCH_RUNNER_CMD) ? FormValidation.ok() : FormValidation.error("Must end with " + UFT_BATCH_RUNNER_CMD);
 	}
 
 }

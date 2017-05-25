@@ -6,32 +6,36 @@
          xmlns:f="/lib/form">
     <f:section title="BumbleBee Global Settings">
        
-            <f:entry title="BumbleBee URL:"  field="bumblebeeUrl">
-            <f:textbox name="bumblebeeUrl" value="${descriptor.getBumblebeeUrl()}" checkUrl="'descriptorByName/BumblebeeGlobalConfig/checkbumblebeeUrl?bumblebeeUrl='+encodeURIComponent(this.value)" />
+            <f:entry title="BumbleBee URL:" field="bumblebeeUrl">
+            <f:textbox name="bumblebeeUrl" value="${descriptor.getBumblebeeUrl()}"/>
           </f:entry>
           
-          <f:entry title="HP ALM URL:"  field="qcUrl">
-            <f:textbox name="qcUrl" value="${descriptor.getQcUrl()}" checkUrl="'descriptorByName/BumblebeeGlobalConfig/checkqcUrl?qcUrl='+encodeURIComponent(this.value)" />
+          <f:entry title="HP ALM URL:" field="qcUrl">
+            <f:textbox name="qcUrl" value="${descriptor.getQcUrl()}"/>
           </f:entry>
           
           
-          <f:entry title="HP ALM login:"   field="qcUserName" >
-            <f:textbox name="qcUserName" value="${descriptor.getQcUserName()}"    checkUrl="'descriptorByName/BumblebeeGlobalConfig/checkqcUserName?qcUserName='+encodeURIComponent(this.value)" />
+          <f:entry title="HP ALM Login:" field="qcUserName">
+            <f:textbox name="qcUserName" value="${descriptor.getQcUserName()}"/>
           </f:entry>
           
-          <f:entry title="HP ALM Password:"  field="password"  >
-          	<f:password name="password"   value="${descriptor.getPassword()}"  />
+          <f:entry title="HP ALM Password:" field="password">
+          	<f:password name="password" value="${descriptor.getPassword()}"/>
           </f:entry>
           
-           <f:entry title="Upload Timeout:"  field="timeOut"  >
-            <f:number name="timeOut"  default="0"  value="${descriptor.getTimeOut()}" clazz="required" checkMessage="Must be a valid integer" />
+          <f:entry title="UFT Batch Runner:" field="uftRunnerPath">
+          	<f:textbox name="uftRunnerPath" default="c:\Program Files (x86)\HP\Unified Functional Testing\bin\UFTBatchRunnerCMD.exe" value="${descriptor.getUftRunnerPath()}"/>
+          </f:entry>
+          
+           <f:entry title="Upload Timeout:" field="timeOut">
+            <f:number name="timeOut" default="0" value="${descriptor.getTimeOut()}" clazz="required" checkMessage="Must be a valid integer" />
           </f:entry>
    
         <f:validateButton
             disabled="True" 
             title="${%Save Configuration}"
-            progress="${%Saving  configuration}"
+            progress="${%Saving configuration}"
             method="saveConnection"
-            with="bumblebeeUrl,qcUrl,qcUserName,password,timeOut" />
+            with="bumblebeeUrl,qcUrl,qcUserName,password,timeOut,uftRunnerPath" />
     </f:section>
 </j:jelly>
