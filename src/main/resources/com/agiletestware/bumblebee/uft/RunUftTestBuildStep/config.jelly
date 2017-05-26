@@ -1,7 +1,7 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
 	<f:block>
 		<d:taglib uri="local">			
-			<table width="100%" title="${%UFT Runner Configuration}">
+			<table width="100%" title="UFT Runner Configuration">
 				<f:entry title="Test path" field="testPath">
 					<f:textbox name="testPath" value="${instance.getTestPath()}" clazz="required" checkMessage="Must not be empty"/>
 				</f:entry>          		
