@@ -38,7 +38,7 @@ public class RunUftTestBuildStep extends Builder implements SimpleBuildStep {
 	@Override
 	public void perform(final Run<?, ?> run, final FilePath workspace, final Launcher launcher, final TaskListener listener)
 			throws InterruptedException, IOException {
-		listener.getLogger().println("Bumblebee: running local UFT test");
+		listener.getLogger().println("Bumblebee: Run local UFT test");
 		try {
 			final RunUftTestTask task = new RunUftTestTask(UftRunnerParametersFactory.THE_INSTANCE.create(this,
 					GlobalConfiguration.all().get(BumblebeeGlobalConfig.class), run.getEnvironment(listener)), listener,
