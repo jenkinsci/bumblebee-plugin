@@ -14,6 +14,8 @@ import org.kohsuke.stapler.QueryParameter;
 
 import com.agiletestware.bumblebee.BumblebeeGlobalConfig;
 import com.agiletestware.bumblebee.BumblebeePublisher;
+import com.agiletestware.bumblebee.JenkinsBuildLogger;
+import com.agiletestware.bumblebee.client.pc.ParametersLogger;
 import com.agiletestware.bumblebee.client.pc.RunPcTestContext;
 import com.agiletestware.bumblebee.validator.StringNotEmptyValidator;
 import com.agiletestware.bumblebee.validator.StringStartsWithValidator;
@@ -198,6 +200,7 @@ public class RunPcTestBuildStep extends Builder implements SimpleBuildStep {
 		try {
 			final RunPcTestContext context = new RunPcTestContextImpl(this, GlobalConfiguration.all().get(BumblebeeGlobalConfig.class),
 					workspace);
+			ParametersLogger.THE_INSTANCE.logParameters(context, new JenkinsBuildLogger(listener), isFailIfTaskFails());
 			final RunPerformanceTestCallable callable = new RunPerformanceTestCallable(context, listener, run.getStartTimeInMillis());
 			launcher.getChannel().call(callable);
 		} catch (final Exception e) {
