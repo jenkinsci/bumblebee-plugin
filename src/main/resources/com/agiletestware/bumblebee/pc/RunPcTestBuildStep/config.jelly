@@ -1,0 +1,56 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+	<f:block>
+		<d:taglib uri="local">			
+			<table width="100%" title="${%Start Performance Center test configuration}">
+				<f:entry title="Domain" field="domain">
+					<f:textbox name="domain" value="${instance.getDomain()}" clazz="required" checkMessage="Must not be empty"/>
+				</f:entry>          		
+				<f:entry title="Project" field="project">
+					<f:textbox name="project" value="${instance.getProject()}" clazz="required" checkMessage="Must not be empty"/>
+				</f:entry>
+				<f:entry title="Results Directory" field="outputDir">
+					<f:textbox name="outputDir" value="${instance.getOutputDir()}" clazz="required" checkMessage="Must not be empty" default="pc-results"/>
+				</f:entry>
+				<f:entry title="Path To Test" field="testPlanPath">
+					<f:textbox name="testPlanPath" value="${instance.getTestPlanPath()}" clazz="required" default="Subject\"/>
+				</f:entry>
+				<f:entry title="Test Set" field="testLabPath">
+					<f:textbox name="testLabPath" value="${instance.getTestLabPath()}" clazz="required" default="Root\"/>
+				</f:entry>
+				<f:entry title="Post Run Action" field="postRunActionString">
+					<select name="postRunActionString">
+						<j:forEach var="postRunActionString" items="${descriptor.getAllRunActions()}">
+							<f:option selected="${postRunActionString == instance.getPostRunActionString()}" value="${postRunActionString}">
+									${postRunActionString}
+							</f:option>
+						</j:forEach>
+					</select>											
+				</f:entry>
+				<f:entry title="Time Slot Duration" field="timeslotDuration">
+					<f:number name="timeslotDuration" default="30" value="${instance.getTimeslotDuration()}" checkMessage="Must be a valid integer" />
+				</f:entry>
+				<f:entry title="Use VUD Licenses" field="vudsMode">
+					<f:checkbox name="vudsMode" checked="${instance.isVudsMode()}"/>
+		  		</f:entry>
+		  		<f:entry title="Timeout" field="timeout">
+					<f:number name="timeout" default="0" value="${instance.getTimeout()}" checkMessage="Must be a valid integer" />
+				</f:entry>
+				<f:entry title="Retry Attempts" field="retryCount">
+					<f:number name="retryCount" default="0" value="${instance.getRetryCount()}" checkMessage="Must be a valid integer" />
+				</f:entry>	
+				<f:entry title="Retry Interval" field="retryInterval">
+					<f:number name="retryInterval" default="0" value="${instance.getRetryInterval()}" checkMessage="Must be a valid integer" />
+				</f:entry>
+				<f:entry title="Interval Increase Factor" field="retryIntervalMultiplier">
+					<f:number name="retryIntervalMultiplier" default="2.0" value="${instance.getRetryIntervalMultiplier()}" checkMessage="Must be a valid integer" />
+				</f:entry>
+				<f:entry title="Polling Interval" field="pollingInterval">
+					<f:number name="pollingInterval" default="20" value="${instance.getPollingInterval()}" checkMessage="Must be a valid integer" />
+				</f:entry>
+				<f:entry title="Fail Build If Task Fails" field="failIfTaskFails">
+					<f:checkbox name="failIfTaskFails" checked="${instance.isFailIfTaskFails()}" default="true"/>
+		  		</f:entry>					
+			</table>			
+		</d:taglib>
+	</f:block>
+</j:jelly>

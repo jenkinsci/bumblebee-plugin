@@ -1,8 +1,7 @@
 package com.agiletestware.bumblebee;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -15,14 +14,17 @@ import org.kohsuke.stapler.QueryParameter;
 import com.agiletestware.bumblebee.client.api.BaseParameters;
 import com.agiletestware.bumblebee.client.api.BumblebeeApi;
 import com.agiletestware.bumblebee.client.api.BumblebeeApiImpl;
-import com.agiletestware.bumblebee.util.BumblebeeUtils;
+import com.agiletestware.bumblebee.validator.HpAlmUrlValidator;
+import com.agiletestware.bumblebee.validator.HpUrls;
+import com.agiletestware.bumblebee.validator.HpUserValidator;
+import com.agiletestware.bumblebee.validator.RegExpMatchValidator;
+import com.agiletestware.bumblebee.validator.UftRunnerPathValidator;
+import com.agiletestware.bumblebee.validator.UrlAvailableValidator;
 
 import hudson.Extension;
-import hudson.ProxyConfiguration;
 import hudson.Util;
 import hudson.model.AbstractProject;
 import hudson.util.FormValidation;
-import hudson.util.FormValidation.Kind;
 import jenkins.model.GlobalConfiguration;
 
 /**
@@ -33,17 +35,24 @@ import jenkins.model.GlobalConfiguration;
  */
 @Extension
 public class BumblebeeGlobalConfig extends GlobalConfiguration {
-	private static final String UFT_BATCH_RUNNER_CMD = "UFTBatchRunnerCMD.exe";
 	/** Logger. */
-	private static final Logger LOGGER = Logger.getLogger(BumblebeeGlobalConfig.class.getName());
+	static final Logger LOGGER = Logger.getLogger(BumblebeeGlobalConfig.class.getName());
 	private static final String PLUGIN_HELP_PAGE_URI = "/plugin/bumblebee/help/main.html";
 	private static final String PLUGIN_DISPLAY_NAME = "Bumblebee  HP  ALM  Uploader";
+	private static final UrlAvailableValidator BUMBLEBEE_URL_VALIDATOR = new UrlAvailableValidator("Bumblebee URL is required",
+			"FAILED: Could not connect to {0}");
+	private static final RegExpMatchValidator BUMBLEBEE_URL_REGEXP_VALIDATOR = new RegExpMatchValidator(
+			"Bumblebee URL should be http(s)://<bumblebee_server>:<port>/bumblebee", "^(https?)://[0-9a-zA-Z]([-.\\w]*[0-9a-zA-Z])*(:\\d*[^/])?\\/bumblebee$");
+	private static final RegExpMatchValidator ALM_URL_REGEXP_VALIDATOR = new RegExpMatchValidator("HP ALM URL should be http(s)://<qcserver>:<qcport>/qcbin",
+			"^(https?)\\:\\/\\/[0-9a-zA-Z]([-.\\w]*[0-9a-zA-Z])*(:\\d*[^\\/])?\\/qcbin$");
 	private String bumblebeeUrl;
 	private String qcUserName;
 	private String password;
 	private String qcUrl;
 	private int timeOut;
 	private String uftRunnerPath;
+	private String pcUrl;
+	private int pcTimeOut;
 
 	/**
 	 * Constructor.
@@ -70,36 +79,39 @@ public class BumblebeeGlobalConfig extends GlobalConfiguration {
 	}
 
 	// Used by global.jelly to authenticate User key
-	public FormValidation doSaveConnection(@QueryParameter("bumblebeeUrl") final String bumblebeeUrl, @QueryParameter("qcUrl") final String qcUrl,
-			@QueryParameter("qcUserName") final String qcUserName, @QueryParameter("password") final String password,
-			@QueryParameter("timeOut") final int timeOut, @QueryParameter("uftRunnerPath") final String uftRunnerPath) {
-		try {
-			final String bumblebeeUrlTrimmed = StringUtils.trim(bumblebeeUrl);
-			if (!isUrlReachable(bumblebeeUrlTrimmed, timeOut)) {
-				return FormValidation.error("FAILED: Could not connect to " + bumblebeeUrl);
-			}
-			this.bumblebeeUrl = bumblebeeUrl;
-			final FormValidation uftValidation = doCheckUftRunnerPath(uftRunnerPath);
-			if (uftValidation.kind != Kind.OK) {
-				return uftValidation;
-			}
-			this.uftRunnerPath = uftRunnerPath;
-			if (StringUtils.isEmpty(qcUrl)) {
-				this.qcUrl = StringUtils.trim(qcUrl);
-				return FormValidation.ok("Configuration Saved");
-			}
-			final String qcUrlTrimmed = StringUtils.trim(qcUrl);
-			if (!isUrlReachable(qcUrlTrimmed, timeOut)) {
-				return FormValidation.error("FAILED: Could not connect to " + qcUrlTrimmed);
-			}
-			final String userNameTrimmed = Util.fixEmptyAndTrim(qcUserName);
-			if (userNameTrimmed == null) {
-				return FormValidation.error("Login required");
-			}
-			this.qcUserName = userNameTrimmed;
-			this.qcUrl = qcUrlTrimmed;
+	public FormValidation doSaveConnection(
+			@QueryParameter("bumblebeeUrl") final String bumblebeeUrl,
+			@QueryParameter("qcUrl") final String qcUrl,
+			@QueryParameter("qcUserName") final String qcUserName,
+			@QueryParameter("password") final String password,
+			@QueryParameter("timeOut") final int timeOut,
+			@QueryParameter("uftRunnerPath") final String uftRunnerPath,
+			@QueryParameter("pcUrl") final String pcUrl,
+			@QueryParameter("pcTimeOut") final int pcTimeOut) {
+		final String bumblebeeUrlTrimmed = Util.fixEmptyAndTrim(bumblebeeUrl);
+		final String qcUrlTrimmed = Util.fixEmptyAndTrim(qcUrl);
+		final String userNameTrimmed = Util.fixEmptyAndTrim(qcUserName);
+		final String uftRunnerPathTrimmed = Util.fixEmptyAndTrim(uftRunnerPath);
+		final String pcUrlTrimmed = Util.fixEmptyAndTrim(pcUrl);
 
+		try {
+			final FormValidation validation = FormValidation.aggregate(Arrays.asList(
+					BUMBLEBEE_URL_VALIDATOR.validate(bumblebeeUrlTrimmed, timeOut), //
+					HpAlmUrlValidator.THE_INSTANCE.validate(qcUrlTrimmed, timeOut), //
+					HpUserValidator.THE_INSTANCE.validate(userNameTrimmed, new HpUrls(qcUrl, pcUrl)),
+					UftRunnerPathValidator.THE_INSTANCE.validate(uftRunnerPathTrimmed, null)));
+			if (FormValidation.Kind.ERROR == validation.kind) {
+				return validation;
+			}
+
+			this.bumblebeeUrl = bumblebeeUrlTrimmed;
+			this.uftRunnerPath = uftRunnerPathTrimmed;
+			this.qcUrl = qcUrlTrimmed;
+			this.qcUserName = userNameTrimmed;
 			this.timeOut = timeOut;
+			this.pcUrl = pcUrlTrimmed;
+			this.pcTimeOut = pcTimeOut;
+
 			final BumblebeeApi bmapi = new BumblebeeApiImpl(this.bumblebeeUrl, this.timeOut);
 			// Set password only if old value is null/empty/blank OR if new
 			// value is not equal to old
@@ -112,30 +124,6 @@ public class BumblebeeGlobalConfig extends GlobalConfiguration {
 			return FormValidation.error("FAILED: " + e.getMessage());
 		}
 		return FormValidation.ok("Configuration Saved");
-	}
-
-	/**
-	 * Is given URL can be reached with HTTP.
-	 *
-	 * @param url
-	 *            URL
-	 * @param timeout
-	 *            connection timeout. zero means infinite timeout.
-	 * @return
-	 */
-	private boolean isUrlReachable(final String url, final int timeout) {
-		try {
-			final HttpURLConnection connection = (HttpURLConnection) ProxyConfiguration.open(new URL(url));
-			connection.setConnectTimeout(timeout);
-			connection.setReadTimeout(timeout);
-			connection.setRequestMethod("GET");
-			final int responseCode = connection.getResponseCode();
-			LOGGER.log(Level.INFO, url + " --> HTTP " + responseCode);
-			return true;
-		} catch (final Exception ex) {
-			LOGGER.log(Level.SEVERE, "Could not get response from URL: " + url, ex);
-		}
-		return false;
 	}
 
 	public String getBumblebeeUrl() {
@@ -162,9 +150,17 @@ public class BumblebeeGlobalConfig extends GlobalConfiguration {
 		return uftRunnerPath;
 	}
 
+	public String getPcUrl() {
+		return pcUrl;
+	}
+
+	public int getPcTimeOut() {
+		return pcTimeOut;
+	}
+
 	public FormValidation doCheckBumblebeeUrl(@AncestorInPath final AbstractProject<?, ?> project, @QueryParameter final String bumblebeeUrl)
 			throws IOException, ServletException {
-		return BumblebeeUtils.validatebumblebeeUrl(bumblebeeUrl);
+		return BUMBLEBEE_URL_REGEXP_VALIDATOR.validate(bumblebeeUrl, null);
 	}
 
 	public FormValidation doCheckQcUrl(@AncestorInPath final AbstractProject<?, ?> project, @QueryParameter final String qcUrl)
@@ -172,24 +168,17 @@ public class BumblebeeGlobalConfig extends GlobalConfiguration {
 		if (StringUtils.isEmpty(qcUrl)) {
 			return FormValidation.ok();
 		}
-		return BumblebeeUtils.validateqcUrl(qcUrl);
+		return ALM_URL_REGEXP_VALIDATOR.validate(qcUrl, null);
 	}
 
 	public FormValidation doCheckQcUserName(@AncestorInPath final AbstractProject<?, ?> project, @QueryParameter final String qcUserName,
-			@QueryParameter final String qcUrl)
+			@QueryParameter final String qcUrl, @QueryParameter final String pcUrl)
 					throws IOException, ServletException {
-		// do not check ALM user if ALM URL is empty.
-		if (StringUtils.isEmpty(qcUrl)) {
-			return FormValidation.ok();
-		}
-		return BumblebeeUtils.validateRequiredField(qcUserName);
+		return HpUserValidator.THE_INSTANCE.validate(qcUserName, new HpUrls(qcUrl, pcUrl));
 	}
 
 	public FormValidation doCheckUftRunnerPath(@QueryParameter final String uftRunnerPath) {
-		if (StringUtils.isEmpty(uftRunnerPath)) {
-			return FormValidation.ok();
-		}
-		return uftRunnerPath.endsWith(UFT_BATCH_RUNNER_CMD) ? FormValidation.ok() : FormValidation.error("Must end with " + UFT_BATCH_RUNNER_CMD);
+		return UftRunnerPathValidator.THE_INSTANCE.validate(uftRunnerPath, null);
 	}
 
 }

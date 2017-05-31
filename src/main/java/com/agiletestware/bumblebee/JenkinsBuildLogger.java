@@ -1,5 +1,6 @@
 package com.agiletestware.bumblebee;
 
+import java.io.PrintStream;
 import java.io.Serializable;
 
 import com.agiletestware.bumblebee.client.utils.BuildLogger;
@@ -30,6 +31,18 @@ public class JenkinsBuildLogger implements BuildLogger, Serializable {
 	@Override
 	public void info(final String message) {
 		listener.getLogger().println(message);
+	}
+
+	@Override
+	public void error(final String message) {
+		listener.getLogger().println("ERROR: " + message);
+	}
+
+	@Override
+	public void error(final String message, final Throwable cause) {
+		final PrintStream logger = listener.getLogger();
+		logger.println("ERROR: " + message);
+		cause.printStackTrace(logger);
 	}
 
 }

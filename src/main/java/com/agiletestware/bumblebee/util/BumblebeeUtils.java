@@ -19,15 +19,6 @@ public class BumblebeeUtils {
 
 	private static final String REQUIRED = "Required";
 
-	public static FormValidation validatebumblebeeUrl(final String bumblebeeUrl) {
-		final String t = Util.fixEmptyAndTrim(bumblebeeUrl);
-		if ((t == null)
-				|| (!t.matches("^(https?)://[0-9a-zA-Z]([-.\\w]*[0-9a-zA-Z])*(:\\d*[^/])?\\/bumblebee$"))) {
-			return FormValidation
-					.error("URL should be http(s)://<bumblebee_server>:<port>/bumblebee");
-		}
-		return FormValidation.ok();
-	}
 
 	// FIXME: seems obsolete - clarify and remove.
 	public static FormValidation validateCustomProperties(
@@ -47,25 +38,6 @@ public class BumblebeeUtils {
 			return FormValidation
 					.error("Custom properties should be name=value and seperated by commas "
 							+ anye.getMessage());
-
-		}
-	}
-
-	// FIXME: seems obsolete - clarify and remove.
-	public static FormValidation validateTimeOut(String timeOut) {
-		try {
-			final String t = Util.fixEmptyAndTrim(timeOut);
-			final Pattern p = Pattern.compile("\\d*");
-
-			if (p.matcher(t).matches()) {
-				return FormValidation.ok();
-			}
-
-			return FormValidation.error("TimeOut needs to be a integer");
-		} catch (final Exception anye) {
-			timeOut = "0";
-			return FormValidation.error("TimeOut needs to be a integer "
-					+ anye.getMessage());
 
 		}
 	}

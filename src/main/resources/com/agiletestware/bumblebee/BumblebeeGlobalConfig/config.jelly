@@ -14,6 +14,9 @@
             <f:textbox name="qcUrl" value="${descriptor.getQcUrl()}"/>
           </f:entry>
           
+          <f:entry title="HP PC URL:" field="pcUrl">
+            <f:textbox name="pcUrl" value="${descriptor.getPcUrl()}"/>
+          </f:entry>
           
           <f:entry title="HP ALM Login:" field="qcUserName">
             <f:textbox name="qcUserName" value="${descriptor.getQcUserName()}"/>
@@ -30,12 +33,16 @@
            <f:entry title="Upload Timeout:" field="timeOut">
             <f:number name="timeOut" default="0" value="${descriptor.getTimeOut()}" clazz="required" checkMessage="Must be a valid integer" />
           </f:entry>
-   
+          
+           <f:entry title="PC Timeout:" field="pcTimeOut">
+            <f:number name="pcTimeOut" default="0" value="${descriptor.getPcTimeOut()}" checkMessage="Must be a valid integer" />
+          </f:entry>
+          
         <f:validateButton
             disabled="True" 
             title="${%Save Configuration}"
             progress="${%Saving configuration}"
             method="saveConnection"
-            with="bumblebeeUrl,qcUrl,qcUserName,password,timeOut,uftRunnerPath" />
+            with="bumblebeeUrl,qcUrl,qcUserName,password,timeOut,uftRunnerPath,pcUrl" />
     </f:section>
 </j:jelly>
