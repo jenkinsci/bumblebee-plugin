@@ -42,10 +42,10 @@
 					<f:number name="retryInterval" default="0" value="${instance.getRetryInterval()}" checkMessage="Must be a valid integer" />
 				</f:entry>
 				<f:entry title="Interval Increase Factor" field="retryIntervalMultiplier">
-					<f:number name="retryIntervalMultiplier" default="2.0" value="${instance.getRetryIntervalMultiplier()}" checkMessage="Must be a valid integer" />
+					<f:number name="retryIntervalMultiplier" default="2" value="${instance.getRetryIntervalMultiplier()}" checkMessage="Must be a valid integer" />
 				</f:entry>
 				<f:entry title="Polling Interval" field="pollingInterval">
-					<f:number name="pollingInterval" default="20" value="${instance.getPollingInterval()}" checkMessage="Must be a valid integer" />
+					<f:number name="pollingInterval" default="300" value="${instance.getPollingInterval()}" checkMessage="Must be a valid integer" />
 				</f:entry>
 				<f:entry title="Fail Build If Task Fails" field="failIfTaskFails">
 					<f:checkbox name="failIfTaskFails" checked="${instance.isFailIfTaskFails()}" default="true"/>
