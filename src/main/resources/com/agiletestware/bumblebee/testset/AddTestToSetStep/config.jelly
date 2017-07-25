@@ -1,0 +1,20 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+	<f:block>
+		<d:taglib uri="local">			
+			<table width="100%" title="${%Add Test to a Test Set}">
+				<f:entry title="Domain" field="domain">
+					<f:textbox name="domain" default="DEFAULT" value="${instance.getDomain()}"/>
+				</f:entry>          
+				<f:entry title="Project" field="project">
+					<f:textbox name="project" default="project" value="${instance.getProject()}"/>
+				</f:entry>			
+				<f:entry title="Test Plan Path" field="testPlanPath">						
+					<f:textbox name="testPlanPath" value="${instance.getTestPlanPath()}"/>					
+				</f:entry>		
+				<f:entry title="Test Set Path" field="testSetPath">
+					<f:textbox name="testSetPath" value="${instance.getTestSetPath()}"/>
+				</f:entry>
+			</table>			
+		</d:taglib>
+	</f:block>
+</j:jelly>
