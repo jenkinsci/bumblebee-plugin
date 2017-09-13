@@ -11,7 +11,7 @@ import hudson.EnvVars;
  * @author Sergey Oplavin
  *
  */
-public class BulkUpdateEnvSpecificParameters extends BaseEnvSpecificParameters<BulkUpdateParameters>implements BulkUpdateParameters {
+public class BulkUpdateEnvSpecificParameters extends BaseEnvSpecificParameters<BulkUpdateParameters> implements BulkUpdateParameters {
 
 	/** . */
 	private static final long serialVersionUID = -2876289816591828294L;
@@ -119,4 +119,12 @@ public class BulkUpdateEnvSpecificParameters extends BaseEnvSpecificParameters<B
 		getParameters().setOffline(offline);
 	}
 
+	@Override
+	public String toString() {
+		return "BulkUpdateEnvSpecificParameters [getTestPlanDirectory()=" + getTestPlanDirectory() + ", getTestLabDirectory()=" + getTestLabDirectory()
+		+ ", getFormat()=" + getFormat() + ", getTestSet()=" + getTestSet() + ", getResultPattern()=" + getResultPattern() + ", getMode()=" + getMode()
+		+ ", getTimeOut()=" + getTimeOut() + ", getCustomProperties()=" + getCustomProperties() + ", isOffline()=" + isOffline() + ", getAlmUrl()="
+		+ getAlmUrl() + ", getDomain()=" + getDomain() + ", getProject()=" + getProject() + ", getAlmUserName()=" + getAlmUserName()
+		+ ", getEncryptedPassword()=********" + ", getBumbleBeeUrl()=" + getBumbleBeeUrl() + "]";
+	}
 }

@@ -73,4 +73,11 @@ public class BaseEnvSpecificParameters<T extends BaseParameters> extends VeryBas
 		getParameters().setEncryptedPassword(encryptedPassword);
 	}
 
+	@Override
+	public String toString() {
+		return "BaseEnvSpecificParameters [getAlmUrl()=" + getAlmUrl() + ", getDomain()=" + getDomain() + ", getProject()=" + getProject()
+		+ ", getAlmUserName()=" + getAlmUserName() + ", getEncryptedPassword()=**********" + ", getBumbleBeeUrl()=" + getBumbleBeeUrl()
+		+ "]";
+	}
+
 }

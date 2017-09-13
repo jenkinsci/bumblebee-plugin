@@ -66,7 +66,7 @@ Callable<Void, Exception>, Serializable {
 
 		if (errorSeen) {
 			throw new Exception(
-					"[Bumblebee] Could not upload results to HP ALM using the following arameters: " + parameters
+					"[Bumblebee] Could not upload results to HP ALM using the following parameters: " + parameters
 					+ " , HP URL " + parameters.getAlmUrl()
 					+ ". Please check settings.");
 		}
