@@ -2,6 +2,7 @@ package com.agiletestware.bumblebee.uft;
 
 import com.agiletestware.bumblebee.VeryBaseEnvSpecificParameters;
 import com.agiletestware.bumblebee.client.uftrunner.UftRunnerParameters;
+import com.agiletestware.bumblebee.tracking.ClientType;
 
 import hudson.EnvVars;
 
@@ -59,6 +60,26 @@ public class UftRunnerEnvSpecificParameters extends VeryBaseEnvSpecificParameter
 	@Override
 	public void setTimeOut(final int timeout) {
 		getParameters().setTimeOut(timeout);
+	}
+
+	@Override
+	public String getReportFileName() {
+		return getParameters().getReportFileName();
+	}
+
+	@Override
+	public void setReportFileName(final String fileName) {
+		getParameters().setReportFileName(fileName);
+	}
+
+	@Override
+	public ClientType getClientType() {
+		return getParameters().getClientType();
+	}
+
+	@Override
+	public void setClientType(final ClientType clientType) {
+		getParameters().setClientType(clientType);
 	}
 
 }

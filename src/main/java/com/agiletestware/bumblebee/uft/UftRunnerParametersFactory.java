@@ -5,6 +5,7 @@ import org.apache.commons.lang.StringUtils;
 import com.agiletestware.bumblebee.BumblebeeGlobalConfig;
 import com.agiletestware.bumblebee.client.uftrunner.UftRunnerParameters;
 import com.agiletestware.bumblebee.client.uftrunner.UftRunnerParametersImpl;
+import com.agiletestware.bumblebee.tracking.ClientType;
 
 import hudson.EnvVars;
 
@@ -40,6 +41,7 @@ public enum UftRunnerParametersFactory {
 		params.setOutputDirName(step.getOutputDirPath());
 		params.setTestPath(step.getTestPath());
 		params.setTimeOut(globalConfig.getTimeOut());
+		params.setClientType(ClientType.JENKINS);
 
 		String uftRunnerPath = envVars.get(UFT_RUNNER_ENV_VAR_NAME);
 		if (StringUtils.isEmpty(uftRunnerPath)) {

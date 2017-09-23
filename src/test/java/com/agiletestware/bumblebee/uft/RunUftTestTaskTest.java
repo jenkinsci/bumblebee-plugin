@@ -18,7 +18,6 @@ import org.junit.Test;
 import com.agiletestware.bumblebee.client.runner.ExecutionEnvironment;
 import com.agiletestware.bumblebee.client.runner.ExecutionEnvironmentProvider;
 import com.agiletestware.bumblebee.client.runner.Runner;
-import com.agiletestware.bumblebee.client.runner.RunnerContext;
 import com.agiletestware.bumblebee.client.uftrunner.UftRunnerParameters;
 import com.agiletestware.bumblebee.client.uftrunner.UftRunnerParametersImpl;
 import com.agiletestware.bumblebee.client.utils.BuildLogger;
@@ -67,7 +66,7 @@ public class RunUftTestTaskTest {
 		task.setUftRunner(new Runner<UftRunnerParameters, Integer>() {
 
 			@Override
-			public Integer run(final UftRunnerParameters parameters, final RunnerContext context, final BuildLogger buildLogger) throws Exception {
+			public Integer run(final UftRunnerParameters parameters, final ExecutionEnvironment context, final BuildLogger buildLogger) throws Exception {
 				invoked.set(true);
 				assertEquals(uftParams, parameters);
 				final File bumblebeeDir = new File(jenkinsDir, "bumblebee");
@@ -144,7 +143,7 @@ public class RunUftTestTaskTest {
 		task.setUftRunner(new Runner<UftRunnerParameters, Integer>() {
 
 			@Override
-			public Integer run(final UftRunnerParameters parameters, final RunnerContext context, final BuildLogger buildLogger) throws Exception {
+			public Integer run(final UftRunnerParameters parameters, final ExecutionEnvironment context, final BuildLogger buildLogger) throws Exception {
 				return 0;
 			}
 		});
