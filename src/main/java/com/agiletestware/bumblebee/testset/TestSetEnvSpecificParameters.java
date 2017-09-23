@@ -6,6 +6,7 @@ import java.util.List;
 import com.agiletestware.bumblebee.BaseEnvSpecificParameters;
 import com.agiletestware.bumblebee.client.api.AlmRunMode;
 import com.agiletestware.bumblebee.client.testrunner.TestSetRunnerParameters;
+import com.agiletestware.bumblebee.tracking.ClientType;
 
 import hudson.EnvVars;
 
@@ -16,7 +17,7 @@ import hudson.EnvVars;
  * @author Sergey Oplavin
  *
  */
-public class TestSetEnvSpecificParameters extends BaseEnvSpecificParameters<TestSetRunnerParameters>implements TestSetRunnerParameters {
+public class TestSetEnvSpecificParameters extends BaseEnvSpecificParameters<TestSetRunnerParameters> implements TestSetRunnerParameters {
 
 	/** . */
 	private static final long serialVersionUID = 5224372037113848684L;
@@ -92,5 +93,15 @@ public class TestSetEnvSpecificParameters extends BaseEnvSpecificParameters<Test
 	@Override
 	public void setOutputDirPath(final String outputDirPath) {
 		getParameters().setOutputDirPath(outputDirPath);
+	}
+
+	@Override
+	public ClientType getClientType() {
+		return getParameters().getClientType();
+	}
+
+	@Override
+	public void setClientType(final ClientType clientType) {
+		getParameters().setClientType(clientType);
 	}
 }

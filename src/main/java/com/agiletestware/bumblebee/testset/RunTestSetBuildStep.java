@@ -16,6 +16,7 @@ import com.agiletestware.bumblebee.BumblebeeGlobalConfig;
 import com.agiletestware.bumblebee.client.api.AlmRunMode;
 import com.agiletestware.bumblebee.client.testrunner.TestSetRunnerParameters;
 import com.agiletestware.bumblebee.client.testrunner.TestSetRunnerParametersImpl;
+import com.agiletestware.bumblebee.tracking.ClientType;
 import com.agiletestware.bumblebee.util.BumblebeeUtils;
 
 import hudson.AbortException;
@@ -108,6 +109,7 @@ public class RunTestSetBuildStep extends Builder implements SimpleBuildStep {
 		params.setHost(getHost());
 		params.setOutputDirPath(getOutputDirPath());
 		params.setTimeOut(getTimeOut());
+		params.setClientType(ClientType.JENKINS);
 		final String sets = getTestSets();
 		final List<String> setsList = new ArrayList<>();
 		final StringTokenizer tokenizer = new StringTokenizer(sets, TEST_SET_DELIMETER);
@@ -181,6 +183,7 @@ public class RunTestSetBuildStep extends Builder implements SimpleBuildStep {
 			load();
 		}
 
+		@SuppressWarnings("rawtypes")
 		@Override
 		public boolean isApplicable(final Class<? extends AbstractProject> jobType) {
 			return true;

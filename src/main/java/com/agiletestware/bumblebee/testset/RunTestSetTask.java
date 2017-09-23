@@ -5,13 +5,16 @@ import java.io.File;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.jenkinsci.remoting.RoleChecker;
 
 import com.agiletestware.bumblebee.JenkinsBuildLogger;
 import com.agiletestware.bumblebee.ReportFolderProvider;
+import com.agiletestware.bumblebee.client.api.BumblebeeApiProvider;
+import com.agiletestware.bumblebee.client.api.DefaultBumblebeeApiProvider;
+import com.agiletestware.bumblebee.client.runner.ExecutionEnvironment;
 import com.agiletestware.bumblebee.client.runner.ExternalProcessRunner;
-import com.agiletestware.bumblebee.client.runner.RunnerContext;
 import com.agiletestware.bumblebee.client.testrunner.TestSetCommandLineBuilder;
 import com.agiletestware.bumblebee.client.testrunner.TestSetRunner;
 import com.agiletestware.bumblebee.client.testrunner.TestSetRunnerParameters;
@@ -37,6 +40,7 @@ public class RunTestSetTask implements Callable<Integer, Exception> {
 	private final FilePath jenkinsDirPath;
 	private final FilePath workspace;
 	private final TestSetRunnerParameters parameters;
+	private BumblebeeApiProvider bumblebeeApiProvider;
 
 	/**
 	 * Creates a new task
@@ -55,20 +59,22 @@ public class RunTestSetTask implements Callable<Integer, Exception> {
 		this.jenkinsDirPath = jenkinsDirPath;
 		this.workspace = workspace;
 		this.parameters = parameters;
+		this.bumblebeeApiProvider = new DefaultBumblebeeApiProvider();
 	}
 
 	@Override
 	public Integer call() throws Exception {
 		final File jenkinsDir = new File(jenkinsDirPath.getRemote());
-		final TestSetRunner runner = new TestSetRunner(new ReportFolderProvider(new File(workspace.getRemote()))) {
+		final TestSetRunner runner = new TestSetRunner(new ReportFolderProvider(new File(workspace.getRemote())),
+				bumblebeeApiProvider.provide(parameters.getBumbleBeeUrl(), (int) TimeUnit.MINUTES.toSeconds(parameters.getTimeOut()))) {
 
 			@Override
 			protected Integer runTestSets(final TestSetCommandLineBuilder cmdBuilder, final File projectXml, final File outputDirectory,
-					final RunnerContext context, final BuildLogger logger)
+					final ExecutionEnvironment environment, final BuildLogger logger)
 							throws Exception {
 				final List<String> cmdList = cmdBuilder.getCommandLineArguments(parameters, true);
 				final Launcher launcher = new hudson.Launcher.LocalLauncher(listener);
-				final Proc proc = launcher.launch().cmds(cmdList).pwd(context.getBumblebeeDir()).readStdout().start();
+				final Proc proc = launcher.launch().cmds(cmdList).pwd(environment.getBumblebeeDir()).readStdout().start();
 				final PrintStream stream = listener.getLogger();
 				try (final BufferedReader reader = new BufferedReader(new InputStreamReader(proc.getStdout()), 4096)) {
 					String line;
@@ -89,4 +95,13 @@ public class RunTestSetTask implements Callable<Integer, Exception> {
 	public void checkRoles(final RoleChecker arg0) throws SecurityException {
 	}
 
+	/**
+	 * Set bumblebee api provider.
+	 *
+	 * @param bumblebeeApiProvider
+	 *            provider.
+	 */
+	public void setBumblebeeApiProvider(final BumblebeeApiProvider bumblebeeApiProvider) {
+		this.bumblebeeApiProvider = bumblebeeApiProvider;
+	}
 }
