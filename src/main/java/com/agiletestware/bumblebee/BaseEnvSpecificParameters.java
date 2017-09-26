@@ -1,6 +1,7 @@
 package com.agiletestware.bumblebee;
 
 import com.agiletestware.bumblebee.client.api.BaseParameters;
+import com.agiletestware.bumblebee.tracking.ClientType;
 
 import hudson.EnvVars;
 
@@ -78,6 +79,16 @@ public class BaseEnvSpecificParameters<T extends BaseParameters> extends VeryBas
 		return "BaseEnvSpecificParameters [getAlmUrl()=" + getAlmUrl() + ", getDomain()=" + getDomain() + ", getProject()=" + getProject()
 		+ ", getAlmUserName()=" + getAlmUserName() + ", getEncryptedPassword()=**********" + ", getBumbleBeeUrl()=" + getBumbleBeeUrl()
 		+ "]";
+	}
+
+	@Override
+	public ClientType getClientType() {
+		return getParameters().getClientType();
+	}
+
+	@Override
+	public void setClientType(final ClientType clientType) {
+		getParameters().setClientType(clientType);
 	}
 
 }
