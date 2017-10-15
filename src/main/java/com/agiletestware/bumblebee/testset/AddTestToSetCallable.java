@@ -37,9 +37,10 @@ public class AddTestToSetCallable implements Callable<Void, Exception> {
 
 	@Override
 	public Void call() throws Exception {
-		final BumblebeeApi bumblebeeApi = new BumblebeeApiImpl(parameters.getBumbleBeeUrl(), timeout);
-		bumblebeeApi.addTestToSet(parameters);
-		return null;
+		try (final BumblebeeApi bumblebeeApi = new BumblebeeApiImpl(parameters.getBumbleBeeUrl(), timeout)) {
+			bumblebeeApi.addTestToSet(parameters);
+			return null;
+		}
 	}
 
 	@Override

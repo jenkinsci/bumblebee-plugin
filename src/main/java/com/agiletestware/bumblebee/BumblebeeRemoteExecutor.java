@@ -43,8 +43,6 @@ Callable<Void, Exception>, Serializable {
 	}
 
 	public void execute() throws Exception {
-		final BumblebeeApi api = new BumblebeeApiImpl(parameters.getBumbleBeeUrl(),
-				parameters.getTimeOut() * 60);
 
 		boolean errorSeen = false;
 
@@ -55,13 +53,16 @@ Callable<Void, Exception>, Serializable {
 					+ parameters.getResultPattern() + ". Please check pattern");
 		}
 
-		for (final FilePath filePath : filesToBeUploaded) {
-			final boolean fileUploaded = api.sendSingleTestReport(parameters, new File(filePath.getRemote()),
-					log);
-			if (!fileUploaded && !errorSeen) {
-				errorSeen = true;
+		try (final BumblebeeApi api = new BumblebeeApiImpl(parameters.getBumbleBeeUrl(),
+				parameters.getTimeOut() * 60)) {
+			for (final FilePath filePath : filesToBeUploaded) {
+				final boolean fileUploaded = api.sendSingleTestReport(parameters, new File(filePath.getRemote()),
+						log);
+				if (!fileUploaded && !errorSeen) {
+					errorSeen = true;
+				}
+				log.info("--------------------------");
 			}
-			log.info("--------------------------");
 		}
 
 		if (errorSeen) {

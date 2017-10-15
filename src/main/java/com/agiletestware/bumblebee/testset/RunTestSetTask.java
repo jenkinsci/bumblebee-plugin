@@ -11,6 +11,7 @@ import org.jenkinsci.remoting.RoleChecker;
 
 import com.agiletestware.bumblebee.JenkinsBuildLogger;
 import com.agiletestware.bumblebee.ReportFolderProvider;
+import com.agiletestware.bumblebee.client.api.BumblebeeApi;
 import com.agiletestware.bumblebee.client.api.BumblebeeApiProvider;
 import com.agiletestware.bumblebee.client.api.DefaultBumblebeeApiProvider;
 import com.agiletestware.bumblebee.client.runner.ExecutionEnvironment;
@@ -65,30 +66,32 @@ public class RunTestSetTask implements Callable<Integer, Exception> {
 	@Override
 	public Integer call() throws Exception {
 		final File jenkinsDir = new File(jenkinsDirPath.getRemote());
-		final TestSetRunner runner = new TestSetRunner(new ReportFolderProvider(new File(workspace.getRemote())),
-				bumblebeeApiProvider.provide(parameters.getBumbleBeeUrl(), (int) TimeUnit.MINUTES.toSeconds(parameters.getTimeOut()))) {
+		try (BumblebeeApi api = bumblebeeApiProvider.provide(parameters.getBumbleBeeUrl(), (int) TimeUnit.MINUTES.toSeconds(parameters.getTimeOut()))) {
+			final TestSetRunner runner = new TestSetRunner(new ReportFolderProvider(new File(workspace.getRemote())),
+					api) {
 
-			@Override
-			protected Integer runTestSets(final TestSetCommandLineBuilder cmdBuilder, final File projectXml, final File outputDirectory,
-					final ExecutionEnvironment environment, final BuildLogger logger)
-							throws Exception {
-				final List<String> cmdList = cmdBuilder.getCommandLineArguments(parameters, true);
-				final Launcher launcher = new hudson.Launcher.LocalLauncher(listener);
-				final Proc proc = launcher.launch().cmds(cmdList).pwd(environment.getBumblebeeDir()).readStdout().start();
-				final PrintStream stream = listener.getLogger();
-				try (final BufferedReader reader = new BufferedReader(new InputStreamReader(proc.getStdout()), 4096)) {
-					String line;
-					while ((line = reader.readLine()) != null) {
-						stream.println(line);
+				@Override
+				protected Integer runTestSets(final TestSetCommandLineBuilder cmdBuilder, final File projectXml, final File outputDirectory,
+						final ExecutionEnvironment environment, final BuildLogger logger)
+								throws Exception {
+					final List<String> cmdList = cmdBuilder.getCommandLineArguments(parameters, true);
+					final Launcher launcher = new hudson.Launcher.LocalLauncher(listener);
+					final Proc proc = launcher.launch().cmds(cmdList).pwd(environment.getBumblebeeDir()).readStdout().start();
+					final PrintStream stream = listener.getLogger();
+					try (final BufferedReader reader = new BufferedReader(new InputStreamReader(proc.getStdout()), 4096)) {
+						String line;
+						while ((line = reader.readLine()) != null) {
+							stream.println(line);
+						}
 					}
+					final int code = proc.join();
+					stream.println("Return code: " + code);
+					return code;
 				}
-				final int code = proc.join();
-				stream.println("Return code: " + code);
-				return code;
-			}
 
-		};
-		return new ExternalProcessRunner<TestSetRunnerParameters>(jenkinsDir).run(runner, parameters, new JenkinsBuildLogger(listener));
+			};
+			return new ExternalProcessRunner<TestSetRunnerParameters>(jenkinsDir).run(runner, parameters, new JenkinsBuildLogger(listener));
+		}
 	}
 
 	@Override

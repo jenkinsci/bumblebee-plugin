@@ -58,10 +58,10 @@ public class UftRunner implements Runner<UftRunnerParameters, Integer>, Serializ
 	@Override
 	public Integer run(final UftRunnerParameters parameters, final ExecutionEnvironment context, final BuildLogger buildLogger) throws Exception {
 		final long startTime = System.currentTimeMillis();
-		final BumblebeeApi api = new BumblebeeApiImpl(parameters.getBumbleBeeUrl(), (int) TimeUnit.MINUTES.toSeconds(parameters.getTimeOut()));
 		final File report = new File(context.getWorkingDir(), UUID.randomUUID().toString());
-		final Tracker tracker = new Tracker(api);
-		try {
+		Tracker tracker = null;
+		try (final BumblebeeApi api = new BumblebeeApiImpl(parameters.getBumbleBeeUrl(), (int) TimeUnit.MINUTES.toSeconds(parameters.getTimeOut()))) {
+			tracker = new Tracker(api);
 			parameters.setReportFileName(report.getAbsolutePath());
 			final UftCommandLineBuilder uftBuilder = new UftCommandLineBuilder(parameters, new ReportFolderProvider(new File(workspace.getRemote())),
 					new TestPathFileProvider(new File(workspace.getRemote())));
@@ -80,7 +80,9 @@ public class UftRunner implements Runner<UftRunnerParameters, Integer>, Serializ
 			sendTrackingEvent(tracker, parameters, System.currentTimeMillis() - startTime, report, code, buildLogger);
 			return code;
 		} catch (final Exception ex) {
-			tracker.track(new RunUftTestEvent(parameters.getClientType(), ex.getMessage()), buildLogger);
+			if (tracker != null) {
+				tracker.track(new RunUftTestEvent(parameters.getClientType(), ex.getMessage()), buildLogger);
+			}
 			throw ex;
 		} finally {
 			FileUtils.deleteQuietly(report);

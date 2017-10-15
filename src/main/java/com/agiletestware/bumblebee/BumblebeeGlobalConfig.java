@@ -112,11 +112,12 @@ public class BumblebeeGlobalConfig extends GlobalConfiguration {
 			this.pcUrl = pcUrlTrimmed;
 			this.pcTimeOut = pcTimeOut;
 
-			final BumblebeeApi bmapi = new BumblebeeApiImpl(this.bumblebeeUrl, this.timeOut);
-			// Set password only if old value is null/empty/blank OR if new
-			// value is not equal to old
-			if (StringUtils.isBlank(this.password) || !this.password.equals(password)) {
-				this.password = bmapi.getEncryptedPassword(StringUtils.trim(password));
+			try (final BumblebeeApi bmapi = new BumblebeeApiImpl(this.bumblebeeUrl, this.timeOut)) {
+				// Set password only if old value is null/empty/blank OR if new
+				// value is not equal to old
+				if (StringUtils.isBlank(this.password) || !this.password.equals(password)) {
+					this.password = bmapi.getEncryptedPassword(StringUtils.trim(password));
+				}
 			}
 			save();
 		} catch (final Exception e) {
