@@ -13,7 +13,7 @@ public enum DefaultGetTestResultsParametersFactory implements GetTestResultsPara
 
 	THE_INSTANCE;
 	@Override
-	public GetTestResultsParameters create(final BumblebeeGlobalConfig globalConfig, final GetTestResults jobConfig) {
+	public GetTestResultsParameters create(final BumblebeeGlobalConfig globalConfig, final GetTestResultsConfiguration jobConfig) {
 		return GetTestResultsParametersImpl.builder(globalConfig.getBumblebeeUrl())
 				.almUrl(globalConfig.getQcUrl())
 				.almUser(globalConfig.getQcUserName())

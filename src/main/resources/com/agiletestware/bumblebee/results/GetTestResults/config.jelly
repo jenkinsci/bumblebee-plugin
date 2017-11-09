@@ -1,20 +1,29 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
 	<f:block>
-		<d:taglib uri="local">			
-			<table width="100%" title="Fetch test results from HP ALM">
-				<f:entry title="Domain" field="domain">
-					<f:textbox name="domain" default="DEFAULT" value="${instance.getDomain()}"/>
-				</f:entry>          
-				<f:entry title="Project" field="project">
-					<f:textbox name="project" default="project" value="${instance.getProject()}"/>
-				</f:entry>			
-				<f:entry title="Test Set Path" field="testSetPath">						
-					<f:textbox name="testSetPath" default="Root\" value="${instance.getTestSetPath()}"/>					
-				</f:entry>		
-				<f:entry title="Results Directory" field="resultsDir">
-					<f:textbox name="resultsDir" default='alm-results' value="${instance.getResultsDir()}"/>
-				</f:entry>
-			</table>			
+		<d:taglib uri="local">
+			<f:entry title="${%List of Configurations}" description="${%List of Configurations}">
+     			<f:repeatable var="conf" items="${instance.configurations}" add="Add More" minimum="1">			
+					<table width="100%" title="Fetch test results from HP ALM">
+						<f:entry title="Domain" field="domain">
+							<f:textbox name="domain" default="DEFAULT" value="${conf.getDomain()}"/>
+						</f:entry>          
+						<f:entry title="Project" field="project">
+							<f:textbox name="project" default="project" value="${conf.getProject()}"/>
+						</f:entry>			
+						<f:entry title="Test Set Path" field="testSetPath">						
+							<f:textbox name="testSetPath" default="Root\" value="${conf.getTestSetPath()}"/>					
+						</f:entry>		
+						<f:entry title="Results Directory" field="resultsDir">
+							<f:textbox name="resultsDir" default='alm-results' value="${conf.getResultsDir()}"/>
+						</f:entry>
+						<f:entry title="">
+					    <div align="right">
+					      <f:repeatableDeleteButton />
+					    </div>
+					  </f:entry>
+					</table>
+				</f:repeatable>
+  			</f:entry>			
 		</d:taglib>
 	</f:block>
 </j:jelly>
