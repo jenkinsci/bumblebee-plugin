@@ -12,6 +12,8 @@ import org.kohsuke.stapler.DataBoundConstructor;
  */
 public class GetTestResultsConfiguration implements Serializable {
 
+	/** . */
+	private static final long serialVersionUID = -4600406379228450005L;
 	private final String domain;
 	private final String project;
 	private final String testSetPath;
