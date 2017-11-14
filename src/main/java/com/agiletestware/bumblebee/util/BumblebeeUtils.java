@@ -86,13 +86,17 @@ public class BumblebeeUtils {
 	}
 
 	public static FormValidation validateTestLab(final String testLab) {
-		final String t = Util.fixEmptyAndTrim(testLab);
+		return validateTestLab(testLab, "Test Lab");
+	}
+
+	public static FormValidation validateTestLab(final String testLabPath, final String paramName) {
+		final String t = Util.fixEmptyAndTrim(testLabPath);
 		if (t == null) {
 			return FormValidation.error(REQUIRED);
 		}
 		if (!t.startsWith("Root\\") || t.contains("^") || t.contains("*")) {
 			return FormValidation
-					.error("Test Lab must begin with 'Root\\' and cannot contain '^' or '*'");
+					.error(paramName + " must begin with 'Root\\' and cannot contain '^' or '*'");
 		}
 		return FormValidation.ok();
 	}
