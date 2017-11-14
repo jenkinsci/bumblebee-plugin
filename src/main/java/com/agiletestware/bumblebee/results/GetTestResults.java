@@ -103,7 +103,7 @@ public class GetTestResults extends Recorder {
 	}
 
 	private String createFileName(final String testSetPath) {
-		return testSetPath.replaceAll("\\\\", "_") + "_" + System.currentTimeMillis() + ".xml";
+		return testSetPath.replaceAll("[\\\\/:*?\"<>|]", "_") + "_" + System.currentTimeMillis() + ".xml";
 	}
 
 	private void logParameters(final BumblebeeGlobalConfig config, final GetTestResultsParameters params, final String resultsDir, final PrintStream logger) {
