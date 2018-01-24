@@ -108,7 +108,7 @@ public class GetTestResults extends Recorder {
 					logParameters(bumblebeeUrl, params, resultsDir, logger);
 					final FilePath workspace = build.getWorkspace();
 					final FilePath reportFile = workspace.child(resultsDir).child(createFileName(params.getTestSetPath()));
-					try (InputStream stream = api.getTestResults(params)) {
+					try (InputStream stream = api.getJunitTestResults(params)) {
 						logger.println("Writing results into: " + reportFile.getRemote());
 						try (OutputStream out = reportFile.write()) {
 							IOUtils.copy(stream, out);

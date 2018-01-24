@@ -24,4 +24,9 @@ public class GetTestResultsEnvSpecificParams extends BaseEnvSpecificParameters<G
 	public String getTestSetPath() {
 		return expand(getParameters().getTestSetPath());
 	}
+
+	@Override
+	public String getTestPlanPath() {
+		return expand(getParameters().getTestPlanPath());
+	}
 }
