@@ -55,6 +55,9 @@ public class RunPcTestBuildStep extends Builder implements SimpleBuildStep {
 	private int retryCount;
 	private int retryInterval;
 	private double retryIntervalMultiplier;
+	private boolean retryCollateAndAnalysisFlag;
+	private int retryCollateAndAnalysisAttempts;
+	private int retryCollateAndAnalysisInterval;
 	private int pollingInterval;
 	private boolean failIfTaskFails;
 
@@ -154,6 +157,33 @@ public class RunPcTestBuildStep extends Builder implements SimpleBuildStep {
 	@DataBoundSetter
 	public void setRetryIntervalMultiplier(final double retryIntervalMultiplier) {
 		this.retryIntervalMultiplier = retryIntervalMultiplier;
+	}
+
+	public boolean isRetryCollateAndAnalysisFlag() {
+		return retryCollateAndAnalysisFlag;
+	}
+
+	@DataBoundSetter
+	public void setRetryCollateAndAnalysisFlag(final boolean retryCollateAndAnalysisFlag) {
+		this.retryCollateAndAnalysisFlag = retryCollateAndAnalysisFlag;
+	}
+
+	public int getRetryCollateAndAnalysisInterval() {
+		return retryCollateAndAnalysisInterval;
+	}
+
+	@DataBoundSetter
+	public void setRetryCollateAndAnalysisInterval(final int retryCollateAndAnalysisInterval) {
+		this.retryCollateAndAnalysisInterval = retryCollateAndAnalysisInterval;
+	}
+
+	public int getRetryCollateAndAnalysisAttempts() {
+		return retryCollateAndAnalysisAttempts;
+	}
+
+	@DataBoundSetter
+	public void setRetryCollateAndAnalysisAttempts(final int retryCollateAndAnalysisAttempts) {
+		this.retryCollateAndAnalysisAttempts = retryCollateAndAnalysisAttempts;
 	}
 
 	public int getPollingInterval() {

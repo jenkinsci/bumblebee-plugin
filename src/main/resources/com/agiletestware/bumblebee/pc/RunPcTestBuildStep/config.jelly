@@ -44,6 +44,15 @@
 				<f:entry title="Interval Increase Factor" field="retryIntervalMultiplier">
 					<f:number name="retryIntervalMultiplier" default="2" value="${instance.getRetryIntervalMultiplier()}" checkMessage="Must be a valid integer" />
 				</f:entry>
+				<f:optionalBlock name="retryCollateAndAnalysisFlag" title="Retry Collate/Analyze" checked="${instance.isRetryCollateAndAnalysisFlag()}" inline="true" 
+				 help="/plugin/bumblebee/help-retryCollateAndAnalysisFlag.html">
+				<f:entry title="Collate/Analyze retry attempts" field="retryCollateAndAnalysisAttempts">
+					<f:number name="retryCollateAndAnalysisAttempts" value="${instance.retryCollateAndAnalysisAttempts()}" default="0"  checkMessage="Must be a valid integer" />
+				</f:entry>
+			    <f:entry title="Collate/Analyze retry interval" field="retryCollateAndAnalysisInterval">
+					<f:number name="retryCollateAndAnalysisInterval" value="${instance.retryCollateAndAnalysisInterval()}" default="0"  checkMessage="Must be a valid integer" />
+				</f:entry>
+				</f:optionalBlock>
 				<f:entry title="Polling Interval" field="pollingInterval">
 					<f:number name="pollingInterval" default="300" value="${instance.getPollingInterval()}" checkMessage="Must be a valid integer" />
 				</f:entry>
@@ -53,4 +62,5 @@
 			</table>			
 		</d:taglib>
 	</f:block>
+
 </j:jelly>

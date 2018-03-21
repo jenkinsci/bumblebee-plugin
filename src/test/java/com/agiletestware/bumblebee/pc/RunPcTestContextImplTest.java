@@ -21,6 +21,8 @@ import hudson.FilePath;
  */
 public class RunPcTestContextImplTest {
 
+	private static final double DEFAULT_RETRY_INTERVAL_MULTIPLY_FACTORY = 1.0;
+
 	@Test
 	public void testGetBumblebeeUrl() {
 		final String expBumblebeeUrl = "exp bbe url";
@@ -91,7 +93,7 @@ public class RunPcTestContextImplTest {
 	}
 
 	@Test
-	public void testGetRetrySettings() {
+	public void testGetGenericRetrySettings() {
 		final int retryCount = 1;
 		final int retryInterval = 2;
 		final double increaseFactor = 2.0;
@@ -103,10 +105,48 @@ public class RunPcTestContextImplTest {
 		final RunPcTestContextImpl context = new RunPcTestContextImpl(step,
 				mock(BumblebeeGlobalConfig.class),
 				new FilePath(new File("")));
-		final RetrySettings settings = context.getRetrySettings();
+		final RetrySettings settings = context.getGenericRetrySettings();
 		assertEquals(retryCount, settings.getRetryAttempts());
 		assertEquals(retryInterval, settings.getRetryIntervalSeconds());
 		assertEquals(increaseFactor, settings.getRetryIntervalMultiplyFactor(), 0);
+	}
+
+	@Test
+	public void testGetCollateAnalyzeRetrySettingsWithEnableRetryEqualTrue() {
+		final boolean retryCollateAndAnalysisFlag = true;
+		final int retryCollateAndAnalysisAttempts = 2;
+		final int retryCollateAndAnalysisInterval = 12;
+		final RunPcTestBuildStep step = new RunPcTestBuildStep();
+		step.setOutputDir("output");
+		step.setRetryCollateAndAnalysisFlag(retryCollateAndAnalysisFlag);
+		step.setRetryCollateAndAnalysisAttempts(retryCollateAndAnalysisAttempts);
+		step.setRetryCollateAndAnalysisInterval(retryCollateAndAnalysisInterval);
+		final RunPcTestContextImpl context = new RunPcTestContextImpl(step,
+				mock(BumblebeeGlobalConfig.class),
+				new FilePath(new File("")));
+		final RetrySettings settings = context.getCollateAnalyzeRetrySettings();
+		assertEquals(retryCollateAndAnalysisAttempts, settings.getRetryAttempts());
+		assertEquals(retryCollateAndAnalysisInterval, settings.getRetryIntervalSeconds());
+		assertEquals(0, DEFAULT_RETRY_INTERVAL_MULTIPLY_FACTORY, settings.getRetryIntervalMultiplyFactor());
+	}
+
+	@Test
+	public void testGetCollateAnalyzeRetrySettingsWithEnableRetryEqualFalse() {
+		final boolean retryCollateAndAnalysisFlag = false;
+		final int retryCollateAndAnalysisAttempts = 0;
+		final int retryCollateAndAnalysisInterval = 0;
+		final RunPcTestBuildStep step = new RunPcTestBuildStep();
+		step.setOutputDir("output");
+		step.setRetryCollateAndAnalysisFlag(retryCollateAndAnalysisFlag);
+		step.setRetryCollateAndAnalysisAttempts(retryCollateAndAnalysisAttempts);
+		step.setRetryCollateAndAnalysisInterval(retryCollateAndAnalysisInterval);
+		final RunPcTestContextImpl context = new RunPcTestContextImpl(step,
+				mock(BumblebeeGlobalConfig.class),
+				new FilePath(new File("")));
+		final RetrySettings settings = context.getCollateAnalyzeRetrySettings();
+		assertEquals(retryCollateAndAnalysisAttempts, settings.getRetryAttempts());
+		assertEquals(retryCollateAndAnalysisInterval, settings.getRetryIntervalSeconds());
+		assertEquals(0, DEFAULT_RETRY_INTERVAL_MULTIPLY_FACTORY, settings.getRetryIntervalMultiplyFactor());
 	}
 
 	@Test

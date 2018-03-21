@@ -18,11 +18,12 @@ import hudson.FilePath;
  */
 public class RunPcTestContextImpl implements RunPcTestContext, Serializable {
 
-	/** . */
+	private static final double DEFAULT_RETRY_INTERVAL_MULTIPLY_FACTORY = 1.0;
 	private static final long serialVersionUID = 3758920973453470489L;
 	private final StartRunParameters parameters;
 	private final PcConnectionParameters connectionParameters;
-	private final RetrySettings retrySettings;
+	private final RetrySettings genericRetrySettings;
+	private final RetrySettings collateAnalyzeRetrySettings;
 	private final int pollingInterval;
 	private final File outputDir;
 	private final String bumblebeeUrl;
@@ -33,10 +34,10 @@ public class RunPcTestContextImpl implements RunPcTestContext, Serializable {
 		this.connectionParameters = new PcConnectionParametersImpl(globalConfig, buildStep.getDomain(), buildStep.getProject());
 		this.bumblebeeUrl = globalConfig.getBumblebeeUrl();
 		this.connectionTimeOut = (int) TimeUnit.MINUTES.toSeconds(getTimeout(buildStep, globalConfig));
-		this.retrySettings = new RetrySettings(buildStep.getRetryCount(), buildStep.getRetryInterval(), buildStep.getRetryIntervalMultiplier());
+		this.genericRetrySettings = new RetrySettings(buildStep.getRetryCount(), buildStep.getRetryInterval(), buildStep.getRetryIntervalMultiplier());
+		this.collateAnalyzeRetrySettings = createCollateAnalyzeRetrySettings(buildStep);
 		this.pollingInterval = buildStep.getPollingInterval();
-		this.outputDir = new File(workspace.getRemote(),
-				buildStep.getOutputDir());
+		this.outputDir = new File(workspace.getRemote(), buildStep.getOutputDir());
 	}
 
 	private StartRunParameters createStartRunParameters(final RunPcTestBuildStep buildStep) {
@@ -80,13 +81,25 @@ public class RunPcTestContextImpl implements RunPcTestContext, Serializable {
 	}
 
 	@Override
-	public RetrySettings getRetrySettings() {
-		return retrySettings;
+	public RetrySettings getGenericRetrySettings() {
+		return genericRetrySettings;
+	}
+
+	@Override
+	public RetrySettings getCollateAnalyzeRetrySettings() {
+		return collateAnalyzeRetrySettings;
 	}
 
 	@Override
 	public int getPollingInterval() {
 		return pollingInterval;
+	}
+
+	private RetrySettings createCollateAnalyzeRetrySettings(final RunPcTestBuildStep buildStep) {
+		final boolean enableRetry = buildStep.isRetryCollateAndAnalysisFlag();
+		return enableRetry ? new RetrySettings(buildStep.getRetryCollateAndAnalysisAttempts(), buildStep.getRetryCollateAndAnalysisInterval(),
+				DEFAULT_RETRY_INTERVAL_MULTIPLY_FACTORY)
+				: new RetrySettings(0, 0, DEFAULT_RETRY_INTERVAL_MULTIPLY_FACTORY);
 	}
 
 	private static class PcConnectionParametersImpl implements PcConnectionParameters, Serializable {
