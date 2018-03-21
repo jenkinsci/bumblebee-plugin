@@ -14,12 +14,13 @@ import org.kohsuke.stapler.QueryParameter;
 import com.agiletestware.bumblebee.client.api.BaseParameters;
 import com.agiletestware.bumblebee.client.api.BumblebeeApi;
 import com.agiletestware.bumblebee.client.api.BumblebeeApiImpl;
+import com.agiletestware.bumblebee.client.utils.UrlAvailableValidator;
+import com.agiletestware.bumblebee.validator.CustomUrlAvailableValidator;
 import com.agiletestware.bumblebee.validator.HpAlmUrlValidator;
 import com.agiletestware.bumblebee.validator.HpUrls;
 import com.agiletestware.bumblebee.validator.HpUserValidator;
 import com.agiletestware.bumblebee.validator.RegExpMatchValidator;
 import com.agiletestware.bumblebee.validator.UftRunnerPathValidator;
-import com.agiletestware.bumblebee.validator.UrlAvailableValidator;
 
 import hudson.Extension;
 import hudson.Util;
@@ -39,8 +40,8 @@ public class BumblebeeGlobalConfig extends GlobalConfiguration {
 	static final Logger LOGGER = Logger.getLogger(BumblebeeGlobalConfig.class.getName());
 	private static final String PLUGIN_HELP_PAGE_URI = "/plugin/bumblebee/help/main.html";
 	private static final String PLUGIN_DISPLAY_NAME = "Bumblebee  HP  ALM  Uploader";
-	private static final UrlAvailableValidator BUMBLEBEE_URL_VALIDATOR = new UrlAvailableValidator("Bumblebee URL is required",
-			"FAILED: Could not connect to {0}");
+	private static final CustomUrlAvailableValidator BUMBLEBEE_URL_VALIDATOR = new CustomUrlAvailableValidator("Bumblebee URL is required",
+			"FAILED: Could not connect to {0}", new UrlAvailableValidator(new JenkinsLogger(BumblebeeGlobalConfig.class)));
 	private static final RegExpMatchValidator BUMBLEBEE_URL_REGEXP_VALIDATOR = new RegExpMatchValidator(
 			"Bumblebee URL should be http(s)://<bumblebee_server>:<port>/bumblebee", "^(https?)://[0-9a-zA-Z]([-.\\w]*[0-9a-zA-Z])*(:\\d*[^/])?\\/bumblebee$");
 	private static final RegExpMatchValidator ALM_URL_REGEXP_VALIDATOR = new RegExpMatchValidator("HP ALM URL should be http(s)://<qcserver>:<qcport>/qcbin",

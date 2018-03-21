@@ -2,6 +2,9 @@ package com.agiletestware.bumblebee.validator;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.agiletestware.bumblebee.JenkinsLogger;
+import com.agiletestware.bumblebee.client.utils.UrlAvailableValidator;
+
 import hudson.util.FormValidation;
 
 /**
@@ -13,7 +16,8 @@ import hudson.util.FormValidation;
 public enum HpAlmUrlValidator implements Validator<String, Integer> {
 
 	THE_INSTANCE;
-	private final UrlAvailableValidator urlValidator = new UrlAvailableValidator("HP ALM is required", "FAILED: Could not connect to {0}");
+	private final CustomUrlAvailableValidator urlValidator = new CustomUrlAvailableValidator("HP ALM is required", "FAILED: Could not connect to {0}",
+			new UrlAvailableValidator(new JenkinsLogger(HpAlmUrlValidator.class)));
 
 	@Override
 	public FormValidation validate(final String value, final Integer timeout) {
