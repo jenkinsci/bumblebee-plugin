@@ -13,7 +13,7 @@ import hudson.util.FormValidation;
 public enum HpAlmUrlValidator implements Validator<String, Integer> {
 
 	THE_INSTANCE;
-	private final UrlAvailableValidator urlValidator = new UrlAvailableValidator("HP ALM is required", "FAILED: Could not connect to {0}");;
+	private final UrlAvailableValidator urlValidator = new UrlAvailableValidator("HP ALM is required", "FAILED: Could not connect to {0}");
 
 	@Override
 	public FormValidation validate(final String value, final Integer timeout) {
