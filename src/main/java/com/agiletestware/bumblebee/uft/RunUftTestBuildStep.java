@@ -77,7 +77,7 @@ public class RunUftTestBuildStep extends Builder implements SimpleBuildStep {
 
 		@SuppressWarnings("rawtypes")
 		@Override
-		public boolean isApplicable(final Class<? extends AbstractProject> arg0) {
+		public boolean isApplicable(final Class<? extends AbstractProject> jobType) {
 			return true;
 		}
 
