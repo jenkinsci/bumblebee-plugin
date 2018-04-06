@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 import javax.servlet.ServletException;
 
 import org.kohsuke.stapler.AncestorInPath;
+import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
@@ -23,18 +24,21 @@ import com.agiletestware.bumblebee.client.api.BulkUpdateParametersImpl;
 import com.agiletestware.bumblebee.tracking.ClientType;
 import com.agiletestware.bumblebee.util.BumblebeeUtils;
 
+import hudson.AbortException;
 import hudson.Extension;
+import hudson.FilePath;
 import hudson.Launcher;
-import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
-import hudson.model.BuildListener;
 import hudson.model.Job;
+import hudson.model.Run;
+import hudson.model.TaskListener;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
 import hudson.tasks.Recorder;
 import hudson.util.FormValidation;
 import jenkins.model.GlobalConfiguration;
+import jenkins.tasks.SimpleBuildStep;
 import net.sf.json.JSONObject;
 
 /**
@@ -42,7 +46,7 @@ import net.sf.json.JSONObject;
  *
  * @author Sergey Oplavin (refactored)
  */
-public class BumblebeePublisher extends Recorder {
+public class BumblebeePublisher extends Recorder implements SimpleBuildStep {
 
 	/** Logger. */
 	private static final Logger LOGGER = Logger.getLogger(BumblebeePublisher.class.getName());
@@ -66,6 +70,7 @@ public class BumblebeePublisher extends Recorder {
 	 * @param configs
 	 *            List of configurations.
 	 */
+	@DataBoundConstructor
 	public BumblebeePublisher(final Collection<BumblebeeConfiguration> configs) {
 		this(configs.toArray(new BumblebeeConfiguration[configs.size()]));
 	}
@@ -88,13 +93,13 @@ public class BumblebeePublisher extends Recorder {
 		return BuildStepMonitor.NONE;
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
-	public boolean perform(final AbstractBuild build, final Launcher launcher, final BuildListener listener) throws InterruptedException, IOException {
+	public void perform(final Run<?, ?> run, final FilePath workspace, final Launcher launcher, final TaskListener listener)
+			throws InterruptedException, IOException {
 		boolean success = true;
 		for (final BumblebeeConfiguration config : getConfigs()) {
 			try {
-				doBulkUpdate(config, build, launcher, listener);
+				doBulkUpdate(config, run, workspace, launcher, listener);
 			} catch (final Throwable ex) {
 				listener.getLogger().println(ex.getMessage());
 				LOGGER.log(Level.SEVERE, null, ex);
@@ -107,7 +112,9 @@ public class BumblebeePublisher extends Recorder {
 
 			}
 		}
-		return success;
+		if (!success) {
+			throw new AbortException("Bumblebee: Fail if upload flag is set to true -> mark build as failed");
+		}
 	}
 
 	/**
@@ -125,9 +132,9 @@ public class BumblebeePublisher extends Recorder {
 	 *            what it says
 	 * @throws Exception
 	 */
-	@SuppressWarnings("rawtypes")
-	public void doBulkUpdate(final BumblebeeConfiguration config, final AbstractBuild build, final Launcher launcher, final BuildListener listener)
-			throws Exception {
+	public void doBulkUpdate(final BumblebeeConfiguration config, final Run<?, ?> run, final FilePath workspace, final Launcher launcher,
+			final TaskListener listener)
+					throws Exception {
 		final BumblebeeGlobalConfig globalConfig = GlobalConfiguration.all().get(BumblebeeGlobalConfig.class);
 		final BulkUpdateParameters params = new BulkUpdateParametersImpl();
 		globalConfig.populateBaseParameters(params);
@@ -145,8 +152,8 @@ public class BumblebeePublisher extends Recorder {
 		params.setClientType(ClientType.JENKINS);
 
 		final PrintStream logger = listener.getLogger();
-		final BumblebeeRemoteExecutor remoteExecutor = new BumblebeeRemoteExecutor(BumblebeeUtils.getWorkspace(build),
-				new BulkUpdateEnvSpecificParameters(params, build.getEnvironment(listener)), listener);
+		final BumblebeeRemoteExecutor remoteExecutor = new BumblebeeRemoteExecutor(workspace,
+				new BulkUpdateEnvSpecificParameters(params, run.getEnvironment(listener)), listener);
 		try {
 			launcher.getChannel().call(remoteExecutor);
 		} catch (final Throwable e) {
@@ -235,5 +242,4 @@ public class BumblebeePublisher extends Recorder {
 		}
 
 	}
-
 }
