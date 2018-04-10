@@ -60,31 +60,22 @@ public class BumblebeeRemoteExecutor implements Callable<Void, Exception>, Seria
 		logParameters();
 		try (final BumblebeeApi api = new BumblebeeApiImpl(parameters.getBumbleBeeUrl(),
 				parameters.getTimeOut() * 60)) {
-			if (JASMINE_REPORT.equalsIgnoreCase(parameters.getFormat())) {
-				final JasmineJsonParser jasmineJsonParser = new JasmineJsonParser();
-				for (final FilePath filePath : filesToBeUploaded) {
-					ReportResources jasmineResources = null;
-					final File fileToUpload = new File(filePath.getRemote());
-					if (JASMINE_REPORT.equalsIgnoreCase(parameters.getFormat())) {
-						final JasmineReport jasmineReport = jasmineJsonParser.parseJasmineReport(fileToUpload);
-						jasmineResources = ReportResourcesFactory.THE_INSTANCE.create(jasmineReport.getSuites(), workspace.getRemote(),
-								jasmineReport.getScreenshotPath());
-					}
-					final boolean fileUploaded = api.sendSingleTestReport(parameters, fileToUpload, log, jasmineResources);
-					if (!fileUploaded && !errorSeen) {
-						errorSeen = true;
-					}
-					log.info("--------------------------");
+			final JasmineJsonParser jasmineJsonParser = new JasmineJsonParser();
+			for (final FilePath filePath : filesToBeUploaded) {
+				final File fileToUpload = new File(filePath.getRemote());
+				boolean fileUploaded;
+				if (JASMINE_REPORT.equalsIgnoreCase(parameters.getFormat())) {
+					final JasmineReport jasmineReport = jasmineJsonParser.parseJasmineReport(fileToUpload);
+					final ReportResources jasmineResources = ReportResourcesFactory.THE_INSTANCE.create(jasmineReport.getSuites(), workspace.getRemote(),
+							jasmineReport.getScreenshotPath());
+					fileUploaded = api.sendSingleTestReport(parameters, fileToUpload, log, jasmineResources);
+				} else {
+					fileUploaded = api.sendSingleTestReport(parameters, fileToUpload, log);
 				}
-			} else {
-				for (final FilePath filePath : filesToBeUploaded) {
-					final File fileToUpload = new File(filePath.getRemote());
-					final boolean fileUploaded = api.sendSingleTestReport(parameters, fileToUpload, log);
-					if (!fileUploaded && !errorSeen) {
-						errorSeen = true;
-					}
-					log.info("--------------------------");
+				if (!fileUploaded && !errorSeen) {
+					errorSeen = true;
 				}
+				log.info("--------------------------");
 			}
 		}
 
