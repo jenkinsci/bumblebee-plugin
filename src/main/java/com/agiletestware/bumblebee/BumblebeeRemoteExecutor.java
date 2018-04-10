@@ -9,13 +9,13 @@ import java.util.List;
 
 import org.jenkinsci.remoting.RoleChecker;
 
+import com.agiletestware.bumblebee.client.ReportResources;
+import com.agiletestware.bumblebee.client.ReportResourcesFactory;
 import com.agiletestware.bumblebee.client.api.BulkUpdateParameters;
 import com.agiletestware.bumblebee.client.api.BumblebeeApi;
 import com.agiletestware.bumblebee.client.api.BumblebeeApiImpl;
 import com.agiletestware.bumblebee.client.jasmine.JasmineJsonParser;
 import com.agiletestware.bumblebee.client.jasmine.JasmineReport;
-import com.agiletestware.bumblebee.client.jasmine.JasmineResources;
-import com.agiletestware.bumblebee.jasmine.JasmineResourcesFactory;
 import com.agiletestware.bumblebee.util.ThreadLocalMessageFormat;
 
 import hudson.FilePath;
@@ -60,19 +60,31 @@ public class BumblebeeRemoteExecutor implements Callable<Void, Exception>, Seria
 		logParameters();
 		try (final BumblebeeApi api = new BumblebeeApiImpl(parameters.getBumbleBeeUrl(),
 				parameters.getTimeOut() * 60)) {
-			final JasmineJsonParser jasmineJsonParser = new JasmineJsonParser();
-			for (final FilePath filePath : filesToBeUploaded) {
-				JasmineResources jasmineResources = null;
-				final File fileToUpload = new File(filePath.getRemote());
-				if (JASMINE_REPORT.equalsIgnoreCase(parameters.getFormat())) {
-					final JasmineReport jasmineReport = jasmineJsonParser.parseJasmineReport(fileToUpload);
-					jasmineResources = JasmineResourcesFactory.THE_INSTANCE.create(jasmineReport.getSuites(), workspace, jasmineReport.getScreenshotPath());
+			if (JASMINE_REPORT.equalsIgnoreCase(parameters.getFormat())) {
+				final JasmineJsonParser jasmineJsonParser = new JasmineJsonParser();
+				for (final FilePath filePath : filesToBeUploaded) {
+					ReportResources jasmineResources = null;
+					final File fileToUpload = new File(filePath.getRemote());
+					if (JASMINE_REPORT.equalsIgnoreCase(parameters.getFormat())) {
+						final JasmineReport jasmineReport = jasmineJsonParser.parseJasmineReport(fileToUpload);
+						jasmineResources = ReportResourcesFactory.THE_INSTANCE.create(jasmineReport.getSuites(), workspace.getRemote(),
+								jasmineReport.getScreenshotPath());
+					}
+					final boolean fileUploaded = api.sendSingleTestReport(parameters, fileToUpload, log, jasmineResources);
+					if (!fileUploaded && !errorSeen) {
+						errorSeen = true;
+					}
+					log.info("--------------------------");
 				}
-				final boolean fileUploaded = api.sendSingleTestReport(parameters, fileToUpload, log, jasmineResources);
-				if (!fileUploaded && !errorSeen) {
-					errorSeen = true;
+			} else {
+				for (final FilePath filePath : filesToBeUploaded) {
+					final File fileToUpload = new File(filePath.getRemote());
+					final boolean fileUploaded = api.sendSingleTestReport(parameters, fileToUpload, log);
+					if (!fileUploaded && !errorSeen) {
+						errorSeen = true;
+					}
+					log.info("--------------------------");
 				}
-				log.info("--------------------------");
 			}
 		}
 
