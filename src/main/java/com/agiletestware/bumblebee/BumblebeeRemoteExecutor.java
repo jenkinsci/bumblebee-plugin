@@ -9,24 +9,26 @@ import java.util.List;
 
 import org.jenkinsci.remoting.RoleChecker;
 
+import com.agiletestware.bumblebee.client.ReportResources;
+import com.agiletestware.bumblebee.client.ReportResourcesFactory;
 import com.agiletestware.bumblebee.client.api.BulkUpdateParameters;
 import com.agiletestware.bumblebee.client.api.BumblebeeApi;
 import com.agiletestware.bumblebee.client.api.BumblebeeApiImpl;
+import com.agiletestware.bumblebee.client.jasmine.JasmineJsonParser;
+import com.agiletestware.bumblebee.client.jasmine.JasmineReport;
 import com.agiletestware.bumblebee.util.ThreadLocalMessageFormat;
 
 import hudson.FilePath;
 import hudson.model.TaskListener;
 import hudson.remoting.Callable;
 
-public class BumblebeeRemoteExecutor implements
-Callable<Void, Exception>, Serializable {
-
+public class BumblebeeRemoteExecutor implements Callable<Void, Exception>, Serializable {
 	/**
 	 *
 	 */
 	private static final long serialVersionUID = 3670838509646174454L;
 	private static final ThreadLocalMessageFormat LOG_FORMAT = new ThreadLocalMessageFormat("{0}: {1}");
-
+	private static final String JASMINE_REPORT = "jasmine";
 	private final JenkinsBuildLogger log;
 	private final FilePath workspace;
 	private final BulkUpdateParameters parameters;
@@ -50,16 +52,26 @@ Callable<Void, Exception>, Serializable {
 
 		final List<FilePath> filesToBeUploaded = locateBumbleBeeReports(
 				workspace, parameters.getResultPattern());
-		if (filesToBeUploaded.size() == 0) {
+
+		if (filesToBeUploaded.isEmpty()) {
 			throw new Exception("Bumblebee: Did not find any file matching the pattern "
 					+ parameters.getResultPattern() + ". Please check pattern");
 		}
 		logParameters();
 		try (final BumblebeeApi api = new BumblebeeApiImpl(parameters.getBumbleBeeUrl(),
 				parameters.getTimeOut() * 60)) {
+			final JasmineJsonParser jasmineJsonParser = new JasmineJsonParser();
 			for (final FilePath filePath : filesToBeUploaded) {
-				final boolean fileUploaded = api.sendSingleTestReport(parameters, new File(filePath.getRemote()),
-						log);
+				final File fileToUpload = new File(filePath.getRemote());
+				boolean fileUploaded;
+				if (JASMINE_REPORT.equalsIgnoreCase(parameters.getFormat())) {
+					final JasmineReport jasmineReport = jasmineJsonParser.parseJasmineReport(fileToUpload);
+					final ReportResources jasmineResources = ReportResourcesFactory.THE_INSTANCE.create(jasmineReport.getSuites(), workspace.getRemote(),
+							jasmineReport.getScreenshotPath());
+					fileUploaded = api.sendSingleTestReport(parameters, fileToUpload, log, jasmineResources);
+				} else {
+					fileUploaded = api.sendSingleTestReport(parameters, fileToUpload, log);
+				}
 				if (!fileUploaded && !errorSeen) {
 					errorSeen = true;
 				}
