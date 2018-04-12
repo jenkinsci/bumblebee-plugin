@@ -127,9 +127,10 @@ public class GetTestResults extends Recorder implements SimpleBuildStep {
 		} catch (final Exception ex) {
 			logger.println(ex.getMessage());
 			LOGGER.log(Level.SEVERE, null, ex);
+			throw new AbortException(ex.getMessage());
 		}
 		if (!success) {
-			logger.println("One or more configurations have fail --> mark build as failure. Check the log for details");
+			throw new AbortException("One or more configurations have fail --> mark build as failure. Check the log for details");
 		}
 
 	}
