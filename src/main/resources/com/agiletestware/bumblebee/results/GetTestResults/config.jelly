@@ -17,10 +17,10 @@
 				<f:textbox name="resultsDir" default='alm-results' value="${instance.getResultsDir()}" clazz="required"/>
 			</f:entry>		
 			<f:entry title="Test Results Configuration:" description="Test Results Configuration">
-     			<f:repeatable var="configuration" items="${instance.configurations}" add="Add More" minimum="1">			
+     			<f:repeatable var="configurations" items="${instance.configurations}" add="Add More" minimum="1">			
 					<table width="100%" title="Fetch test results from HP ALM">					
 						<f:entry title="Test Set Path" field="testSetPath">						
-							<f:textbox name="testSetPath" default="Root\" value="${configuration.getTestSetPath()}" clazz="required"/>					
+							<f:textbox name="testSetPath" default="Root\" value="${configurations.getTestSetPath()}" clazz="required"/>					
 						</f:entry>								
 						<f:entry title="">
 					    <div align="right">

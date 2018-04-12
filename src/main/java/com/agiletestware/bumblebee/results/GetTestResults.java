@@ -16,6 +16,7 @@ import javax.servlet.ServletException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 
 import com.agiletestware.bumblebee.BumblebeeGlobalConfig;
@@ -28,9 +29,9 @@ import hudson.AbortException;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
-import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
-import hudson.model.BuildListener;
+import hudson.model.Run;
+import hudson.model.TaskListener;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
@@ -38,6 +39,7 @@ import hudson.tasks.Recorder;
 import hudson.util.FormValidation;
 import hudson.util.Secret;
 import jenkins.model.GlobalConfiguration;
+import jenkins.tasks.SimpleBuildStep;
 
 /**
  * Post build action for fetching test results from HP ALM TestSet. It fetches
@@ -47,15 +49,15 @@ import jenkins.model.GlobalConfiguration;
  * @author Sergey Oplavin
  *
  */
-public class GetTestResults extends Recorder {
+public class GetTestResults extends Recorder implements SimpleBuildStep {
 	private static final Logger LOGGER = Logger.getLogger(GetTestResults.class.getName());
 	private static final String PLUGIN_DISPLAY_NAME = "Bumblebee: Import HP ALM Test Results";
 	private BumblebeeApiProvider bumblebeeApiProvider = new DefaultBumblebeeApiProvider();
 	private final GetTestResultsParametersFactory parametersFactory = DefaultGetTestResultsParametersFactory.THE_INSTANCE;
 	private final String domain;
 	private final String project;
-	private final String user;
-	private final String password;
+	private String user;
+	private String password;
 	private final String resultsDir;
 	private final List<GetTestResultsConfiguration> configurations;
 
@@ -77,20 +79,22 @@ public class GetTestResults extends Recorder {
 	 */
 	@DataBoundConstructor
 	public GetTestResults(final String domain, final String project, final String user, final String password, final String resultsDir,
-			final List<GetTestResultsConfiguration> configuration) {
+			final List<GetTestResultsConfiguration> configurations) {
 		this.domain = fixEmptyAndTrim(domain);
 		this.project = fixEmptyAndTrim(project);
 		this.user = fixEmptyAndTrim(user);
 		final String plainPassword = fixEmptyAndTrim(password);
 		this.password = plainPassword != null ? Secret.fromString(plainPassword).getEncryptedValue() : null;
 		this.resultsDir = fixEmptyAndTrim(resultsDir);
-		this.configurations = configuration;
+		this.configurations = configurations;
 	}
 
 	@Override
-	public boolean perform(final AbstractBuild<?, ?> build, final Launcher launcher, final BuildListener listener) throws InterruptedException, IOException {
+	public void perform(final Run<?, ?> run, final FilePath workspace, final Launcher launcher, final TaskListener listener)
+			throws InterruptedException, IOException {
 		boolean success = true;
 		final PrintStream logger = listener.getLogger();
+
 		final BumblebeeGlobalConfig globalConfig = GlobalConfiguration.all().get(BumblebeeGlobalConfig.class);
 		assertGlobalConfig(globalConfig);
 		final String bumblebeeUrl = globalConfig.getBumblebeeUrl();
@@ -101,12 +105,11 @@ public class GetTestResults extends Recorder {
 				try {
 					logger.println("Fetching test results from HP ALM");
 					final GetTestResultsParameters params = new GetTestResultsEnvSpecificParams(parametersFactory.create(globalConfig, this, configuration),
-							build.getEnvironment(listener));
+							run.getEnvironment(listener));
 					if (encryptedPassword != null) {
 						params.setEncryptedPassword(encryptedPassword);
 					}
 					logParameters(bumblebeeUrl, params, resultsDir, logger);
-					final FilePath workspace = build.getWorkspace();
 					final FilePath reportFile = workspace.child(resultsDir).child(createFileName(params.getTestSetPath()));
 					try (InputStream stream = api.getJunitTestResults(params)) {
 						logger.println("Writing results into: " + reportFile.getRemote());
@@ -124,12 +127,12 @@ public class GetTestResults extends Recorder {
 		} catch (final Exception ex) {
 			logger.println(ex.getMessage());
 			LOGGER.log(Level.SEVERE, null, ex);
-			return false;
+			throw new AbortException(ex.getMessage());
 		}
 		if (!success) {
-			logger.println("One or more configurations have fail --> mark build as failure. Check the log for details");
+			throw new AbortException("One or more configurations have fail --> mark build as failure. Check the log for details");
 		}
-		return success;
+
 	}
 
 	private void assertGlobalConfig(final BumblebeeGlobalConfig globalConfig) throws AbortException {
@@ -163,8 +166,18 @@ public class GetTestResults extends Recorder {
 		return user;
 	}
 
+	@DataBoundSetter
+	public void setUser(final String user) {
+		this.user = user;
+	}
+
 	public String getPassword() {
 		return password;
+	}
+
+	@DataBoundSetter
+	public void setPassword(final String password) {
+		this.password = password;
 	}
 
 	void setBumblebeeApiProvider(final BumblebeeApiProvider bumblebeeApiProvider) {
