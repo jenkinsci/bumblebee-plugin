@@ -4,11 +4,17 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.agiletestware.bumblebee.BumblebeeGlobalConfig;
+import com.agiletestware.bumblebee.client.api.BumblebeeApi;
+import com.agiletestware.bumblebee.client.api.BumblebeeApiProvider;
 import com.agiletestware.bumblebee.client.pc.RunPcTestContext;
 import com.agiletestware.bumblebee.client.utils.action.RetrySettings;
+import com.agiletestware.bumblebee.encryption.CustomSecret;
 
 import hudson.FilePath;
+import hudson.Util;
 
 /**
  * Context for running PC test.
@@ -29,9 +35,11 @@ public class RunPcTestContextImpl implements RunPcTestContext, Serializable {
 	private final String bumblebeeUrl;
 	private final int connectionTimeOut;
 
-	public RunPcTestContextImpl(final RunPcTestBuildStep buildStep, final BumblebeeGlobalConfig globalConfig, final FilePath workspace) {
+	public RunPcTestContextImpl(final RunPcTestBuildStep buildStep, final BumblebeeGlobalConfig globalConfig, final FilePath workspace,
+			final CustomSecret customSecret, final BumblebeeApiProvider bumblebeeApiProvider) throws Exception {
 		this.parameters = createStartRunParameters(buildStep);
-		this.connectionParameters = new PcConnectionParametersImpl(globalConfig, buildStep.getDomain(), buildStep.getProject());
+		this.connectionParameters = new PcConnectionParametersImpl(globalConfig, buildStep.getDomain(), buildStep.getProject(), buildStep.getAlmUser(),
+				buildStep.getAlmPassword(), customSecret, bumblebeeApiProvider);
 		this.bumblebeeUrl = globalConfig.getBumblebeeUrl();
 		this.connectionTimeOut = (int) TimeUnit.MINUTES.toSeconds(getTimeout(buildStep, globalConfig));
 		this.genericRetrySettings = new RetrySettings(buildStep.getRetryCount(), buildStep.getRetryInterval(), buildStep.getRetryIntervalMultiplier());
@@ -104,6 +112,9 @@ public class RunPcTestContextImpl implements RunPcTestContext, Serializable {
 
 	private static class PcConnectionParametersImpl implements PcConnectionParameters, Serializable {
 
+		private static final long serialVersionUID = 1L;
+		private final CustomSecret customSecret;
+		private final BumblebeeApiProvider bumblebeeApiProvider;
 		private final String project;
 		private final String domain;
 		private final String almUrl;
@@ -111,20 +122,21 @@ public class RunPcTestContextImpl implements RunPcTestContext, Serializable {
 		private final String pcUrl;
 		private final String password;
 
-		public PcConnectionParametersImpl(final BumblebeeGlobalConfig globalConfig, final String domain, final String project) {
+		public PcConnectionParametersImpl(final BumblebeeGlobalConfig globalConfig, final String domain, final String project, final String almUser,
+				final String almPassword, final CustomSecret customSecret, final BumblebeeApiProvider bumblebeeApiProvider) throws Exception {
 			// have to copy all values into separate fields, as
 			// BumblebeeGlobalConfig is not Serializable -> break build on
 			// slave.
 			this.project = project;
 			this.domain = domain;
 			this.almUrl = globalConfig.getQcUrl();
-			this.user = globalConfig.getQcUserName();
+			final String almUserFromStep = Util.fixEmptyAndTrim(almUser);
+			this.customSecret = customSecret;
+			this.bumblebeeApiProvider = bumblebeeApiProvider;
+			this.user = StringUtils.isNotEmpty(almUserFromStep) ? almUserFromStep : globalConfig.getQcUserName();
 			this.pcUrl = globalConfig.getPcUrl();
-			this.password = globalConfig.getPassword();
+			this.password = getEncryptedAlmPassword(globalConfig, almPassword);
 		}
-
-		/** . */
-		private static final long serialVersionUID = 1L;
 
 		@Override
 		public String getUser() {
@@ -154,6 +166,19 @@ public class RunPcTestContextImpl implements RunPcTestContext, Serializable {
 		@Override
 		public String getAlmUrl() {
 			return almUrl;
+		}
+
+		private String getEncryptedAlmPassword(final BumblebeeGlobalConfig globalConfig, final String almPasswordFromStep) throws Exception {
+			if (StringUtils.isEmpty(almPasswordFromStep)) {
+				return globalConfig.getPassword();
+			}
+			final String bumblebeeUrl = globalConfig.getBumblebeeUrl();
+			if (StringUtils.isEmpty(bumblebeeUrl)) {
+				throw new IllegalStateException("Bumblebee URL is not defined in Bumblebee Global Configuration");
+			}
+			try (final BumblebeeApi bumblebeeApi = bumblebeeApiProvider.provide(bumblebeeUrl, (int) TimeUnit.MINUTES.toSeconds(globalConfig.getTimeOut()))) {
+				return bumblebeeApi.getEncryptedPassword(customSecret.getPlainText(almPasswordFromStep));
+			}
 		}
 
 	}

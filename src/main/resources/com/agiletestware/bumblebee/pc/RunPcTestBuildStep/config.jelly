@@ -8,6 +8,12 @@
 				<f:entry title="Project" field="project">
 					<f:textbox name="project" value="${instance.getProject()}" clazz="required" checkMessage="Must not be empty"/>
 				</f:entry>
+				 <f:entry title="HP ALM Login:" field="almUser">
+                    <f:textbox name="almUser" value="${instance.getAlmUser()}"/>
+                 </f:entry>
+				<f:entry title="HP ALM Password:" field="almPassword">
+          	        <f:password name="almPassword" value="${instance.getAlmPassword()}"/>
+                </f:entry>
 				<f:entry title="Results Directory" field="outputDir">
 					<f:textbox name="outputDir" value="${instance.getOutputDir()}" clazz="required" checkMessage="Must not be empty" default="pc-results"/>
 				</f:entry>
