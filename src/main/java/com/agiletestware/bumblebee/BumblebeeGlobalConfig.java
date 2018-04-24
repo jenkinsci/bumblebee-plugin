@@ -16,7 +16,6 @@ import com.agiletestware.bumblebee.client.api.BumblebeeApi;
 import com.agiletestware.bumblebee.client.api.BumblebeeApiImpl;
 import com.agiletestware.bumblebee.client.utils.UrlAvailableValidator;
 import com.agiletestware.bumblebee.validator.CustomUrlAvailableValidator;
-import com.agiletestware.bumblebee.validator.HpAlmUrlValidator;
 import com.agiletestware.bumblebee.validator.HpUrls;
 import com.agiletestware.bumblebee.validator.HpUserValidator;
 import com.agiletestware.bumblebee.validator.RegExpMatchValidator;
@@ -98,7 +97,6 @@ public class BumblebeeGlobalConfig extends GlobalConfiguration {
 		try {
 			final FormValidation validation = FormValidation.aggregate(Arrays.asList(
 					BUMBLEBEE_URL_VALIDATOR.validate(bumblebeeUrlTrimmed, timeOut), //
-					HpAlmUrlValidator.THE_INSTANCE.validate(qcUrlTrimmed, timeOut), //
 					HpUserValidator.THE_INSTANCE.validate(userNameTrimmed, new HpUrls(qcUrl, pcUrl)),
 					UftRunnerPathValidator.THE_INSTANCE.validate(uftRunnerPathTrimmed, null)));
 			if (FormValidation.Kind.ERROR == validation.kind) {
