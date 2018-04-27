@@ -11,11 +11,14 @@ import org.jenkinsci.remoting.RoleChecker;
 
 import com.agiletestware.bumblebee.client.ReportResources;
 import com.agiletestware.bumblebee.client.ReportResourcesFactory;
+import com.agiletestware.bumblebee.client.SerenityResourcesFactory;
 import com.agiletestware.bumblebee.client.api.BulkUpdateParameters;
 import com.agiletestware.bumblebee.client.api.BumblebeeApi;
 import com.agiletestware.bumblebee.client.api.BumblebeeApiImpl;
 import com.agiletestware.bumblebee.client.jasmine.JasmineJsonParser;
 import com.agiletestware.bumblebee.client.jasmine.JasmineReport;
+import com.agiletestware.bumblebee.serenity.json.SerenityJsonParser;
+import com.agiletestware.bumblebee.serenity.json.SerenityReport;
 import com.agiletestware.bumblebee.util.ThreadLocalMessageFormat;
 
 import hudson.FilePath;
@@ -29,6 +32,7 @@ public class BumblebeeRemoteExecutor implements Callable<Void, Exception>, Seria
 	private static final long serialVersionUID = 3670838509646174454L;
 	private static final ThreadLocalMessageFormat LOG_FORMAT = new ThreadLocalMessageFormat("{0}: {1}");
 	private static final String JASMINE_REPORT = "jasmine";
+	private static final String SERENITY_REPORT = "serenity";
 	private final JenkinsBuildLogger log;
 	private final FilePath workspace;
 	private final BulkUpdateParameters parameters;
@@ -61,6 +65,7 @@ public class BumblebeeRemoteExecutor implements Callable<Void, Exception>, Seria
 		try (final BumblebeeApi api = new BumblebeeApiImpl(parameters.getBumbleBeeUrl(),
 				parameters.getTimeOut() * 60)) {
 			final JasmineJsonParser jasmineJsonParser = new JasmineJsonParser();
+			final SerenityJsonParser serenityJsonParser = new SerenityJsonParser();
 			for (final FilePath filePath : filesToBeUploaded) {
 				final File fileToUpload = new File(filePath.getRemote());
 				boolean fileUploaded;
@@ -69,6 +74,10 @@ public class BumblebeeRemoteExecutor implements Callable<Void, Exception>, Seria
 					final ReportResources jasmineResources = ReportResourcesFactory.THE_INSTANCE.create(jasmineReport.getSuites(), workspace.getRemote(),
 							jasmineReport.getScreenshotPath());
 					fileUploaded = api.sendSingleTestReport(parameters, fileToUpload, log, jasmineResources);
+				} else if (SERENITY_REPORT.equalsIgnoreCase(parameters.getFormat())) {
+					final SerenityReport serenityReport = serenityJsonParser.parseSerenityReport(fileToUpload);
+					final ReportResources serenityResources = SerenityResourcesFactory.THE_INSTANCE.create(serenityReport, fileToUpload.getParent());
+					fileUploaded = api.sendSingleTestReport(parameters, fileToUpload, log, serenityResources);
 				} else {
 					fileUploaded = api.sendSingleTestReport(parameters, fileToUpload, log);
 				}
