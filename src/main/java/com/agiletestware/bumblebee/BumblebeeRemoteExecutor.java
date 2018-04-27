@@ -4,22 +4,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.jenkinsci.remoting.RoleChecker;
 
-import com.agiletestware.bumblebee.client.ReportResources;
-import com.agiletestware.bumblebee.client.ReportResourcesFactory;
-import com.agiletestware.bumblebee.client.SerenityResourcesFactory;
 import com.agiletestware.bumblebee.client.api.BulkUpdateParameters;
-import com.agiletestware.bumblebee.client.api.BumblebeeApi;
-import com.agiletestware.bumblebee.client.api.BumblebeeApiImpl;
-import com.agiletestware.bumblebee.client.jasmine.JasmineJsonParser;
-import com.agiletestware.bumblebee.client.jasmine.JasmineReport;
-import com.agiletestware.bumblebee.serenity.json.SerenityJsonParser;
-import com.agiletestware.bumblebee.serenity.json.SerenityReport;
-import com.agiletestware.bumblebee.util.ThreadLocalMessageFormat;
+import com.agiletestware.bumblebee.client.api.DefaultBumblebeeApiProvider;
+import com.agiletestware.bumblebee.client.uploader.ReportFilesUploaderFactory;
 
 import hudson.FilePath;
 import hudson.model.TaskListener;
@@ -30,9 +21,6 @@ public class BumblebeeRemoteExecutor implements Callable<Void, Exception>, Seria
 	 *
 	 */
 	private static final long serialVersionUID = 3670838509646174454L;
-	private static final ThreadLocalMessageFormat LOG_FORMAT = new ThreadLocalMessageFormat("{0}: {1}");
-	private static final String JASMINE_REPORT = "jasmine";
-	private static final String SERENITY_REPORT = "serenity";
 	private final JenkinsBuildLogger log;
 	private final FilePath workspace;
 	private final BulkUpdateParameters parameters;
@@ -51,79 +39,22 @@ public class BumblebeeRemoteExecutor implements Callable<Void, Exception>, Seria
 	}
 
 	public void execute() throws Exception {
-
-		boolean errorSeen = false;
-
-		final List<FilePath> filesToBeUploaded = locateBumbleBeeReports(
-				workspace, parameters.getResultPattern());
-
-		if (filesToBeUploaded.isEmpty()) {
-			throw new Exception("Bumblebee: Did not find any file matching the pattern "
-					+ parameters.getResultPattern() + ". Please check pattern");
-		}
-		logParameters();
-		try (final BumblebeeApi api = new BumblebeeApiImpl(parameters.getBumbleBeeUrl(),
-				parameters.getTimeOut() * 60)) {
-			final JasmineJsonParser jasmineJsonParser = new JasmineJsonParser();
-			final SerenityJsonParser serenityJsonParser = new SerenityJsonParser();
-			for (final FilePath filePath : filesToBeUploaded) {
-				final File fileToUpload = new File(filePath.getRemote());
-				boolean fileUploaded;
-				if (JASMINE_REPORT.equalsIgnoreCase(parameters.getFormat())) {
-					final JasmineReport jasmineReport = jasmineJsonParser.parseJasmineReport(fileToUpload);
-					final ReportResources jasmineResources = ReportResourcesFactory.THE_INSTANCE.create(jasmineReport.getSuites(), workspace.getRemote(),
-							jasmineReport.getScreenshotPath());
-					fileUploaded = api.sendSingleTestReport(parameters, fileToUpload, log, jasmineResources);
-				} else if (SERENITY_REPORT.equalsIgnoreCase(parameters.getFormat())) {
-					final SerenityReport serenityReport = serenityJsonParser.parseSerenityReport(fileToUpload);
-					final ReportResources serenityResources = SerenityResourcesFactory.THE_INSTANCE.create(serenityReport, fileToUpload.getParent());
-					fileUploaded = api.sendSingleTestReport(parameters, fileToUpload, log, serenityResources);
-				} else {
-					fileUploaded = api.sendSingleTestReport(parameters, fileToUpload, log);
-				}
-				if (!fileUploaded && !errorSeen) {
-					errorSeen = true;
-				}
-				log.info("--------------------------");
-			}
-		}
-
-		if (errorSeen) {
-			throw new Exception(
-					"Bumblebee: Could not upload results to HP ALM using the following parameters: " + parameters
-					+ " , HP URL " + parameters.getAlmUrl()
-					+ ". Please check settings.");
-		}
-
-		log.info("Bumblebee: Upload done");
+		final List<File> filesToBeUploaded = locateBumbleBeeReports(workspace, parameters.getResultPattern());
+		ReportFilesUploaderFactory.getReportFilesUploader(parameters.getFormat()).sendReportFiles(new DefaultBumblebeeApiProvider(), parameters, log,
+				filesToBeUploaded, workspace.getRemote());
 	}
 
-	// XXX legacy code, but working
-	private List<FilePath> locateBumbleBeeReports(final FilePath workspace,
-			final String includes) throws IOException, InterruptedException {
-
-		// First use ant-style pattern
+	private List<File> locateBumbleBeeReports(final FilePath workspace, final String pattern) throws IOException, InterruptedException {
+		final List<File> files = new ArrayList<>();
 		try {
-			final FilePath[] ret = workspace.list(includes);
-			if (ret.length > 0) {
-				return Arrays.asList(ret);
-			}
-		} catch (final IOException e) {
-			// Do nothing.
-		}
-
-		// If it fails, do a legacy search
-		final ArrayList<FilePath> files = new ArrayList<FilePath>();
-		final String parts[] = includes.split("\\s*[;:,]+\\s*");
-		for (final String path : parts) {
-			final FilePath src = workspace.child(path);
-			if (src.exists()) {
-				if (src.isDirectory()) {
-					files.addAll(Arrays.asList(src.list("**/*")));
-				} else {
-					files.add(src);
+			final FilePath[] filePaths = workspace.list(pattern);
+			if (filePaths.length > 0) {
+				for (final FilePath filePath : filePaths) {
+					files.add(new File(filePath.getRemote()));
 				}
 			}
+		} catch (final Exception ex) {
+			log.error("Error occurred during the search with pattern: " + pattern + ", error: " + ex.getMessage(), ex);
 		}
 		return files;
 	}
@@ -131,22 +62,4 @@ public class BumblebeeRemoteExecutor implements Callable<Void, Exception>, Seria
 	@Override
 	public void checkRoles(final RoleChecker arg0) throws SecurityException {
 	}
-
-	private void logParameters() {
-		log.info("Bumblebee: Uploading results to HP ALM");
-		log.info(LOG_FORMAT.format("Bumblebee URL", parameters.getBumbleBeeUrl()));
-		log.info(LOG_FORMAT.format("HP ALM URL", parameters.getAlmUrl()));
-		log.info(LOG_FORMAT.format("HP ALM User", parameters.getAlmUserName()));
-		log.info(LOG_FORMAT.format("HP ALM Password", "*******"));
-		log.info(LOG_FORMAT.format("HP ALM Domain", parameters.getDomain()));
-		log.info(LOG_FORMAT.format("HP ALM Project", parameters.getProject()));
-		log.info(LOG_FORMAT.format("TestPlan Path", parameters.getTestPlanDirectory()));
-		log.info(LOG_FORMAT.format("TestLab Path", parameters.getTestLabDirectory()));
-		log.info(LOG_FORMAT.format("TestSet Name", parameters.getTestSet()));
-		log.info(LOG_FORMAT.format("Report Format", parameters.getFormat()));
-		log.info(LOG_FORMAT.format("Custom Properties", parameters.getCustomProperties()));
-		log.info(LOG_FORMAT.format("Offline update", parameters.isOffline()));
-		log.info(LOG_FORMAT.format("Timeout", String.valueOf(parameters.getTimeOut())));
-	}
-
 }
