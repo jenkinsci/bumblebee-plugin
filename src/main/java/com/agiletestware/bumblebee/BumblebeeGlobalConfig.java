@@ -118,6 +118,7 @@ public class BumblebeeGlobalConfig extends GlobalConfiguration {
 			this.timeOut = timeOut;
 			this.pcUrl = pcUrlTrimmed;
 			this.pcTimeOut = pcTimeOut;
+			this.skipConnectivityDiagnostic = skipConnectivityDiagnostic;
 
 			try (final BumblebeeApi bmapi = new BumblebeeApiImpl(this.bumblebeeUrl, this.timeOut)) {
 				// Set password only if old value is null/empty/blank OR if new
