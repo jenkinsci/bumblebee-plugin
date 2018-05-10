@@ -1,7 +1,9 @@
 package com.agiletestware.bumblebee;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -53,6 +55,7 @@ public class BumblebeeGlobalConfig extends GlobalConfiguration {
 	private String uftRunnerPath;
 	private String pcUrl;
 	private int pcTimeOut;
+	private boolean skipConnectivityDiagnostic;
 
 	/**
 	 * Constructor.
@@ -87,7 +90,8 @@ public class BumblebeeGlobalConfig extends GlobalConfiguration {
 			@QueryParameter("timeOut") final int timeOut,
 			@QueryParameter("uftRunnerPath") final String uftRunnerPath,
 			@QueryParameter("pcUrl") final String pcUrl,
-			@QueryParameter("pcTimeOut") final int pcTimeOut) {
+			@QueryParameter("pcTimeOut") final int pcTimeOut,
+			@QueryParameter("skipConnectivityDiagnostic") final boolean skipConnectivityDiagnostic) {
 		final String bumblebeeUrlTrimmed = Util.fixEmptyAndTrim(bumblebeeUrl);
 		final String qcUrlTrimmed = Util.fixEmptyAndTrim(qcUrl);
 		final String userNameTrimmed = Util.fixEmptyAndTrim(qcUserName);
@@ -95,10 +99,14 @@ public class BumblebeeGlobalConfig extends GlobalConfiguration {
 		final String pcUrlTrimmed = Util.fixEmptyAndTrim(pcUrl);
 
 		try {
-			final FormValidation validation = FormValidation.aggregate(Arrays.asList(
-					BUMBLEBEE_URL_VALIDATOR.validate(bumblebeeUrlTrimmed, timeOut), //
+			final List<FormValidation> validators = new ArrayList<>();
+			if (!skipConnectivityDiagnostic) {
+				validators.add(BUMBLEBEE_URL_VALIDATOR.validate(bumblebeeUrlTrimmed, timeOut));
+			}
+			validators.addAll(Arrays.asList(
 					HpUserValidator.THE_INSTANCE.validate(userNameTrimmed, new HpUrls(qcUrl, pcUrl)),
 					UftRunnerPathValidator.THE_INSTANCE.validate(uftRunnerPathTrimmed, null)));
+			final FormValidation validation = FormValidation.aggregate(validators);
 			if (FormValidation.Kind.ERROR == validation.kind) {
 				return validation;
 			}
@@ -156,6 +164,10 @@ public class BumblebeeGlobalConfig extends GlobalConfiguration {
 
 	public int getPcTimeOut() {
 		return pcTimeOut;
+	}
+
+	public boolean isSkipConnectivityDiagnostic() {
+		return skipConnectivityDiagnostic;
 	}
 
 	public FormValidation doCheckBumblebeeUrl(@AncestorInPath final AbstractProject<?, ?> project, @QueryParameter final String bumblebeeUrl)
