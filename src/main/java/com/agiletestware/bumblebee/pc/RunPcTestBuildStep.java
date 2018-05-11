@@ -260,7 +260,7 @@ public class RunPcTestBuildStep extends Builder implements SimpleBuildStep {
 		logger.println("Start Performance Center test");
 		try {
 			final RunPcTestContext context = new RunPcTestContextImpl(this, GlobalConfiguration.all().get(BumblebeeGlobalConfig.class),
-					workspace, DefaultCustomSecret.THE_INSTANCE, new DefaultBumblebeeApiProvider());
+					workspace, customSecret, new DefaultBumblebeeApiProvider());
 			ParametersLogger.THE_INSTANCE.logParameters(context, new JenkinsBuildLogger(listener), isFailIfTaskFails());
 			final RunPerformanceTestCallable callable = new RunPerformanceTestCallable(context, listener, run.getStartTimeInMillis());
 			launcher.getChannel().call(callable);
