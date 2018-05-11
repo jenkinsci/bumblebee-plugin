@@ -1,6 +1,7 @@
 package com.agiletestware.bumblebee;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -16,6 +17,7 @@ import org.kohsuke.stapler.QueryParameter;
 import com.agiletestware.bumblebee.client.api.BaseParameters;
 import com.agiletestware.bumblebee.client.api.BumblebeeApi;
 import com.agiletestware.bumblebee.client.api.BumblebeeApiImpl;
+import com.agiletestware.bumblebee.client.utils.Messages;
 import com.agiletestware.bumblebee.client.utils.UrlAvailableValidator;
 import com.agiletestware.bumblebee.validator.CustomUrlAvailableValidator;
 import com.agiletestware.bumblebee.validator.HpUrls;
@@ -126,6 +128,9 @@ public class BumblebeeGlobalConfig extends GlobalConfiguration {
 				if (StringUtils.isBlank(this.password) || !this.password.equals(password)) {
 					this.password = bmapi.getEncryptedPassword(StringUtils.trim(password));
 				}
+			} catch (final RuntimeException | ConnectException ex) {
+				save();
+				return FormValidation.warning(Messages.THE_INSTANCE.getWarningMessage(bumblebeeUrl));
 			}
 			save();
 		} catch (final Exception e) {
@@ -186,12 +191,11 @@ public class BumblebeeGlobalConfig extends GlobalConfiguration {
 
 	public FormValidation doCheckQcUserName(@AncestorInPath final AbstractProject<?, ?> project, @QueryParameter final String qcUserName,
 			@QueryParameter final String qcUrl, @QueryParameter final String pcUrl)
-					throws IOException, ServletException {
+			throws IOException, ServletException {
 		return HpUserValidator.THE_INSTANCE.validate(qcUserName, new HpUrls(qcUrl, pcUrl));
 	}
 
 	public FormValidation doCheckUftRunnerPath(@QueryParameter final String uftRunnerPath) {
 		return UftRunnerPathValidator.THE_INSTANCE.validate(uftRunnerPath, null);
 	}
-
 }
