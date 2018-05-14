@@ -15,8 +15,11 @@ import org.kohsuke.stapler.QueryParameter;
 import com.agiletestware.bumblebee.BumblebeeGlobalConfig;
 import com.agiletestware.bumblebee.BumblebeePublisher;
 import com.agiletestware.bumblebee.JenkinsBuildLogger;
+import com.agiletestware.bumblebee.client.api.DefaultBumblebeeApiProvider;
 import com.agiletestware.bumblebee.client.pc.ParametersLogger;
 import com.agiletestware.bumblebee.client.pc.RunPcTestContext;
+import com.agiletestware.bumblebee.encryption.CustomSecret;
+import com.agiletestware.bumblebee.encryption.DefaultCustomSecret;
 import com.agiletestware.bumblebee.validator.StringNotEmptyValidator;
 import com.agiletestware.bumblebee.validator.StringStartsWithValidator;
 
@@ -24,6 +27,7 @@ import hudson.AbortException;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
+import hudson.Util;
 import hudson.model.AbstractProject;
 import hudson.model.Job;
 import hudson.model.Run;
@@ -43,8 +47,11 @@ import jenkins.tasks.SimpleBuildStep;
  */
 public class RunPcTestBuildStep extends Builder implements SimpleBuildStep {
 	private static final Logger LOGGER = Logger.getLogger(BumblebeePublisher.class.getName());
+	private CustomSecret customSecret = DefaultCustomSecret.THE_INSTANCE;
 	private String project;
 	private String domain;
+	private String almUser;
+	private String almPassword;
 	private String outputDir;
 	private String testPlanPath;
 	private String testLabPath;
@@ -222,6 +229,30 @@ public class RunPcTestBuildStep extends Builder implements SimpleBuildStep {
 		this.domain = domain;
 	}
 
+	public String getAlmUser() {
+		return almUser;
+	}
+
+	@DataBoundSetter
+	public void setAlmUser(final String almUser) {
+		this.almUser = almUser;
+	}
+
+	public String getAlmPassword() {
+		return almPassword;
+	}
+
+	@DataBoundSetter
+	public void setAlmPassword(final String almPassword) {
+		final String plainTextPassword = Util.fixEmpty(almPassword);
+		this.almPassword = plainTextPassword != null ? customSecret.getEncryptedValue(plainTextPassword) : null;
+	}
+
+	// Used only on tests.
+	void setCustomSecret(final CustomSecret customSecret) {
+		this.customSecret = customSecret;
+	}
+
 	@Override
 	public void perform(final Run<?, ?> run, final FilePath workspace, final Launcher launcher, final TaskListener listener)
 			throws InterruptedException, IOException {
@@ -229,7 +260,7 @@ public class RunPcTestBuildStep extends Builder implements SimpleBuildStep {
 		logger.println("Start Performance Center test");
 		try {
 			final RunPcTestContext context = new RunPcTestContextImpl(this, GlobalConfiguration.all().get(BumblebeeGlobalConfig.class),
-					workspace);
+					workspace, customSecret, new DefaultBumblebeeApiProvider());
 			ParametersLogger.THE_INSTANCE.logParameters(context, new JenkinsBuildLogger(listener), isFailIfTaskFails());
 			final RunPerformanceTestCallable callable = new RunPerformanceTestCallable(context, listener, run.getStartTimeInMillis());
 			launcher.getChannel().call(callable);
