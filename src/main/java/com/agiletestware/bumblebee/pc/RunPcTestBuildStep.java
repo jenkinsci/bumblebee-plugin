@@ -15,7 +15,7 @@ import org.kohsuke.stapler.QueryParameter;
 import com.agiletestware.bumblebee.BumblebeeGlobalConfig;
 import com.agiletestware.bumblebee.BumblebeePublisher;
 import com.agiletestware.bumblebee.JenkinsBuildLogger;
-import com.agiletestware.bumblebee.client.pc.ParametersLogger;
+import com.agiletestware.bumblebee.client.ParametersLogger;
 import com.agiletestware.bumblebee.client.pc.RunPcTestContext;
 import com.agiletestware.bumblebee.validator.StringNotEmptyValidator;
 import com.agiletestware.bumblebee.validator.StringStartsWithValidator;
