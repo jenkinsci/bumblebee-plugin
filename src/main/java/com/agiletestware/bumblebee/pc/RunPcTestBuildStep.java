@@ -16,7 +16,7 @@ import com.agiletestware.bumblebee.BumblebeeGlobalConfig;
 import com.agiletestware.bumblebee.BumblebeePublisher;
 import com.agiletestware.bumblebee.JenkinsBuildLogger;
 import com.agiletestware.bumblebee.client.api.DefaultBumblebeeApiProvider;
-import com.agiletestware.bumblebee.client.pc.ParametersLogger;
+import com.agiletestware.bumblebee.client.ParametersLogger;
 import com.agiletestware.bumblebee.client.pc.RunPcTestContext;
 import com.agiletestware.bumblebee.encryption.CustomSecret;
 import com.agiletestware.bumblebee.encryption.DefaultCustomSecret;
