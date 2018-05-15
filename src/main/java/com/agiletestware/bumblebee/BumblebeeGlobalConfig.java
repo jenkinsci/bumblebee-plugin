@@ -129,8 +129,10 @@ public class BumblebeeGlobalConfig extends GlobalConfiguration {
 					this.password = bmapi.getEncryptedPassword(StringUtils.trim(password));
 				}
 			} catch (final RuntimeException | ConnectException ex) {
+				final String encryptedPassword = (StringUtils.isBlank(this.password) || this.password.equals(password)) ? this.password : password;
+				this.password = encryptedPassword;
 				save();
-				return FormValidation.warning(Messages.THE_INSTANCE.getWarningMessage(bumblebeeUrl));
+				return FormValidation.ok("Configuration Saved");
 			}
 			save();
 		} catch (final Exception e) {
@@ -191,11 +193,16 @@ public class BumblebeeGlobalConfig extends GlobalConfiguration {
 
 	public FormValidation doCheckQcUserName(@AncestorInPath final AbstractProject<?, ?> project, @QueryParameter final String qcUserName,
 			@QueryParameter final String qcUrl, @QueryParameter final String pcUrl)
-			throws IOException, ServletException {
+					throws IOException, ServletException {
 		return HpUserValidator.THE_INSTANCE.validate(qcUserName, new HpUrls(qcUrl, pcUrl));
 	}
 
 	public FormValidation doCheckUftRunnerPath(@QueryParameter final String uftRunnerPath) {
 		return UftRunnerPathValidator.THE_INSTANCE.validate(uftRunnerPath, null);
 	}
+
+	public FormValidation doCheckSkipConnectivityDiagnostic(@QueryParameter final boolean skipConnectivityDiagnostic) {
+		return skipConnectivityDiagnostic ? FormValidation.warning(Messages.THE_INSTANCE.getWarningMessage(bumblebeeUrl)) : FormValidation.ok();
+	}
+
 }
