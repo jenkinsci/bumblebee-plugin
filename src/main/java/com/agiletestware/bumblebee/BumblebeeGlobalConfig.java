@@ -1,7 +1,6 @@
 package com.agiletestware.bumblebee;
 
 import java.io.IOException;
-import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -126,13 +125,8 @@ public class BumblebeeGlobalConfig extends GlobalConfiguration {
 				// Set password only if old value is null/empty/blank OR if new
 				// value is not equal to old
 				if (StringUtils.isBlank(this.password) || !this.password.equals(password)) {
-					this.password = bmapi.getEncryptedPassword(StringUtils.trim(password));
+					this.password = skipConnectivityDiagnostic ? password : bmapi.getEncryptedPassword(StringUtils.trim(password));
 				}
-			} catch (final RuntimeException | ConnectException ex) {
-				final String encryptedPassword = (StringUtils.isBlank(this.password) || this.password.equals(password)) ? this.password : password;
-				this.password = encryptedPassword;
-				save();
-				return FormValidation.ok("Configuration Saved");
 			}
 			save();
 		} catch (final Exception e) {
