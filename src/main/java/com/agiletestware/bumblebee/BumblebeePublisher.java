@@ -21,7 +21,6 @@ import org.kohsuke.stapler.StaplerRequest;
 
 import com.agiletestware.bumblebee.client.api.BulkUpdateParameters;
 import com.agiletestware.bumblebee.client.api.BulkUpdateParametersImpl;
-import com.agiletestware.bumblebee.tracking.ClientType;
 import com.agiletestware.bumblebee.util.BumblebeeUtils;
 
 import hudson.AbortException;
@@ -149,7 +148,6 @@ public class BumblebeePublisher extends Recorder implements SimpleBuildStep {
 		params.setTimeOut(globalConfig.getTimeOut());
 		params.setCustomProperties(config.getCustomProperties());
 		params.setOffline(config.isOffline());
-		params.setClientType(ClientType.JENKINS);
 
 		final PrintStream logger = listener.getLogger();
 		final BumblebeeRemoteExecutor remoteExecutor = new BumblebeeRemoteExecutor(workspace,

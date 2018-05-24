@@ -3,7 +3,6 @@ package com.agiletestware.bumblebee.results;
 import org.apache.commons.lang.StringUtils;
 
 import com.agiletestware.bumblebee.BumblebeeGlobalConfig;
-import com.agiletestware.bumblebee.tracking.ClientType;
 
 /**
  * Factory for producing {@link GetTestResultsParameters} objects.
@@ -24,7 +23,6 @@ public enum DefaultGetTestResultsParametersFactory implements GetTestResultsPara
 				.almDomain(commonJobConfig.getDomain())
 				.almProject(commonJobConfig.getProject())
 				.testSetPath(jobConfig.getTestSetPath())
-				.clientType(ClientType.JENKINS)
 				.build();
 	}
 
