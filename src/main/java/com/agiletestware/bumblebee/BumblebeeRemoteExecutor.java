@@ -14,8 +14,8 @@ import com.agiletestware.bumblebee.client.ReportResourcesFactory;
 import com.agiletestware.bumblebee.client.api.BulkUpdateParameters;
 import com.agiletestware.bumblebee.client.api.BumblebeeApi;
 import com.agiletestware.bumblebee.client.api.BumblebeeApiImpl;
-import com.agiletestware.bumblebee.client.jasmine.JasmineJsonParser;
-import com.agiletestware.bumblebee.client.jasmine.JasmineReport;
+import com.agiletestware.bumblebee.jasmine.json.JasmineJsonParser;
+import com.agiletestware.bumblebee.jasmine.json.JasmineReport;
 import com.agiletestware.bumblebee.util.ThreadLocalMessageFormat;
 
 import hudson.FilePath;

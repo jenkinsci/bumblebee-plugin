@@ -67,8 +67,7 @@ public class RunTestSetTask implements Callable<Integer, Exception> {
 	public Integer call() throws Exception {
 		final File jenkinsDir = new File(jenkinsDirPath.getRemote());
 		try (BumblebeeApi api = bumblebeeApiProvider.provide(parameters.getBumbleBeeUrl(), (int) TimeUnit.MINUTES.toSeconds(parameters.getTimeOut()))) {
-			final TestSetRunner runner = new TestSetRunner(new ReportFolderProvider(new File(workspace.getRemote())),
-					api) {
+			final TestSetRunner runner = new TestSetRunner(new ReportFolderProvider(new File(workspace.getRemote()))) {
 
 				@Override
 				protected Integer runTestSets(final TestSetCommandLineBuilder cmdBuilder, final File projectXml, final File outputDirectory,
