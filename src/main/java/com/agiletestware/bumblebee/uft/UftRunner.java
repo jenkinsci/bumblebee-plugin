@@ -68,7 +68,6 @@ public class UftRunner implements Runner<UftRunnerParameters, Integer>, Serializ
 			final int code = proc.join();
 			stream.println("Return code: " + code);
 			return code;
-
 		} finally {
 			FileUtils.deleteQuietly(report);
 		}

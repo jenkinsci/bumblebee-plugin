@@ -1,7 +1,9 @@
 package com.agiletestware.bumblebee;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -14,6 +16,7 @@ import org.kohsuke.stapler.QueryParameter;
 import com.agiletestware.bumblebee.client.api.BaseParameters;
 import com.agiletestware.bumblebee.client.api.BumblebeeApi;
 import com.agiletestware.bumblebee.client.api.BumblebeeApiImpl;
+import com.agiletestware.bumblebee.client.utils.Messages;
 import com.agiletestware.bumblebee.client.utils.UrlAvailableValidator;
 import com.agiletestware.bumblebee.validator.CustomUrlAvailableValidator;
 import com.agiletestware.bumblebee.validator.HpUrls;
@@ -53,6 +56,7 @@ public class BumblebeeGlobalConfig extends GlobalConfiguration {
 	private String uftRunnerPath;
 	private String pcUrl;
 	private int pcTimeOut;
+	private boolean skipConnectivityDiagnostic;
 
 	/**
 	 * Constructor.
@@ -87,7 +91,8 @@ public class BumblebeeGlobalConfig extends GlobalConfiguration {
 			@QueryParameter("timeOut") final int timeOut,
 			@QueryParameter("uftRunnerPath") final String uftRunnerPath,
 			@QueryParameter("pcUrl") final String pcUrl,
-			@QueryParameter("pcTimeOut") final int pcTimeOut) {
+			@QueryParameter("pcTimeOut") final int pcTimeOut,
+			@QueryParameter("skipConnectivityDiagnostic") final boolean skipConnectivityDiagnostic) {
 		final String bumblebeeUrlTrimmed = Util.fixEmptyAndTrim(bumblebeeUrl);
 		final String qcUrlTrimmed = Util.fixEmptyAndTrim(qcUrl);
 		final String userNameTrimmed = Util.fixEmptyAndTrim(qcUserName);
@@ -95,10 +100,14 @@ public class BumblebeeGlobalConfig extends GlobalConfiguration {
 		final String pcUrlTrimmed = Util.fixEmptyAndTrim(pcUrl);
 
 		try {
-			final FormValidation validation = FormValidation.aggregate(Arrays.asList(
-					BUMBLEBEE_URL_VALIDATOR.validate(bumblebeeUrlTrimmed, timeOut), //
+			final List<FormValidation> validators = new ArrayList<>();
+			if (!skipConnectivityDiagnostic) {
+				validators.add(BUMBLEBEE_URL_VALIDATOR.validate(bumblebeeUrlTrimmed, timeOut));
+			}
+			validators.addAll(Arrays.asList(
 					HpUserValidator.THE_INSTANCE.validate(userNameTrimmed, new HpUrls(qcUrl, pcUrl)),
 					UftRunnerPathValidator.THE_INSTANCE.validate(uftRunnerPathTrimmed, null)));
+			final FormValidation validation = FormValidation.aggregate(validators);
 			if (FormValidation.Kind.ERROR == validation.kind) {
 				return validation;
 			}
@@ -110,12 +119,13 @@ public class BumblebeeGlobalConfig extends GlobalConfiguration {
 			this.timeOut = timeOut;
 			this.pcUrl = pcUrlTrimmed;
 			this.pcTimeOut = pcTimeOut;
+			this.skipConnectivityDiagnostic = skipConnectivityDiagnostic;
 
 			try (final BumblebeeApi bmapi = new BumblebeeApiImpl(this.bumblebeeUrl, this.timeOut)) {
 				// Set password only if old value is null/empty/blank OR if new
 				// value is not equal to old
 				if (StringUtils.isBlank(this.password) || !this.password.equals(password)) {
-					this.password = bmapi.getEncryptedPassword(StringUtils.trim(password));
+					this.password = skipConnectivityDiagnostic ? StringUtils.trim(password) : bmapi.getEncryptedPassword(StringUtils.trim(password));
 				}
 			}
 			save();
@@ -158,6 +168,10 @@ public class BumblebeeGlobalConfig extends GlobalConfiguration {
 		return pcTimeOut;
 	}
 
+	public boolean isSkipConnectivityDiagnostic() {
+		return skipConnectivityDiagnostic;
+	}
+
 	public FormValidation doCheckBumblebeeUrl(@AncestorInPath final AbstractProject<?, ?> project, @QueryParameter final String bumblebeeUrl)
 			throws IOException, ServletException {
 		return BUMBLEBEE_URL_REGEXP_VALIDATOR.validate(bumblebeeUrl, null);
@@ -179,6 +193,10 @@ public class BumblebeeGlobalConfig extends GlobalConfiguration {
 
 	public FormValidation doCheckUftRunnerPath(@QueryParameter final String uftRunnerPath) {
 		return UftRunnerPathValidator.THE_INSTANCE.validate(uftRunnerPath, null);
+	}
+
+	public FormValidation doCheckSkipConnectivityDiagnostic(@QueryParameter final boolean skipConnectivityDiagnostic) {
+		return skipConnectivityDiagnostic ? FormValidation.warning(Messages.THE_INSTANCE.getWarningMessage(bumblebeeUrl)) : FormValidation.ok();
 	}
 
 }

@@ -38,11 +38,15 @@
             <f:number name="pcTimeOut" default="0" value="${descriptor.getPcTimeOut()}" checkMessage="Must be a valid integer" />
           </f:entry>
           
+          <f:entry title="Skip connectivity diagnostic" field="skipConnectivityDiagnostic">
+		   <f:checkbox name="skipConnectivityDiagnostic" checked="${descriptor.isSkipConnectivityDiagnostic()}"/>
+		  </f:entry>
+          
         <f:validateButton
             disabled="True" 
             title="${%Save Configuration}"
             progress="${%Saving configuration}"
             method="saveConnection"
-            with="bumblebeeUrl,qcUrl,qcUserName,password,timeOut,uftRunnerPath,pcUrl" />
+            with="bumblebeeUrl,qcUrl,qcUserName,password,timeOut,uftRunnerPath,pcUrl,skipConnectivityDiagnostic" />
     </f:section>
 </j:jelly>
