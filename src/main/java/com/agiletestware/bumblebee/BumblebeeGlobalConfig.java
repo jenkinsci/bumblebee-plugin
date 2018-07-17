@@ -125,7 +125,7 @@ public class BumblebeeGlobalConfig extends GlobalConfiguration {
 				// Set password only if old value is null/empty/blank OR if new
 				// value is not equal to old
 				if (StringUtils.isBlank(this.password) || !this.password.equals(password)) {
-					this.password = skipConnectivityDiagnostic ? password : bmapi.getEncryptedPassword(StringUtils.trim(password));
+					this.password = skipConnectivityDiagnostic ? StringUtils.trim(password) : bmapi.getEncryptedPassword(StringUtils.trim(password));
 				}
 			}
 			save();
