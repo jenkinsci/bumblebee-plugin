@@ -49,6 +49,7 @@ public class RunTestSetBuildStep extends Builder implements SimpleBuildStep {
 	private final String testSets;
 	private final String outputDirPath;
 	private final int timeOut;
+	private final boolean failRunInAlmIfAnalysisFail;
 
 	/**
 	 * Constructor.
@@ -67,11 +68,13 @@ public class RunTestSetBuildStep extends Builder implements SimpleBuildStep {
 	 * @param outputDirPath
 	 *            output directory for test set execution results.
 	 * @param timeOut
-	 *            execution timeout in munutes.
+	 *            execution timeout in minutes.
+	 * @param failRunInAlmIfAnalysisFail
+	 *            the fail run in ALM if analysis fail.
 	 */
 	@DataBoundConstructor
 	public RunTestSetBuildStep(final String domain, final String project, final String runMode, final String host, final String testSets,
-			final String outputDirPath, final int timeOut) {
+			final String outputDirPath, final int timeOut, final boolean failRunInAlmIfAnalysisFail) {
 		this.domain = domain;
 		this.project = project;
 		this.runMode = AlmRunMode.valueOf(runMode.toUpperCase());
@@ -79,6 +82,7 @@ public class RunTestSetBuildStep extends Builder implements SimpleBuildStep {
 		this.testSets = testSets;
 		this.outputDirPath = outputDirPath;
 		this.timeOut = timeOut;
+		this.failRunInAlmIfAnalysisFail = failRunInAlmIfAnalysisFail;
 	}
 
 	@Override
@@ -167,6 +171,13 @@ public class RunTestSetBuildStep extends Builder implements SimpleBuildStep {
 	 */
 	public int getTimeOut() {
 		return timeOut;
+	}
+
+	/**
+	 * @return true, if is fail run in ALM if analysis fail.
+	 */
+	public boolean isFailRunInAlmIfAnalysisFail() {
+		return failRunInAlmIfAnalysisFail;
 	}
 
 	/**

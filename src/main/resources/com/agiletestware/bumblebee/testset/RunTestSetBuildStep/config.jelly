@@ -28,7 +28,10 @@
 				</f:entry>
 				<f:entry title="Execution Timeout"  field="timeOut"  >
 					<f:number name="timeOut"  default="0"  value="${instance.getTimeOut()}" clazz="required" checkMessage="Must be a valid integer" />
-				</f:entry>				
+				</f:entry>	
+				<f:entry title="Fail Run In ALM If Analysis Fail" field="failRunInAlmIfAnalysisFail">
+					<f:checkbox name="failRunInAlmIfAnalysisFail" checked="${instance.isFailRunInAlmIfAnalysisFail()}" default="false"/>
+		  		</f:entry>			
 			</table>			
 		</d:taglib>
 	</f:block>
