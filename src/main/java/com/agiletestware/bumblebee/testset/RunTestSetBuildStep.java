@@ -121,6 +121,7 @@ public class RunTestSetBuildStep extends Builder implements SimpleBuildStep {
 			setsList.add(tokenizer.nextToken());
 		}
 		params.setTestSets(setsList);
+		params.setFailRunInAlmIfAnalysisFail(isFailRunInAlmIfAnalysisFail());
 		return new TestSetEnvSpecificParameters(params, envVars);
 	}
 

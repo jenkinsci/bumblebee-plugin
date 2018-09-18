@@ -104,4 +104,14 @@ public class TestSetEnvSpecificParameters extends BaseEnvSpecificParameters<Test
 	public void setClientType(final ClientType clientType) {
 		getParameters().setClientType(clientType);
 	}
+
+	@Override
+	public boolean isFailRunInAlmIfAnalysisFail() {
+		return getParameters().isFailRunInAlmIfAnalysisFail();
+	}
+
+	@Override
+	public void setFailRunInAlmIfAnalysisFail(final boolean failRunInAlmIfAnalysisFail) {
+		getParameters().setFailRunInAlmIfAnalysisFail(failRunInAlmIfAnalysisFail);
+	}
 }
