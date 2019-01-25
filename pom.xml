@@ -92,12 +92,15 @@
 			<id>repo.jenkins-ci.org</id>
 			<url>http://repo.jenkins-ci.org/public/</url>
 		</repository>
+		
 		<repository>
-			<id>com.agiletestware</id>
-			<name>Agiletestware Maven Repository</name>
-			<url>http://www.agiletestware.com/maven/</url>
-			<layout>default</layout>
+			<id>release.agiletestware.com</id>
+			<url>http://public.maven.agiletestware.com.s3-website-us-west-2.amazonaws.com/release</url>
 		</repository>
+		<repository>
+			<id>snapshot.agiletestware.com</id>
+			<url>http://public.maven.agiletestware.com.s3-website-us-west-2.amazonaws.com/snapshot</url>
+		</repository>	
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
