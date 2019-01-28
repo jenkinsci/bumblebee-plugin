@@ -12,6 +12,7 @@ import javax.servlet.ServletException;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.interceptor.RequirePOST;
 
 import com.agiletestware.bumblebee.client.api.BaseParameters;
 import com.agiletestware.bumblebee.client.api.BumblebeeApi;
@@ -29,6 +30,7 @@ import hudson.Util;
 import hudson.model.AbstractProject;
 import hudson.util.FormValidation;
 import jenkins.model.GlobalConfiguration;
+import jenkins.model.Jenkins;
 
 /**
  * Global configuration for Bumblebee plugin.
@@ -83,6 +85,7 @@ public class BumblebeeGlobalConfig extends GlobalConfiguration {
 	}
 
 	// Used by global.jelly to authenticate User key
+	@RequirePOST
 	public FormValidation doSaveConnection(
 			@QueryParameter("bumblebeeUrl") final String bumblebeeUrl,
 			@QueryParameter("qcUrl") final String qcUrl,
@@ -93,6 +96,7 @@ public class BumblebeeGlobalConfig extends GlobalConfiguration {
 			@QueryParameter("pcUrl") final String pcUrl,
 			@QueryParameter("pcTimeOut") final int pcTimeOut,
 			@QueryParameter("skipConnectivityDiagnostic") final boolean skipConnectivityDiagnostic) {
+		Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
 		final String bumblebeeUrlTrimmed = Util.fixEmptyAndTrim(bumblebeeUrl);
 		final String qcUrlTrimmed = Util.fixEmptyAndTrim(qcUrl);
 		final String userNameTrimmed = Util.fixEmptyAndTrim(qcUserName);
