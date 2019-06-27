@@ -52,8 +52,8 @@ import jenkins.tasks.SimpleBuildStep;
 public class GetTestResults extends Recorder implements SimpleBuildStep {
 	private static final Logger LOGGER = Logger.getLogger(GetTestResults.class.getName());
 	private static final String PLUGIN_DISPLAY_NAME = "Bumblebee: Import HP ALM Test Results";
-	private BumblebeeApiProvider bumblebeeApiProvider = new DefaultBumblebeeApiProvider();
-	private final GetTestResultsParametersFactory parametersFactory = DefaultGetTestResultsParametersFactory.THE_INSTANCE;
+	private transient BumblebeeApiProvider bumblebeeApiProvider = new DefaultBumblebeeApiProvider();
+	private transient final GetTestResultsParametersFactory parametersFactory = DefaultGetTestResultsParametersFactory.THE_INSTANCE;
 	private final String domain;
 	private final String project;
 	private String user;
