@@ -33,6 +33,7 @@ public enum AddTestToSetParametersFactory {
 		params.setProject(step.getProject());
 		params.setTestPlanPath(step.getTestPlanPath());
 		params.setTestSetPath(step.getTestSetPath());
+		params.setTrustSelfSignedCerts(globalConfig.isTrustSelfSignedCerts());
 		return params;
 	}
 }

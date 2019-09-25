@@ -42,6 +42,7 @@ public enum UftRunnerParametersFactory {
 		params.setTestPath(step.getTestPath());
 		params.setTimeOut(globalConfig.getTimeOut());
 		params.setClientType(ClientType.JENKINS);
+		params.setTrustSelfSignedCerts(globalConfig.isTrustSelfSignedCerts());
 
 		String uftRunnerPath = envVars.get(UFT_RUNNER_ENV_VAR_NAME);
 		if (StringUtils.isEmpty(uftRunnerPath)) {

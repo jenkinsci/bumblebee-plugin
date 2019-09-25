@@ -110,6 +110,7 @@ public class RunTestSetBuildStep extends Builder implements SimpleBuildStep {
 		params.setOutputDirPath(getOutputDirPath());
 		params.setTimeOut(getTimeOut());
 		params.setClientType(ClientType.JENKINS);
+		params.setTrustSelfSignedCerts(globalConfig.isTrustSelfSignedCerts());
 		final String sets = getTestSets();
 		final List<String> setsList = new ArrayList<>();
 		final StringTokenizer tokenizer = new StringTokenizer(sets, TEST_SET_DELIMETER);

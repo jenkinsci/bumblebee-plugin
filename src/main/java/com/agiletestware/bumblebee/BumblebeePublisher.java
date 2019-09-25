@@ -148,6 +148,7 @@ public class BumblebeePublisher extends Recorder implements SimpleBuildStep {
 		params.setTimeOut(globalConfig.getTimeOut());
 		params.setCustomProperties(config.getCustomProperties());
 		params.setOffline(config.isOffline());
+		params.setTrustSelfSignedCerts(globalConfig.isTrustSelfSignedCerts());
 
 		final PrintStream logger = listener.getLogger();
 		final BumblebeeRemoteExecutor remoteExecutor = new BumblebeeRemoteExecutor(workspace,
