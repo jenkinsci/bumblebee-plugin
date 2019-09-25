@@ -3,7 +3,6 @@ package com.agiletestware.bumblebee.results;
 import static hudson.Util.fixEmptyAndTrim;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.List;
@@ -13,7 +12,6 @@ import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
@@ -99,7 +97,7 @@ public class GetTestResults extends Recorder implements SimpleBuildStep {
 		assertGlobalConfig(globalConfig);
 		final String bumblebeeUrl = globalConfig.getBumblebeeUrl();
 		try (final BumblebeeApi api = bumblebeeApiProvider.provide(bumblebeeUrl,
-				(int) TimeUnit.MINUTES.toSeconds(globalConfig.getTimeOut()))) {
+				(int) TimeUnit.MINUTES.toSeconds(globalConfig.getTimeOut()), globalConfig.isTrustSelfSignedCerts())) {
 			final String encryptedPassword = StringUtils.isNotEmpty(password) ? api.getEncryptedPassword(Secret.decrypt(password).getPlainText()) : null;
 			for (final GetTestResultsConfiguration configuration : configurations) {
 				try {
@@ -111,12 +109,9 @@ public class GetTestResults extends Recorder implements SimpleBuildStep {
 					}
 					logParameters(bumblebeeUrl, params, resultsDir, logger);
 					final FilePath reportFile = workspace.child(resultsDir).child(createFileName(params.getTestSetPath()));
-					try (InputStream stream = api.getJunitTestResults(params)) {
-						logger.println("Writing results into: " + reportFile.getRemote());
-						try (OutputStream out = reportFile.write()) {
-							IOUtils.copy(stream, out);
-							out.flush();
-						}
+					logger.println("Writing results into: " + reportFile.getRemote());
+					try (OutputStream out = reportFile.write()) {
+						api.getJunitTestResults(params, out);
 					}
 				} catch (final Exception ex) {
 					logger.println(ex.getMessage());

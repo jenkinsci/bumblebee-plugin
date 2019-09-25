@@ -167,7 +167,8 @@ public class RunUftTestTaskTest {
 	private static class ExecutionEnvironmentProviderImpl implements ExecutionEnvironmentProvider {
 
 		@Override
-		public ExecutionEnvironment getOrCreateEnvironment(final String bumblebeeUrl, final File tempDir, final BuildLogger buildLogger)
+		public ExecutionEnvironment getOrCreateEnvironment(final String bumblebeeUrl, final File tempDir, final BuildLogger buildLogger,
+				final boolean trustSelfSignedCerts)
 				throws IOException {
 			final File bumblebeeDir = createDir(tempDir, "bumblebee");
 			final File dummyFile = new File(bumblebeeDir, "something");

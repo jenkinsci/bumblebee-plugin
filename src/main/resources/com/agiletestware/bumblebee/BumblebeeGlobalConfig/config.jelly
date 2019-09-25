@@ -41,12 +41,16 @@
           <f:entry title="Skip connectivity diagnostic" field="skipConnectivityDiagnostic">
 		   <f:checkbox name="skipConnectivityDiagnostic" checked="${descriptor.isSkipConnectivityDiagnostic()}"/>
 		  </f:entry>
+		  
+		  <f:entry title="Trust self-signed certificates" field="trustSelfSignedCerts">
+		   <f:checkbox name="trustSelfSignedCerts" checked="${descriptor.isTrustSelfSignedCerts()}"/>
+		  </f:entry>
           
         <f:validateButton
             disabled="True" 
             title="${%Save Configuration}"
             progress="${%Saving configuration}"
             method="saveConnection"
-            with="bumblebeeUrl,qcUrl,qcUserName,password,timeOut,uftRunnerPath,pcUrl,skipConnectivityDiagnostic" />
+            with="bumblebeeUrl,qcUrl,qcUserName,password,timeOut,uftRunnerPath,pcUrl,skipConnectivityDiagnostic,trustSelfSignedCerts" />
     </f:section>
 </j:jelly>

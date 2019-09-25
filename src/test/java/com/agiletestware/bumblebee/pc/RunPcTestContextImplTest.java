@@ -1,6 +1,7 @@
 package com.agiletestware.bumblebee.pc;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -47,7 +48,7 @@ public class RunPcTestContextImplTest {
 		when(customSecret.getPlainText("secretPwd")).thenReturn(OVERRIDNG_ALM_PASSWORD);
 		final BumblebeeApi bumblebeeApi = mock(BumblebeeApi.class);
 		when(bumblebeeApi.getEncryptedPassword(OVERRIDNG_ALM_PASSWORD)).thenReturn(ENCRYPTED_OVERRIDNG_ALM_PASSWORD);
-		when(bumblebeeApiProvider.provide(anyString(), anyInt())).thenReturn(bumblebeeApi);
+		when(bumblebeeApiProvider.provide(anyString(), anyInt(), anyBoolean())).thenReturn(bumblebeeApi);
 	}
 
 	@Test

@@ -59,6 +59,7 @@ public class BumblebeeGlobalConfig extends GlobalConfiguration {
 	private String pcUrl;
 	private int pcTimeOut;
 	private boolean skipConnectivityDiagnostic;
+	private boolean trustSelfSignedCerts;
 
 	/**
 	 * Constructor.
@@ -95,7 +96,8 @@ public class BumblebeeGlobalConfig extends GlobalConfiguration {
 			@QueryParameter("uftRunnerPath") final String uftRunnerPath,
 			@QueryParameter("pcUrl") final String pcUrl,
 			@QueryParameter("pcTimeOut") final int pcTimeOut,
-			@QueryParameter("skipConnectivityDiagnostic") final boolean skipConnectivityDiagnostic) {
+			@QueryParameter("skipConnectivityDiagnostic") final boolean skipConnectivityDiagnostic,
+			@QueryParameter("trustSelfSignedCerts") final boolean trustSelfSignedCerts) {
 		Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
 		final String bumblebeeUrlTrimmed = Util.fixEmptyAndTrim(bumblebeeUrl);
 		final String qcUrlTrimmed = Util.fixEmptyAndTrim(qcUrl);
@@ -124,8 +126,9 @@ public class BumblebeeGlobalConfig extends GlobalConfiguration {
 			this.pcUrl = pcUrlTrimmed;
 			this.pcTimeOut = pcTimeOut;
 			this.skipConnectivityDiagnostic = skipConnectivityDiagnostic;
+			this.trustSelfSignedCerts = trustSelfSignedCerts;
 
-			try (final BumblebeeApi bmapi = new BumblebeeApiImpl(this.bumblebeeUrl, this.timeOut)) {
+			try (final BumblebeeApi bmapi = new BumblebeeApiImpl(this.bumblebeeUrl, this.timeOut, trustSelfSignedCerts)) {
 				// Set password only if old value is null/empty/blank OR if new
 				// value is not equal to old
 				if (StringUtils.isBlank(this.password) || !this.password.equals(password)) {
@@ -174,6 +177,10 @@ public class BumblebeeGlobalConfig extends GlobalConfiguration {
 
 	public boolean isSkipConnectivityDiagnostic() {
 		return skipConnectivityDiagnostic;
+	}
+
+	public boolean isTrustSelfSignedCerts() {
+		return trustSelfSignedCerts;
 	}
 
 	public FormValidation doCheckBumblebeeUrl(@AncestorInPath final AbstractProject<?, ?> project, @QueryParameter final String bumblebeeUrl)

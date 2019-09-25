@@ -21,6 +21,8 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<skipTests>true</skipTests>
+		<bumblebee-client.version>0.1.2-SNAPSHOT</bumblebee-client.version>
+		<mockito.version>1.9.5</mockito.version>
 	</properties>
 	<dependencyManagement>
 		<dependencies>
@@ -39,7 +41,7 @@
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpclient</artifactId>
-				<version>4.3</version>
+				<version>4.5.10</version>
 				<type>jar</type>
 			</dependency>
 		</dependencies>
@@ -78,12 +80,12 @@
 		<dependency>
 			<groupId>com.agiletestware</groupId>
 			<artifactId>bumblebee-client</artifactId>
-			<version>0.1.1</version>
+			<version>${bumblebee-client.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-all</artifactId>
-			<version>1.9.5</version>
+			<version>${mockito.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

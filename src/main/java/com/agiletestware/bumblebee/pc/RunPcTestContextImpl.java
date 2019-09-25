@@ -34,6 +34,7 @@ public class RunPcTestContextImpl implements RunPcTestContext, Serializable {
 	private final File outputDir;
 	private final String bumblebeeUrl;
 	private final int connectionTimeOut;
+	private final boolean trustSelfSignedCertificate;
 
 	public RunPcTestContextImpl(final RunPcTestBuildStep buildStep, final BumblebeeGlobalConfig globalConfig, final FilePath workspace,
 			final CustomSecret customSecret, final BumblebeeApiProvider bumblebeeApiProvider) throws Exception {
@@ -46,6 +47,7 @@ public class RunPcTestContextImpl implements RunPcTestContext, Serializable {
 		this.collateAnalyzeRetrySettings = createCollateAnalyzeRetrySettings(buildStep);
 		this.pollingInterval = buildStep.getPollingInterval();
 		this.outputDir = new File(workspace.getRemote(), buildStep.getOutputDir());
+		this.trustSelfSignedCertificate = globalConfig.isTrustSelfSignedCerts();
 	}
 
 	private StartRunParameters createStartRunParameters(final RunPcTestBuildStep buildStep) {
@@ -103,6 +105,11 @@ public class RunPcTestContextImpl implements RunPcTestContext, Serializable {
 		return pollingInterval;
 	}
 
+	@Override
+	public boolean isTrustSelfSignedCerts() {
+		return trustSelfSignedCertificate;
+	}
+
 	private RetrySettings createCollateAnalyzeRetrySettings(final RunPcTestBuildStep buildStep) {
 		final boolean enableRetry = buildStep.isRetryCollateAndAnalysisFlag();
 		return enableRetry ? new RetrySettings(buildStep.getRetryCollateAndAnalysisAttempts(), buildStep.getRetryCollateAndAnalysisInterval(),
@@ -121,6 +128,7 @@ public class RunPcTestContextImpl implements RunPcTestContext, Serializable {
 		private final String user;
 		private final String pcUrl;
 		private final String password;
+		private final boolean trustSelfSignedCertificate;
 
 		public PcConnectionParametersImpl(final BumblebeeGlobalConfig globalConfig, final String domain, final String project, final String almUser,
 				final String almPassword, final CustomSecret customSecret, final BumblebeeApiProvider bumblebeeApiProvider) throws Exception {
@@ -136,6 +144,7 @@ public class RunPcTestContextImpl implements RunPcTestContext, Serializable {
 			this.user = StringUtils.isNotEmpty(almUserFromStep) ? almUserFromStep : globalConfig.getQcUserName();
 			this.pcUrl = globalConfig.getPcUrl();
 			this.password = getEncryptedAlmPassword(globalConfig, almPassword);
+			this.trustSelfSignedCertificate = globalConfig.isTrustSelfSignedCerts();
 		}
 
 		@Override
@@ -176,7 +185,8 @@ public class RunPcTestContextImpl implements RunPcTestContext, Serializable {
 			if (StringUtils.isEmpty(bumblebeeUrl)) {
 				throw new IllegalStateException("Bumblebee URL is not defined in Bumblebee Global Configuration");
 			}
-			try (final BumblebeeApi bumblebeeApi = bumblebeeApiProvider.provide(bumblebeeUrl, (int) TimeUnit.MINUTES.toSeconds(globalConfig.getTimeOut()))) {
+			try (final BumblebeeApi bumblebeeApi = bumblebeeApiProvider.provide(bumblebeeUrl, (int) TimeUnit.MINUTES.toSeconds(globalConfig.getTimeOut()),
+					trustSelfSignedCertificate)) {
 				return bumblebeeApi.getEncryptedPassword(customSecret.getPlainText(almPasswordFromStep));
 			}
 		}

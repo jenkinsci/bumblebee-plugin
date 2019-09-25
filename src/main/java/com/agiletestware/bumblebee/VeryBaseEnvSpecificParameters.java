@@ -34,6 +34,16 @@ public class VeryBaseEnvSpecificParameters<T extends BumblebeeParameters> implem
 		params.setBumbleBeeUrl(bumbleBeeUrl);
 	}
 
+	@Override
+	public boolean isTrustSelfSignedCerts() {
+		return params.isTrustSelfSignedCerts();
+	}
+
+	@Override
+	public void setTrustSelfSignedCerts(final boolean trustSelfSignedCerts) {
+		params.setTrustSelfSignedCerts(trustSelfSignedCerts);
+	}
+
 	protected String expand(final String value) {
 		return envVars.expand(value);
 	}

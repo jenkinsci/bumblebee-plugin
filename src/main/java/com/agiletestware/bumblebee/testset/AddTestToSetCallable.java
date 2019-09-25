@@ -37,7 +37,7 @@ public class AddTestToSetCallable implements Callable<Void, Exception> {
 
 	@Override
 	public Void call() throws Exception {
-		try (final BumblebeeApi bumblebeeApi = new BumblebeeApiImpl(parameters.getBumbleBeeUrl(), timeout)) {
+		try (final BumblebeeApi bumblebeeApi = new BumblebeeApiImpl(parameters.getBumbleBeeUrl(), timeout, parameters.isTrustSelfSignedCerts())) {
 			bumblebeeApi.addTestToSet(parameters);
 			return null;
 		}
