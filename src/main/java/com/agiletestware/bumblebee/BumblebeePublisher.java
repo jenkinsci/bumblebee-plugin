@@ -9,9 +9,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 import javax.servlet.ServletException;
 
 import org.kohsuke.stapler.AncestorInPath;
@@ -23,6 +26,7 @@ import com.agiletestware.bumblebee.client.api.BulkUpdateParameters;
 import com.agiletestware.bumblebee.client.api.BulkUpdateParametersImpl;
 import com.agiletestware.bumblebee.util.BumblebeeUtils;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.AbortException;
 import hudson.Extension;
 import hudson.FilePath;
@@ -133,8 +137,10 @@ public class BumblebeePublisher extends Recorder implements SimpleBuildStep {
 	 */
 	public void doBulkUpdate(final BumblebeeConfiguration config, final Run<?, ?> run, final FilePath workspace, final Launcher launcher,
 			final TaskListener listener)
-					throws Exception {
-		final BumblebeeGlobalConfig globalConfig = GlobalConfiguration.all().get(BumblebeeGlobalConfig.class);
+			throws Exception {
+		@SuppressFBWarnings(justification = "Objects.requreNonNull does null check but FindBugs still consider this as potential NPE", value = "NP")
+		final BumblebeeGlobalConfig globalConfig = Objects.requireNonNull(GlobalConfiguration.all().get(BumblebeeGlobalConfig.class),
+				"Bumblebee Global Configuration is null!");
 		final BulkUpdateParameters params = new BulkUpdateParametersImpl();
 		globalConfig.populateBaseParameters(params);
 		params.setDomain(config.getDomain());
@@ -200,8 +206,9 @@ public class BumblebeePublisher extends Recorder implements SimpleBuildStep {
 
 		@SuppressWarnings("deprecation")
 		@Override
-		public BumblebeePublisher newInstance(final StaplerRequest req, final JSONObject formData) throws FormException {
-			return new BumblebeePublisher(req.bindParametersToList(BumblebeeConfiguration.class, "Bumblebee.bumblebeeConfiguration."));
+		public BumblebeePublisher newInstance(@CheckForNull final StaplerRequest req, @Nonnull final JSONObject formData) throws FormException {
+			return new BumblebeePublisher(
+					Objects.requireNonNull(req, "Req is null").bindParametersToList(BumblebeeConfiguration.class, "Bumblebee.bumblebeeConfiguration."));
 		}
 
 		public FormValidation doCheckDomain(@AncestorInPath final AbstractProject<?, ?> project, @QueryParameter final String domain)

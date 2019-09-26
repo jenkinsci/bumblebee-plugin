@@ -3,11 +3,18 @@
  */
 package com.agiletestware.bumblebee.util;
 
+import java.util.Objects;
 import java.util.regex.Pattern;
 
+import javax.annotation.Nonnull;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.FilePath;
 import hudson.Util;
 import hudson.model.AbstractBuild;
+import hudson.model.Executor;
+import hudson.model.Node;
+import hudson.model.Run;
 import hudson.util.FormValidation;
 
 /**
@@ -18,7 +25,6 @@ import hudson.util.FormValidation;
 public class BumblebeeUtils {
 
 	private static final String REQUIRED = "Required";
-
 
 	// FIXME: seems obsolete - clarify and remove.
 	public static FormValidation validateCustomProperties(
@@ -129,6 +135,15 @@ public class BumblebeeUtils {
 			workspace = build.getProject().getSomeWorkspace();
 		}
 		return workspace;
+	}
+
+	@Nonnull
+	@SuppressFBWarnings(justification = "Objects.requreNonNull does null check but FindBugs still consider this as potential NPE", value = "NP")
+	public static FilePath getRootPathOrFail(final Run<?, ?> run) {
+		final Executor executor = run.getExecutor();
+		final Node node = Objects.requireNonNull(executor, "Jenkins Executor is null").getOwner().getNode();
+		Objects.requireNonNull(node, "Jenkins Node is null");
+		return Objects.requireNonNull(node.getRootPath(), "FilePath is null");
 	}
 
 }

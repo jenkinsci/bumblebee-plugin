@@ -1,12 +1,15 @@
 package com.agiletestware.bumblebee.uft;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import com.agiletestware.bumblebee.BumblebeeGlobalConfig;
 import com.agiletestware.bumblebee.testset.RunTestSetBuildStep;
+import com.agiletestware.bumblebee.util.BumblebeeUtils;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.AbortException;
 import hudson.Extension;
 import hudson.FilePath;
@@ -40,9 +43,11 @@ public class RunUftTestBuildStep extends Builder implements SimpleBuildStep {
 			throws InterruptedException, IOException {
 		listener.getLogger().println("Bumblebee: Run local UFT test");
 		try {
+			@SuppressFBWarnings(justification = "Objects.requreNonNull does null check but FindBugs still consider this as potential NPE", value = "NP")
 			final RunUftTestTask task = new RunUftTestTask(UftRunnerParametersFactory.THE_INSTANCE.create(this,
-					GlobalConfiguration.all().get(BumblebeeGlobalConfig.class), run.getEnvironment(listener)), listener,
-					run.getExecutor().getOwner().getNode().getRootPath(), workspace);
+					Objects.requireNonNull(GlobalConfiguration.all().get(BumblebeeGlobalConfig.class), "Bumblebee Global Configuration is null"),
+					run.getEnvironment(listener)), listener,
+					BumblebeeUtils.getRootPathOrFail(run), workspace);
 			final int returnCode = launcher.getChannel().call(task);
 			if (returnCode != 0) {
 				throw new AbortException("UFT test execution failed. See logs for details.");

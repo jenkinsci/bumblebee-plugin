@@ -98,7 +98,7 @@ public class GetTestResults extends Recorder implements SimpleBuildStep {
 		final String bumblebeeUrl = globalConfig.getBumblebeeUrl();
 		try (final BumblebeeApi api = bumblebeeApiProvider.provide(bumblebeeUrl,
 				(int) TimeUnit.MINUTES.toSeconds(globalConfig.getTimeOut()), globalConfig.isTrustSelfSignedCerts())) {
-			final String encryptedPassword = StringUtils.isNotEmpty(password) ? api.getEncryptedPassword(Secret.decrypt(password).getPlainText()) : null;
+			final String encryptedPassword = getEncryptedPassword(api);
 			for (final GetTestResultsConfiguration configuration : configurations) {
 				try {
 					logger.println("Fetching test results from HP ALM");
@@ -181,6 +181,14 @@ public class GetTestResults extends Recorder implements SimpleBuildStep {
 
 	private String createFileName(final String testSetPath) {
 		return testSetPath.replaceAll("[\\\\/:*?\"<>|]", "_") + "_" + System.currentTimeMillis() + ".xml";
+	}
+
+	private String getEncryptedPassword(final BumblebeeApi api) throws Exception {
+		if (StringUtils.isEmpty(password)) {
+			return null;
+		}
+		final Secret passwordSecret = Secret.decrypt(password);
+		return passwordSecret != null ? api.getEncryptedPassword(passwordSecret.getPlainText()) : null;
 	}
 
 	private void logParameters(final String bumblebeeUrl, final GetTestResultsParameters params, final String resultsDir, final PrintStream logger) {

@@ -3,6 +3,7 @@ package com.agiletestware.bumblebee.testset;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.StringTokenizer;
 
 import javax.servlet.ServletException;
@@ -19,6 +20,7 @@ import com.agiletestware.bumblebee.client.testrunner.TestSetRunnerParametersImpl
 import com.agiletestware.bumblebee.tracking.ClientType;
 import com.agiletestware.bumblebee.util.BumblebeeUtils;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.AbortException;
 import hudson.EnvVars;
 import hudson.Extension;
@@ -86,7 +88,7 @@ public class RunTestSetBuildStep extends Builder implements SimpleBuildStep {
 			throws InterruptedException, IOException {
 		listener.getLogger().println("Bumblebee: running test sets");
 		try {
-			final RunTestSetTask task = new RunTestSetTask(listener, run.getExecutor().getOwner().getNode().getRootPath(), workspace,
+			final RunTestSetTask task = new RunTestSetTask(listener, BumblebeeUtils.getRootPathOrFail(run), workspace,
 					createParameters(run.getEnvironment(listener)));
 			final int returnCode = launcher.getChannel().call(task);
 			if (returnCode != 0) {
@@ -100,7 +102,9 @@ public class RunTestSetBuildStep extends Builder implements SimpleBuildStep {
 	}
 
 	private TestSetRunnerParameters createParameters(final EnvVars envVars) {
-		final BumblebeeGlobalConfig globalConfig = GlobalConfiguration.all().get(BumblebeeGlobalConfig.class);
+		@SuppressFBWarnings(justification = "Objects.requreNonNull does null check but FindBugs still consider this as potential NPE", value = "NP")
+		final BumblebeeGlobalConfig globalConfig = Objects.requireNonNull(GlobalConfiguration.all().get(BumblebeeGlobalConfig.class),
+				"Bumblebee Global Configuration is null!");
 		final TestSetRunnerParameters params = new TestSetRunnerParametersImpl();
 		globalConfig.populateBaseParameters(params);
 		params.setDomain(getDomain());
