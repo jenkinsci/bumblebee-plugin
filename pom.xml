@@ -16,6 +16,11 @@
 			<name>Ali Raza</name>
 			<email>ali.raza@agiletestware.com</email>
 		</developer>
+		<developer>
+			<id>sergey_oplavin</id>
+			<name>Sergey Oplavin</name>
+			<email>sergey.oplavin@agiletestware.com</email>
+		</developer>
 	</developers>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
