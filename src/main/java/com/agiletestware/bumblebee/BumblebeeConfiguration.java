@@ -29,6 +29,12 @@ public final class BumblebeeConfiguration implements Serializable {
 	private final String customProperties;
 	private final boolean failIfUploadFailed;
 	private final boolean offline;
+	private final String defectCreatePolicy;
+	private final String defectCreateStatus;
+	private final String defectSeverity;
+	private final String defectReopenStatus;
+	private final String defectResolvePolicy;
+	private final String defectResolveStatus;
 
 	/**
 	 * Creates new instance.
@@ -56,7 +62,13 @@ public final class BumblebeeConfiguration implements Serializable {
 			final String testLab, final String testSet, final String format,
 			final String resultPattern, final String customProperties,
 			final boolean failIfUploadFailed,
-			final boolean offline) {
+			final boolean offline,
+			final String defectCreatePolicy,
+			final String defectCreateStatus,
+			final String defectSeverity,
+			final String defectReopenStatus,
+			final String defectResolvePolicy,
+			final String defectResolveStatus) {
 		super();
 		this.domain = Util.fixEmptyAndTrim(domain);
 		this.projectName = Util.fixEmptyAndTrim(projectName);
@@ -67,8 +79,13 @@ public final class BumblebeeConfiguration implements Serializable {
 		this.resultPattern = Util.fixEmptyAndTrim(resultPattern);
 		this.customProperties = Util.fixEmptyAndTrim(customProperties);
 		this.failIfUploadFailed = failIfUploadFailed;
-		this.offline=offline;
-
+		this.offline = offline;
+		this.defectCreatePolicy = Util.fixEmptyAndTrim(defectCreatePolicy);
+		this.defectCreateStatus = Util.fixEmptyAndTrim(defectCreateStatus);
+		this.defectSeverity = Util.fixEmptyAndTrim(defectSeverity);
+		this.defectReopenStatus = Util.fixEmptyAndTrim(defectReopenStatus);
+		this.defectResolvePolicy = Util.fixEmptyAndTrim(defectResolvePolicy);
+		this.defectResolveStatus = Util.fixEmptyAndTrim(defectResolveStatus);
 	}
 
 	/**
@@ -156,5 +173,29 @@ public final class BumblebeeConfiguration implements Serializable {
 	 */
 	public boolean isOffline() {
 		return offline;
+	}
+
+	public String getDefectCreatePolicy() {
+		return defectCreatePolicy;
+	}
+
+	public String getDefectCreateStatus() {
+		return defectCreateStatus;
+	}
+
+	public String getDefectSeverity() {
+		return defectSeverity;
+	}
+
+	public String getDefectReopenStatus() {
+		return defectReopenStatus;
+	}
+
+	public String getDefectResolvePolicy() {
+		return defectResolvePolicy;
+	}
+
+	public String getDefectResolveStatus() {
+		return defectResolveStatus;
 	}
 }

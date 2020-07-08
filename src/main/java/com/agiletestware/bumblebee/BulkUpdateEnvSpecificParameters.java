@@ -120,11 +120,75 @@ public class BulkUpdateEnvSpecificParameters extends BaseEnvSpecificParameters<B
 	}
 
 	@Override
+	public String getDefectCreatePolicy() {
+		return getParameters().getDefectCreatePolicy();
+	}
+
+	@Override
+	public void setDefectCreatePolicy(final String defectCreatePolicy) {
+		getParameters().setDefectCreatePolicy(defectCreatePolicy);
+	}
+
+	@Override
+	public String getDefectCreateStatus() {
+		return expand(getParameters().getDefectCreateStatus());
+	}
+
+	@Override
+	public void setDefectCreateStatus(final String defectCreateStatus) {
+		getParameters().setDefectCreateStatus(defectCreateStatus);
+	}
+
+	@Override
+	public String getDefectSeverity() {
+		return expand(getParameters().getDefectSeverity());
+	}
+
+	@Override
+	public void setDefectSeverity(final String defectSeverity) {
+		getParameters().setDefectSeverity(defectSeverity);
+	}
+
+	@Override
+	public String getDefectReopenStatus() {
+		return expand(getParameters().getDefectReopenStatus());
+	}
+
+	@Override
+	public void setDefectReopenStatus(final String defectReopenStatus) {
+		getParameters().setDefectReopenStatus(defectReopenStatus);
+	}
+
+	@Override
+	public String getDefectResolvePolicy() {
+		return getParameters().getDefectResolvePolicy();
+	}
+
+	@Override
+	public void setDefectResolvePolicy(final String defectResolvePolicy) {
+		getParameters().setDefectResolvePolicy(defectResolvePolicy);
+	}
+
+	@Override
+	public String getDefectResolveStatus() {
+		return expand(getParameters().getDefectResolveStatus());
+	}
+
+	@Override
+	public void setDefectResolveStatus(final String defectResolveStatus) {
+		getParameters().setDefectResolveStatus(defectResolveStatus);
+	}
+
+	@Override
 	public String toString() {
 		return "BulkUpdateEnvSpecificParameters [getTestPlanDirectory()=" + getTestPlanDirectory() + ", getTestLabDirectory()=" + getTestLabDirectory()
 		+ ", getFormat()=" + getFormat() + ", getTestSet()=" + getTestSet() + ", getResultPattern()=" + getResultPattern() + ", getMode()=" + getMode()
-		+ ", getTimeOut()=" + getTimeOut() + ", getCustomProperties()=" + getCustomProperties() + ", isOffline()=" + isOffline() + ", getAlmUrl()="
-		+ getAlmUrl() + ", getDomain()=" + getDomain() + ", getProject()=" + getProject() + ", getAlmUserName()=" + getAlmUserName()
-		+ ", getEncryptedPassword()=********" + ", getBumbleBeeUrl()=" + getBumbleBeeUrl() + "]";
+		+ ", getTimeOut()=" + getTimeOut() + ", getCustomProperties()=" + getCustomProperties() + ", isOffline()=" + isOffline()
+		+ ", getDefectCreatePolicy()=" + getDefectCreatePolicy() + ", getDefectCreateStatus()=" + getDefectCreateStatus() + ", getDefectSeverity()="
+		+ getDefectSeverity() + ", getDefectReopenStatus()=" + getDefectReopenStatus() + ", getDefectResolvePolicy()=" + getDefectResolvePolicy()
+		+ ", getDefectResolveStatus()=" + getDefectResolveStatus() + ", getAlmUrl()=" + getAlmUrl() + ", getDomain()=" + getDomain() + ", getProject()="
+		+ getProject() + ", getAlmUserName()=" + getAlmUserName() + ", getEncryptedPassword()=*******" + ", toString()="
+		+ super.toString() + ", getBumbleBeeUrl()=" + getBumbleBeeUrl() + ", isTrustSelfSignedCerts()=" + isTrustSelfSignedCerts() + "]";
 	}
+
 }

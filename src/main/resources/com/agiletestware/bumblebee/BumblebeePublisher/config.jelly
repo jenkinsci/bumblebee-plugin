@@ -34,6 +34,38 @@
 		  <f:entry title="Process offline" field="offline">
 			<f:checkbox name="Bumblebee.bumblebeeConfiguration.offline" checked="${c.isOffline()}"/>
 		  </f:entry>
+		  <f:entry title="Defect create policy" field="defectCreatePolicy" >						
+					<select name="Bumblebee.bumblebeeConfiguration.defectCreatePolicy">
+						<f:option selected="{'' == c.getDefectCreatePolicy()}" value="">--</f:option>
+						<j:forEach var="defectCreatePolicy" items="${descriptor.getDefectCreatePolicies()}">
+							<f:option selected="${defectCreatePolicy == c.getDefectCreatePolicy()}" value="${defectCreatePolicy}">
+									${defectCreatePolicy}
+							</f:option>
+						</j:forEach>
+					</select>						
+		  </f:entry>
+		  <f:entry title="Create status" field="defectCreateStatus">
+            <f:textbox name="Bumblebee.bumblebeeConfiguration.defectCreateStatus" default="New" value="${c.getDefectCreateStatus()}"/>
+          </f:entry>
+          <f:entry title="Reopen status" field="defectReopenStatus">
+            <f:textbox name="Bumblebee.bumblebeeConfiguration.defectReopenStatus" default="Reopen" value="${c.getDefectReopenStatus()}"/>
+          </f:entry>
+           <f:entry title="Severity" field="defectSeverity">
+            <f:textbox name="Bumblebee.bumblebeeConfiguration.defectSeverity" default="2-Medium" value="${c.getDefectSeverity()}"/>
+          </f:entry>
+           <f:entry title="Defect resolve policy" field="defectResolvePolicy" >						
+					<select name="Bumblebee.bumblebeeConfiguration.defectResolvePolicy">
+					<f:option selected="{'' == c.getDefectResolvePolicy()}" value="">--</f:option>
+						<j:forEach var="defectResolvePolicy" items="${descriptor.getDefectResolvePolicies()}">
+							<f:option selected="${defectResolvePolicy == c.getDefectResolvePolicy()}" value="${defectResolvePolicy}">
+									${defectResolvePolicy}
+							</f:option>
+						</j:forEach>
+					</select>						
+		  </f:entry>
+		  <f:entry title="Resolve status" field="defectResolveStatus">
+            <f:textbox name="Bumblebee.bumblebeeConfiguration.defectResolveStatus" default="Fixed" value="${c.getDefectResolveStatus()}"/>
+          </f:entry>
   <f:entry title="">
     <div align="right">
       <f:repeatableDeleteButton />

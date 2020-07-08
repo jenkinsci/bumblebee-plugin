@@ -137,7 +137,7 @@ public class BumblebeePublisher extends Recorder implements SimpleBuildStep {
 	 */
 	public void doBulkUpdate(final BumblebeeConfiguration config, final Run<?, ?> run, final FilePath workspace, final Launcher launcher,
 			final TaskListener listener)
-			throws Exception {
+					throws Exception {
 		@SuppressFBWarnings(justification = "Objects.requreNonNull does null check but FindBugs still consider this as potential NPE", value = "NP")
 		final BumblebeeGlobalConfig globalConfig = Objects.requireNonNull(GlobalConfiguration.all().get(BumblebeeGlobalConfig.class),
 				"Bumblebee Global Configuration is null!");
@@ -155,6 +155,12 @@ public class BumblebeePublisher extends Recorder implements SimpleBuildStep {
 		params.setCustomProperties(config.getCustomProperties());
 		params.setOffline(config.isOffline());
 		params.setTrustSelfSignedCerts(globalConfig.isTrustSelfSignedCerts());
+		params.setDefectCreatePolicy(config.getDefectCreatePolicy());
+		params.setDefectCreateStatus(config.getDefectCreateStatus());
+		params.setDefectSeverity(config.getDefectSeverity());
+		params.setDefectReopenStatus(config.getDefectReopenStatus());
+		params.setDefectResolvePolicy(config.getDefectResolvePolicy());
+		params.setDefectResolveStatus(config.getDefectResolveStatus());
 
 		final PrintStream logger = listener.getLogger();
 		final BumblebeeRemoteExecutor remoteExecutor = new BumblebeeRemoteExecutor(workspace,
@@ -179,6 +185,8 @@ public class BumblebeePublisher extends Recorder implements SimpleBuildStep {
 	public static final class DescriptorImpl extends BuildStepDescriptor<Publisher> {
 		private static final String PLUGIN_HELP_PAGE_URI = "/plugin/bumblebee/help/main.html";
 		private static final String PLUGIN_DISPLAY_NAME = "Bumblebee  HP  ALM  Uploader";
+		private static final List<String> DEFECT_CREATE_POLICIES = Collections.unmodifiableList(Arrays.asList("Create", "Reopen"));
+		private static final List<String> DEFECT_RESOLVE_POLICIES = Collections.unmodifiableList(Arrays.asList("Close"));
 
 		/**
 		 * Constructor.
@@ -245,6 +253,14 @@ public class BumblebeePublisher extends Recorder implements SimpleBuildStep {
 				throws IOException, ServletException {
 			project.checkPermission(Job.CONFIGURE);
 			return BumblebeeUtils.validateRequiredField(format);
+		}
+
+		public List<String> getDefectCreatePolicies() {
+			return DEFECT_CREATE_POLICIES;
+		}
+
+		public List<String> getDefectResolvePolicies() {
+			return DEFECT_RESOLVE_POLICIES;
 		}
 
 	}
