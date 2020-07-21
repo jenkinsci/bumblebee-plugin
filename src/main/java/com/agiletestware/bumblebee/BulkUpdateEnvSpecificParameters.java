@@ -180,15 +180,45 @@ public class BulkUpdateEnvSpecificParameters extends BaseEnvSpecificParameters<B
 	}
 
 	@Override
+	public String getDefectCreateProperties() {
+		return expand(getParameters().getDefectCreateProperties());
+	}
+
+	@Override
+	public void setDefectCreateProperties(final String defectCreateProperties) {
+		getParameters().setDefectCreateProperties(defectCreateProperties);
+	}
+
+	@Override
+	public String getDefectReopenProperties() {
+		return expand(getParameters().getDefectReopenProperties());
+	}
+
+	@Override
+	public void setDefectReopenProperties(final String defectReopenProperties) {
+		getParameters().setDefectReopenProperties(defectReopenProperties);
+	}
+
+	@Override
+	public String getDefectResolveProperties() {
+		return expand(getParameters().getDefectResolveProperties());
+	}
+
+	@Override
+	public void setDefectResolveProperties(final String defectResolveProperties) {
+		getParameters().setDefectResolveProperties(defectResolveProperties);
+	}
+
+	@Override
 	public String toString() {
 		return "BulkUpdateEnvSpecificParameters [getTestPlanDirectory()=" + getTestPlanDirectory() + ", getTestLabDirectory()=" + getTestLabDirectory()
 		+ ", getFormat()=" + getFormat() + ", getTestSet()=" + getTestSet() + ", getResultPattern()=" + getResultPattern() + ", getMode()=" + getMode()
 		+ ", getTimeOut()=" + getTimeOut() + ", getCustomProperties()=" + getCustomProperties() + ", isOffline()=" + isOffline()
 		+ ", getDefectCreatePolicy()=" + getDefectCreatePolicy() + ", getDefectCreateStatus()=" + getDefectCreateStatus() + ", getDefectSeverity()="
 		+ getDefectSeverity() + ", getDefectReopenStatus()=" + getDefectReopenStatus() + ", getDefectResolvePolicy()=" + getDefectResolvePolicy()
-		+ ", getDefectResolveStatus()=" + getDefectResolveStatus() + ", getAlmUrl()=" + getAlmUrl() + ", getDomain()=" + getDomain() + ", getProject()="
-		+ getProject() + ", getAlmUserName()=" + getAlmUserName() + ", getEncryptedPassword()=*******" + ", toString()="
-		+ super.toString() + ", getBumbleBeeUrl()=" + getBumbleBeeUrl() + ", isTrustSelfSignedCerts()=" + isTrustSelfSignedCerts() + "]";
+		+ ", getDefectResolveStatus()=" + getDefectResolveStatus() + ", getDefectCreateProperties()=" + getDefectCreateProperties()
+		+ ", getDefectReopenProperties()=" + getDefectReopenProperties() + ", getDefectResolveProperties()=" + getDefectResolveProperties()
+		+ ", toString()=" + super.toString() + "]";
 	}
 
 }

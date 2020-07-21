@@ -35,6 +35,9 @@ public final class BumblebeeConfiguration implements Serializable {
 	private final String defectReopenStatus;
 	private final String defectResolvePolicy;
 	private final String defectResolveStatus;
+	private final String defectCreateProperties;
+	private final String defectReopenProperties;
+	private final String defectResolveProperties;
 
 	/**
 	 * Creates new instance.
@@ -68,7 +71,10 @@ public final class BumblebeeConfiguration implements Serializable {
 			final String defectSeverity,
 			final String defectReopenStatus,
 			final String defectResolvePolicy,
-			final String defectResolveStatus) {
+			final String defectResolveStatus,
+			final String defectCreateProperties,
+			final String defectReopenProperties,
+			final String defectResolveProperties) {
 		super();
 		this.domain = Util.fixEmptyAndTrim(domain);
 		this.projectName = Util.fixEmptyAndTrim(projectName);
@@ -86,6 +92,9 @@ public final class BumblebeeConfiguration implements Serializable {
 		this.defectReopenStatus = Util.fixEmptyAndTrim(defectReopenStatus);
 		this.defectResolvePolicy = Util.fixEmptyAndTrim(defectResolvePolicy);
 		this.defectResolveStatus = Util.fixEmptyAndTrim(defectResolveStatus);
+		this.defectCreateProperties = Util.fixEmptyAndTrim(defectCreateProperties);
+		this.defectReopenProperties = Util.fixEmptyAndTrim(defectReopenProperties);
+		this.defectResolveProperties = Util.fixEmptyAndTrim(defectResolveProperties);
 	}
 
 	/**
@@ -197,5 +206,17 @@ public final class BumblebeeConfiguration implements Serializable {
 
 	public String getDefectResolveStatus() {
 		return defectResolveStatus;
+	}
+
+	public String getDefectCreateProperties() {
+		return defectCreateProperties;
+	}
+
+	public String getDefectReopenProperties() {
+		return defectReopenProperties;
+	}
+
+	public String getDefectResolveProperties() {
+		return defectResolveProperties;
 	}
 }

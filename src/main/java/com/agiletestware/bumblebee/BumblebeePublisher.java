@@ -161,6 +161,9 @@ public class BumblebeePublisher extends Recorder implements SimpleBuildStep {
 		params.setDefectReopenStatus(config.getDefectReopenStatus());
 		params.setDefectResolvePolicy(config.getDefectResolvePolicy());
 		params.setDefectResolveStatus(config.getDefectResolveStatus());
+		params.setDefectCreateProperties(config.getDefectCreateProperties());
+		params.setDefectReopenProperties(config.getDefectReopenProperties());
+		params.setDefectResolveProperties(config.getDefectResolveProperties());
 
 		final PrintStream logger = listener.getLogger();
 		final BumblebeeRemoteExecutor remoteExecutor = new BumblebeeRemoteExecutor(workspace,
