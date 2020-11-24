@@ -34,7 +34,12 @@ public class BumblebeeRemoteExecutor implements Callable<Void, Exception>, Seria
 
 	@Override
 	public Void call() throws Exception {
-		execute();
+		try {
+			execute();
+		} catch (final Exception ex) {
+			log.error("Exception ocurred during report upload: " + ex.getMessage(), ex);
+			throw ex;
+		}
 		return null;
 	}
 
