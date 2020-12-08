@@ -4,11 +4,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.QueryParameter;
@@ -16,19 +18,24 @@ import org.kohsuke.stapler.interceptor.RequirePOST;
 
 import com.agiletestware.bumblebee.client.api.BaseParameters;
 import com.agiletestware.bumblebee.client.api.BumblebeeApi;
-import com.agiletestware.bumblebee.client.api.BumblebeeApiImpl;
+import com.agiletestware.bumblebee.client.api.BumblebeeApiProvider;
+import com.agiletestware.bumblebee.client.api.DefaultBumblebeeApiProvider;
 import com.agiletestware.bumblebee.client.utils.Messages;
 import com.agiletestware.bumblebee.client.utils.UrlAvailableValidator;
+import com.agiletestware.bumblebee.encryption.CustomSecret;
+import com.agiletestware.bumblebee.encryption.DefaultCustomSecret;
 import com.agiletestware.bumblebee.validator.CustomUrlAvailableValidator;
 import com.agiletestware.bumblebee.validator.HpUrls;
 import com.agiletestware.bumblebee.validator.HpUserValidator;
 import com.agiletestware.bumblebee.validator.RegExpMatchValidator;
 import com.agiletestware.bumblebee.validator.UftRunnerPathValidator;
+import com.agiletestware.bumblebee.validator.Validator;
 
 import hudson.Extension;
 import hudson.Util;
 import hudson.model.AbstractProject;
 import hudson.util.FormValidation;
+import hudson.util.Secret;
 import jenkins.model.GlobalConfiguration;
 import jenkins.model.Jenkins;
 
@@ -50,9 +57,12 @@ public class BumblebeeGlobalConfig extends GlobalConfiguration {
 			"Bumblebee URL should be http(s)://<bumblebee_server>:<port>/bumblebee", "^(https?)://[0-9a-zA-Z]([-.\\w]*[0-9a-zA-Z])*(:\\d*[^/])?\\/bumblebee$");
 	private static final RegExpMatchValidator ALM_URL_REGEXP_VALIDATOR = new RegExpMatchValidator("HP ALM URL should be http(s)://<qcserver>:<qcport>/qcbin",
 			"^(https?)\\:\\/\\/[0-9a-zA-Z]([-.\\w]*[0-9a-zA-Z])*(:\\d*[^\\/])?\\/qcbin$");
+	private final transient BumblebeeApiProvider apiProvider;
+	private final transient CustomSecret secretHelper;
+	private final transient Validator<String, Integer> bumblebeeUrlValidator;
 	private String bumblebeeUrl;
 	private String qcUserName;
-	private String password;
+	private Secret password;
 	private String qcUrl;
 	private int timeOut;
 	private String uftRunnerPath;
@@ -65,6 +75,13 @@ public class BumblebeeGlobalConfig extends GlobalConfiguration {
 	 * Constructor.
 	 */
 	public BumblebeeGlobalConfig() {
+		this(new DefaultBumblebeeApiProvider(), DefaultCustomSecret.THE_INSTANCE, BUMBLEBEE_URL_VALIDATOR);
+	}
+
+	BumblebeeGlobalConfig(final BumblebeeApiProvider apiProvider, final CustomSecret secretHelper, final Validator<String, Integer> bumblebeeUrlValidator) {
+		this.apiProvider = apiProvider;
+		this.secretHelper = secretHelper;
+		this.bumblebeeUrlValidator = bumblebeeUrlValidator;
 		load();
 	}
 
@@ -80,7 +97,7 @@ public class BumblebeeGlobalConfig extends GlobalConfiguration {
 
 	public void populateBaseParameters(final BaseParameters params) {
 		params.setBumbleBeeUrl(this.getBumblebeeUrl());
-		params.setEncryptedPassword(this.getPassword());
+		params.setEncryptedPassword(this.getPasswordPlain());
 		params.setAlmUserName(this.getQcUserName());
 		params.setAlmUrl(this.getQcUrl());
 	}
@@ -91,7 +108,7 @@ public class BumblebeeGlobalConfig extends GlobalConfiguration {
 			@QueryParameter("bumblebeeUrl") final String bumblebeeUrl,
 			@QueryParameter("qcUrl") final String qcUrl,
 			@QueryParameter("qcUserName") final String qcUserName,
-			@QueryParameter("password") final String password,
+			@QueryParameter("password") final Secret password,
 			@QueryParameter("timeOut") final int timeOut,
 			@QueryParameter("uftRunnerPath") final String uftRunnerPath,
 			@QueryParameter("pcUrl") final String pcUrl,
@@ -108,7 +125,7 @@ public class BumblebeeGlobalConfig extends GlobalConfiguration {
 		try {
 			final List<FormValidation> validators = new ArrayList<>();
 			if (!skipConnectivityDiagnostic) {
-				validators.add(BUMBLEBEE_URL_VALIDATOR.validate(bumblebeeUrlTrimmed, timeOut));
+				validators.add(bumblebeeUrlValidator.validate(bumblebeeUrlTrimmed, (int) TimeUnit.MINUTES.toSeconds(timeOut)));
 			}
 			validators.addAll(Arrays.asList(
 					HpUserValidator.THE_INSTANCE.validate(userNameTrimmed, new HpUrls(qcUrl, pcUrl)),
@@ -117,7 +134,7 @@ public class BumblebeeGlobalConfig extends GlobalConfiguration {
 			if (FormValidation.Kind.ERROR == validation.kind) {
 				return validation;
 			}
-
+			setPassword(password, bumblebeeUrlTrimmed, timeOut, skipConnectivityDiagnostic, trustSelfSignedCerts);
 			this.bumblebeeUrl = bumblebeeUrlTrimmed;
 			this.uftRunnerPath = uftRunnerPathTrimmed;
 			this.qcUrl = qcUrlTrimmed;
@@ -127,14 +144,6 @@ public class BumblebeeGlobalConfig extends GlobalConfiguration {
 			this.pcTimeOut = pcTimeOut;
 			this.skipConnectivityDiagnostic = skipConnectivityDiagnostic;
 			this.trustSelfSignedCerts = trustSelfSignedCerts;
-
-			try (final BumblebeeApi bmapi = new BumblebeeApiImpl(this.bumblebeeUrl, this.timeOut, trustSelfSignedCerts)) {
-				// Set password only if old value is null/empty/blank OR if new
-				// value is not equal to old
-				if (StringUtils.isBlank(this.password) || !this.password.equals(password)) {
-					this.password = skipConnectivityDiagnostic ? StringUtils.trim(password) : bmapi.getEncryptedPassword(StringUtils.trim(password));
-				}
-			}
 			save();
 		} catch (final Exception e) {
 			LOGGER.log(Level.SEVERE, null, e);
@@ -155,8 +164,12 @@ public class BumblebeeGlobalConfig extends GlobalConfiguration {
 		return this.qcUrl;
 	}
 
-	public String getPassword() {
-		return this.password;
+	public Secret getPassword() {
+		return password;
+	}
+
+	public String getPasswordPlain() {
+		return secretHelper.getPlainText(password);
 	}
 
 	public int getTimeOut() {
@@ -208,6 +221,21 @@ public class BumblebeeGlobalConfig extends GlobalConfiguration {
 
 	public FormValidation doCheckSkipConnectivityDiagnostic(@QueryParameter final boolean skipConnectivityDiagnostic) {
 		return skipConnectivityDiagnostic ? FormValidation.warning(Messages.THE_INSTANCE.getWarningMessage(bumblebeeUrl)) : FormValidation.ok();
+	}
+
+	private void setPassword(final Secret newPassword, final String bumblebeeUrl, final int timeOutMinutes, final boolean skipConnectivityDiag,
+			final boolean trustSelfSignedCerts) throws Exception {
+		if (ObjectUtils.equals(this.password, newPassword)) {
+			return;
+		}
+		if (skipConnectivityDiag) {
+			this.password = newPassword;
+			return;
+		}
+
+		try (final BumblebeeApi bmapi = apiProvider.provide(bumblebeeUrl, (int) TimeUnit.MINUTES.toSeconds(timeOutMinutes), trustSelfSignedCerts)) {
+			this.password = secretHelper.getSecret(bmapi.getEncryptedPassword(secretHelper.getPlainText(newPassword)));
+		}
 	}
 
 }

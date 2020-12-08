@@ -28,7 +28,7 @@ public enum AddTestToSetParametersFactory {
 		params.setAlmUrl(globalConfig.getQcUrl());
 		params.setBumbleBeeUrl(globalConfig.getBumblebeeUrl());
 		params.setAlmUserName(globalConfig.getQcUserName());
-		params.setEncryptedPassword(globalConfig.getPassword());
+		params.setEncryptedPassword(globalConfig.getPasswordPlain());
 		params.setDomain(step.getDomain());
 		params.setProject(step.getProject());
 		params.setTestPlanPath(step.getTestPlanPath());

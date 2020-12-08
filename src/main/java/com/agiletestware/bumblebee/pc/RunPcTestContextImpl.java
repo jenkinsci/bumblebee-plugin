@@ -179,7 +179,7 @@ public class RunPcTestContextImpl implements RunPcTestContext, Serializable {
 
 		private String getEncryptedAlmPassword(final BumblebeeGlobalConfig globalConfig, final String almPasswordFromStep) throws Exception {
 			if (StringUtils.isEmpty(almPasswordFromStep)) {
-				return globalConfig.getPassword();
+				return globalConfig.getPasswordPlain();
 			}
 			final String bumblebeeUrl = globalConfig.getBumblebeeUrl();
 			if (StringUtils.isEmpty(bumblebeeUrl)) {

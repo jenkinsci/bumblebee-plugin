@@ -19,7 +19,7 @@ public enum DefaultGetTestResultsParametersFactory implements GetTestResultsPara
 		return GetTestResultsParametersImpl.builder(globalConfig.getBumblebeeUrl())
 				.almUrl(globalConfig.getQcUrl())
 				.almUser(getValueFromConfig(globalConfig.getQcUserName(), commonJobConfig.getUser()))
-				.almEncryptedPassword(getValueFromConfig(globalConfig.getPassword(), commonJobConfig.getPassword()))
+				.almEncryptedPassword(getValueFromConfig(globalConfig.getPasswordPlain(), commonJobConfig.getPassword()))
 				.almDomain(commonJobConfig.getDomain())
 				.almProject(commonJobConfig.getProject())
 				.testSetPath(jobConfig.getTestSetPath())

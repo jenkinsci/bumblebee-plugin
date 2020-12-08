@@ -29,4 +29,14 @@ public enum DefaultCustomSecret implements CustomSecret {
 		return secret.getPlainText();
 	}
 
+	@Override
+	public String getPlainText(final Secret encryptedPassword) {
+		return encryptedPassword != null ? encryptedPassword.getPlainText() : null;
+	}
+
+	@Override
+	public Secret getSecret(final String plainTextPassword) {
+		return plainTextPassword != null ? Secret.fromString(plainTextPassword) : null;
+	}
+
 }
