@@ -97,15 +97,15 @@ directly from Jenkins and view the results in both Jenkins and HP ALM.
 
  **Pre-Requisites for running HP ALM tests from Jenkins**
 
--   Job must run on the Jenkins slave installed on Windows machine
--   Jenkins slave must have launch method: Launch slave agents via Java
+-   Job must run on the Jenkins agent installed on Windows machine
+-   Jenkins agent must have launch method: Launch agent agents via Java
     Web Start
--   Jenkins slave must NOT run as windows service
+-   Jenkins agent must NOT run as windows service
 -   Appropriate version of HP ALM Connectivity Tool must be installed on
-    Jenkins slave machine. Tool is available at
+    Jenkins agent machine. Tool is available at
     *http://your\_alm\_server\_and\_port/qcbin/PlugIns/TDConnectivity/TDConnect.exe*
 -   Appropriate version of HP ALM Client must be installed on Jenkins
-    slave machine. Available
+    agent machine. Available
     at *http://your\_alm\_server\_and\_port/qcbin/start\_a.jsp?common=true*
 
 To run test set from Jenkins you need to
@@ -155,26 +155,26 @@ Jenkins and reports results back to Jenkins.
 ### Prerequisites
 
 -   Bumblebee server v4.1.0 or higher
--   Jenkins slave runs on Windows machine and have appropriate [HP
+-   Jenkins agent runs on Windows machine and have appropriate [HP
     Unified Functional
     Testing](https://saas.hpe.com/en-us/software/uft) version installed.
     Please see UFT requirements for a particular version of OS and other
     software.
--   Jenkins slave must run as a console application (not as a windows
+-   Jenkins agent must run as a console application (not as a windows
     service)
 -   UFT Batch Runner property of Global Configuration or UFT\_RUNNER
-    environment variable on slave must be set
+    environment variable on agent must be set
 
 To override path to UFT Batch Runner, defined in the Global
 Configuration, you need to set a UFT\_RUNNER environment variable on a
-Jenkins slave.
+Jenkins agent.
 
-To set a value to UFT\_RUNNER environment variable of Jenkins slave:
+To set a value to UFT\_RUNNER environment variable of Jenkins agent:
 
--   Open Jenkins slave configuration page
+-   Open Jenkins agent configuration page
 -   Check "Environment variables" checkbox
 -   Add a new variable and type "UFT\_RUNNER" as "Name" and path to UFT
-    Batch Runner on that slave as a "Value"
+    Batch Runner on that agent as a "Value"
 -   Click on "Save" button
 
   
