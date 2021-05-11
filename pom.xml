@@ -9,7 +9,7 @@
 	<artifactId>bumblebee</artifactId>
 	<version>4.1.8-SNAPSHOT</version>
 	<name>Bumblebee HP ALM Plugin</name>
-	<url>https://wiki.jenkins-ci.org/display/JENKINS/Bumblebee+HP+ALM+Plugin</url>
+	<url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
 	<developers>
 		<developer>
 			<id>ali</id>
