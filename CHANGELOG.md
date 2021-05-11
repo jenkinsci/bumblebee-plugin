@@ -1,6 +1,20 @@
 Changelog
 ===
 
+### Version 4.1.7 (released May, 2021) 
+
+-	Add support for UFT reports in native format
+
+### Version 4.1.6 (released December, 2020)
+
+-	Add support for Allure reports
+-	Fix for SECURITY-2156 - Encrypt all passwords (even encrypted by Bumblebee) with
+Jenkins Secret so they cannot be recovered from XML config file
+
+### Version 4.1.5 (released August, 2020)
+
+-	Add "HP ALM Auto Defect Management" feature
+
 ### Version 4.1.4 (released September, 2019)
 
 -   Add "Trust to self-signed certificats" checkbox
