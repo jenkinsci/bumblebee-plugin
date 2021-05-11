@@ -3,6 +3,8 @@
 
   
 Bumblebee Jenkins plugin allows seamless integration of Jenkins jobs and build test results with [Micro Focus ALM](https://www.microfocus.com/en-us/products/alm-quality-center/overview) (former HP ALM) 11, 12, 14, 15. The plugin processes jenkins build data and sends it to the Bumblebee server for processing. Bumblebee automatically creates TestPlan, TestLab, TestSet, and TestRuns in [Micro Focus ALM](https://www.microfocus.com/en-us/products/alm-quality-center/overview).  
+
+
 Bumblebee plugin is ideal for organizations who want to reflect the data from Jenkins into their Micro Focus ALM project. Organization use Bumblebee to show unit tests, Selenium test, Visual Studio tests, and various othertest frameworks that run in Jenkins into some Micro Focus ALM project. Bumblebee is a commercial product. For more details, please go to
 <http://www.agiletestware.com/bumblebee>
 
