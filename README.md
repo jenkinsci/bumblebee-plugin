@@ -83,8 +83,7 @@ parse, and insert test results in HP ALM.
 Please refer to [the documentation for
 details](https://www.agiletestware.com/docs/bumblebee-docs/en/latest/ci-integration/jenkins/#-export-tests-results)
 
-![](docs/images/jenkins-4.png){width="853"
-height="746"}
+![](docs/images/jenkins-4.png){width="853" height="746"}
 
 ## HP ALM Results
 
@@ -135,8 +134,7 @@ Here is an example of build log produced by Bumblebee:
 
   
 
-![](https://www.agiletestware.com/docs/bumblebee-docs/en/latest/img/ci_integration/jenkins-test-execute-2.png){width="1080"
-height="603"}
+![](https://www.agiletestware.com/docs/bumblebee-docs/en/latest/img/ci_integration/jenkins-test-execute-2.png){width="1080" height="603"}
 
  
 
