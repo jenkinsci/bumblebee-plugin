@@ -1,4 +1,8 @@
- 
+Bumblebee Jenkins Plugin
+===
+[![Jenkins Plugin](https://img.shields.io/jenkins/plugin/v/bumblebee.svg)](https://plugins.jenkins.io/bumblebee-plugin)
+[![Jenkins Plugin Installs](https://img.shields.io/jenkins/plugin/i/bumblebee.svg?color=blue)](https://plugins.jenkins.io/bumblebee-plugin)
+
 ![](docs/images/bumblebee_logo_home.png)
 
   
