@@ -2,23 +2,11 @@
 ![](docs/images/bumblebee_logo_home.png)
 
   
-Bumblebee Jenkins plugin allows seamless integration of Jenkins jobs and
-build test results with [HP
-ALM](https://saas.hpe.com/en-us/software/application-lifecycle-management)
-10, 11, 12. The plugin processes jenkins build data and sends it to the
-Bumblebee server for processing. Bumblebee automatically creates
-TestPlan, TestLab, TestSet, and TestRuns in [HP
-ALM](https://saas.hpe.com/en-us/software/application-lifecycle-management).  
-Bumblebee plugin is ideal for organizations who want to reflect the data
-from Jenkins into their HP ALM project. Organization use Bumblebee to
-show unit tests, Selenium test, Visual Studio tests, and various other
-test frameworks that run in Jenkins into some HP ALM project. Bumblebee
-is a commercial product. For more details, please go to
+Bumblebee Jenkins plugin allows seamless integration of Jenkins jobs and build test results with [Micro Focus ALM](https://www.microfocus.com/en-us/products/alm-quality-center/overview) (former HP ALM) 11, 12, 14, 15. The plugin processes jenkins build data and sends it to the Bumblebee server for processing. Bumblebee automatically creates TestPlan, TestLab, TestSet, and TestRuns in [Micro Focus ALM](https://www.microfocus.com/en-us/products/alm-quality-center/overview).  
+Bumblebee plugin is ideal for organizations who want to reflect the data from Jenkins into their Micro Focus ALM project. Organization use Bumblebee to show unit tests, Selenium test, Visual Studio tests, and various othertest frameworks that run in Jenkins into some Micro Focus ALM project. Bumblebee is a commercial product. For more details, please go to
 <http://www.agiletestware.com/bumblebee>
 
-| Plugin Information                                                                                     |
-|--------------------------------------------------------------------------------------------------------|
-| View Bumblebee HP ALM [on the plugin site](https://plugins.jenkins.io/bumblebee) for more information. |
+[Changelog](./CHANGELOG.md)
 
 Older versions of this plugin may not be safe to use. Please review the
 following warnings before using an older version:
@@ -28,9 +16,8 @@ following warnings before using an older version:
 -   [Credentials stored in plain
     text](https://www.jenkins.io/security/advisory/2021-01-13/#SECURITY-2156)
     
-[Changelog](./CHANGELOG.md)
 
-## Why use Bumblebee plugin for HP ALM
+## Why use Bumblebee plugin for Micro Focus ALM (former HP ALM)
 
 The Bumblebee Jenkins plugin provides the ability to
 
@@ -104,10 +91,10 @@ directly from Jenkins and view the results in both Jenkins and HP ALM.
 -   Jenkins agent must NOT run as windows service
 -   Appropriate version of HP ALM Connectivity Tool must be installed on
     Jenkins agent machine. Tool is available at
-    *http://your\_alm\_server\_and\_port/qcbin/PlugIns/TDConnectivity/TDConnect.exe*
+    `http://your_alm_server_and_port/qcbin/PlugIns/TDConnectivity/TDConnect.exe`
 -   Appropriate version of HP ALM Client must be installed on Jenkins
     agent machine. Available
-    at *http://your\_alm\_server\_and\_port/qcbin/start\_a.jsp?common=true*
+    at `http://your_alm_server_and_port/qcbin/start_a.jsp?common=true`
 
 To run test set from Jenkins you need to
 add `Bumblebee HP ALM Test Set Runner` build step to your build
@@ -146,18 +133,16 @@ using `Publish JUnit test result report` step
 
 ![](https://www.agiletestware.com/docs/bumblebee-docs/en/latest/img/ci_integration/jenkins-test-execute-3.png)
 
-## Running local HP UFT tests directly in Jenkins
+## Running local Micro Focus UFT tests directly in Jenkins
 
-Bumblebee allows you to run local [HP Unified Functional
-Testing](https://saas.hpe.com/en-us/software/uft) tests directly from
+Bumblebee allows you to run local [Micro Focus Unified Functional
+Testing](https://www.microfocus.com/en-us/products/uft-one/overview) tests directly from
 Jenkins and reports results back to Jenkins.
 
 ### Prerequisites
 
 -   Bumblebee server v4.1.0 or higher
--   Jenkins agent runs on Windows machine and have appropriate [HP
-    Unified Functional
-    Testing](https://saas.hpe.com/en-us/software/uft) version installed.
+-   Jenkins agent runs on Windows machine and have appropriate [Micro Focus Unified Functional Testing](https://www.microfocus.com/en-us/products/uft-one/overview) version installed.
     Please see UFT requirements for a particular version of OS and other
     software.
 -   Jenkins agent must run as a console application (not as a windows
@@ -245,19 +230,16 @@ After build has finished, artifacts are displayed on "Artifacts" tab:
 
 ![](https://www.agiletestware.com/docs/bumblebee-docs/en/latest/img/ci_integration/jenkins-uft-artifacts-2.png)
 
-## Running HP Performance Tests from Jenkins
+## Running Micro Focus Performance Tests from Jenkins
 
-> [HP Performance
-> Center](https://saas.hpe.com/en-us/software/performance-center) is a
+> [Micro Focus Performance Center](https://www.microfocus.com/en-us/products/loadrunner-enterprise/overview) is a
 > powerful set of tools for composing and running performance tests
 > which is used by many companies.
 >
 > Bumblebee offers Jenkins users ability to easy trigger Performance
 > Center tests and report results back to Jenkins.
 
-When the task starts it triggers a new test run in PC and then polls run
-status from time to time. When run reaches some terminal state or
-timeout is reached then task is finished.
+When the task starts it triggers a new test run in PC and then polls run status from time to time. When run reaches some terminal state or timeout is reached then task is finished.
 
 Terminal states are:
 
@@ -279,8 +261,7 @@ specified folder in the build working directory.
 
 ### Global configuration
 
-To start working with the new task the following [Bumblebee Global
-Settings](https://www.agiletestware.com/docs/bumblebee-docs/en/latest/ci-integration/jenkins/#configuration-of-global-settings) should
+To start working with the new task the following [Bumblebee Global Configuration](#bumblebee-global-configuration) should
 be set:
 
 -   Bumblebee URL - URL of Bumblebee server
@@ -294,9 +275,7 @@ be set:
 
 ### Adding and configuring of "Bumblebee HP PC Test Runner" task
 
-To add a new "Bumblebee HP PC Test Runner" build step, just add a new
-build step in Jenkins build configuration with name **"Bumblebee HP PC
-Test Runner"**.
+To add a new "Bumblebee HP PC Test Runner" build step, just add a new build step in Jenkins build configuration with name **"Bumblebee HP PC Test Runner"**.
 
 **"Bumblebee HP PC Test Runner"** build step has the following
 configuration parameters:
@@ -406,8 +385,4 @@ Results" step.
 
 ### Execution
 
-During the execution of "Bumblebee: Import HP ALM Test Results" test
-step, Bumblebee searches for a Test Set by path given in "Test Set Path"
-parameter, creates JUnit XML report file and puts it into "Results
-Directory" folder. This folder can be used by JUnit publisher to build
-test trends.
+During the execution of **Bumblebee: Import HP ALM Test Results** test step, Bumblebee searches for a Test Set by path given in **Test Set Path** parameter, creates JUnit XML report file and puts it into **Results Directory** folder. This folder can be used by JUnit publisher to build test trends.
