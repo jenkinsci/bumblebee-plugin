@@ -83,7 +83,7 @@ parse, and insert test results in HP ALM.
 Please refer to [the documentation for
 details](https://www.agiletestware.com/docs/bumblebee-docs/en/latest/ci-integration/jenkins/#-export-tests-results)
 
-![](docs/images/jenkins-4.png){width="853" height="746"}
+![](docs/images/jenkins-4.png)
 
 ## HP ALM Results
 
@@ -113,7 +113,7 @@ To run test set from Jenkins you need to
 add `Bumblebee HP ALM Test Set Runner` build step to your build
 configuration
 
- ![](https://www.agiletestware.com/docs/bumblebee-docs/en/latest/img/ci_integration/jenkins-test-execute-1.png){height="400"}
+ ![](https://www.agiletestware.com/docs/bumblebee-docs/en/latest/img/ci_integration/jenkins-test-execute-1.png)
 
 | Field                   | Description                                                                                                                                                                                                                                                                              |
 |-------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -134,7 +134,7 @@ Here is an example of build log produced by Bumblebee:
 
   
 
-![](https://www.agiletestware.com/docs/bumblebee-docs/en/latest/img/ci_integration/jenkins-test-execute-2.png){width="1080" height="603"}
+![](https://www.agiletestware.com/docs/bumblebee-docs/en/latest/img/ci_integration/jenkins-test-execute-2.png)
 
  
 
@@ -144,7 +144,7 @@ Bumblebee HP ALM Test Set Runner puts results of test execution as a
 simple JUnit report which can be then published
 using `Publish JUnit test result report` step
 
-![](https://www.agiletestware.com/docs/bumblebee-docs/en/latest/img/ci_integration/jenkins-test-execute-3.png){height="400"}
+![](https://www.agiletestware.com/docs/bumblebee-docs/en/latest/img/ci_integration/jenkins-test-execute-3.png)
 
 ## Running local HP UFT tests directly in Jenkins
 
@@ -224,7 +224,7 @@ runner and record its output:
 simple JUnit report which are then attached to the build report and can
 be seen on "Test Results" page:
 
-![](https://www.agiletestware.com/docs/bumblebee-docs/en/latest/img/ci_integration/jenkins-uft-junit-2.png){height="250"}
+![](https://www.agiletestware.com/docs/bumblebee-docs/en/latest/img/ci_integration/jenkins-uft-junit-2.png)
 
 For failed tests, report contains an error message reported by UFT:
 
@@ -402,7 +402,7 @@ Results" step.
 
   
 
-![](https://www.agiletestware.com/docs/bumblebee-docs/en/latest/img/ci_integration/jenkins-pull-results-config.png){height="250"}
+![](https://www.agiletestware.com/docs/bumblebee-docs/en/latest/img/ci_integration/jenkins-pull-results-config.png)
 
 ### Execution
 
