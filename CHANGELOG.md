@@ -1,5 +1,10 @@
 Changelog
+
 ===
+
+### Version 4.1.8 (released May, 2021) 
+
+-	Move documentation into GitHub
 
 ### Version 4.1.7 (released May, 2021) 
 
