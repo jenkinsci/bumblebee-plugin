@@ -1,7 +1,7 @@
 Changelog
 
 ===
-### Version 4.1.9 (released March, 2022) 
+### Version 4.1.9 (released March, 2023) 
 
 - Fix compatibility with the latest Jenkins versions running on Java 11+
 - Upgrade httpclient version to 4.5.13
